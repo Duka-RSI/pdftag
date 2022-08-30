@@ -1,0 +1,299 @@
+@Row: L3 L4 C2 FABRIC Self- Colour 1-  Recycled Memory Crinkle Solid 146  gsm Non-PFC DWR // FN30158DECI C1 - Colour 2-   Recycled Memory Crinkle Solid 146  gsm Non-PFC DWR // FN30158DECI C2 - Colour 3-   Recycled Memory Crinkle Solid 146  gsm Non-PFC DWR // FN30158DECI LINING L1-(waistband facing)- Recycled Memory Crinkle  Solid 146 gsm Non-PFC DWR // FN30158DECI L2-(hem facing)- Recycled Memory Crinkle Solid  146 gsm Non-PFC DWR // FN30158DECI L3-(POCKET BAGS) :Improved Pilling Ultra Light  Swift: F11R620QD L4-(CARD POCKET) : POWER MESH TRIMS (waistband elastic)  EL00445 – Stretch Thinner  Thread Elastic with Multifilament -  45mm  SK080883-045.0 (waist drawcord)   DC00059 - Non-Stretch Paracord  - 4mm // SRC04PL (waist toggle)  CO00026 - Metal Mini Toggle with  Two Holes - 5mm // #3593 (logo)   T00172 - 0.5mm Raised Matte Lulu Logo -  13mm LUF201408071 C1 S L1 L2  | @Row: DESIGNER:  CATHERINE LEBRUN DA: VICTORIA JAGO DEVELOPER: PAV PUNI DATE:  August 6, 2021  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | ----
+@Row:  | @Row:  | @Row:  | @Row:  | @Row:  |  | ----
+@Row:  | @Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  |  | @Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  |  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | @Row:  | @Row:  | @Row:  |  |  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  |  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | ----
+@Row:  |  | @Row: 12 13  | ----
+@Row:  | @Row:  | @Row:  | ----
+@Row:  |  | ----
+@Row:  | ----
+@Row:  |  | @Row:  |  | ----
+@Row:  |  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  |  | @Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | @Row:  | @Row:  | @Row:  |  |  | ----
+@Row: 12 13  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  |  |  |  |  |  |  |  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  |  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | ----
+@Row:  |  |  |  |  |  | ----
+@Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row: 2-5/8” 4” 3-1/2” 1/4”  bartack 1/4”  bartack opening has encased mobilon CARD POCKET - SLIDE IN WIDE TOP ANGLED ENTRY *SHOULD ALWAYS BE IN POWER MESH **HEM HEIGHT 1/2”, HEM EDGE ON FOLD placed on palm-side of pocket wearer’s right pkt 6 6  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  |  | ----
+@Row:  |  |  | ----
+@Row:  | ----
+@Row: 2-5/8”  | ----
+@Row:  | @Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | @Row:  | ----
+@Row:  |  | @Row:  | ----
+@Row:  | ----
+@Row:  |  | ----
+@Row:  | ----
+@Row:  | ----
+@Row:  | ----
+@Row: ing 3  | ----

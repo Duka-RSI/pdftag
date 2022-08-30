@@ -1,0 +1,123 @@
+2022/07/07 10:01:41  Thread:19  Login.btnLogin_Click(Object sender, EventArgs e) in c:\website\pdftag\Login.aspx.cs Line:31
+Login account=admin ,isLogin=True
+
+2022/07/07 10:07:55  Thread:27  Login.btnLogin_Click(Object sender, EventArgs e) in c:\website\pdftag\Login.aspx.cs Line:31
+Login account=admin ,isLogin=True
+
+2022/07/07 10:08:39  Thread:34  Login.btnLogin_Click(Object sender, EventArgs e) in c:\website\pdftag\Login.aspx.cs Line:31
+Login account=admin ,isLogin=True
+
+2022/07/07 10:11:07  Thread:32  Login.btnLogin_Click(Object sender, EventArgs e) in c:\website\pdftag\Login.aspx.cs Line:31
+Login account=admin ,isLogin=True
+
+2022/07/07 10:55:55  Thread:58  Login.btnLogin_Click(Object sender, EventArgs e) in c:\website\pdftag\Login.aspx.cs Line:31
+Login account=admin ,isLogin=True
+
+2022/07/07 11:15:17  Thread:53  Login.btnLogin_Click(Object sender, EventArgs e) in c:\website\pdftag\Login.aspx.cs Line:31
+Login account=admin ,isLogin=True
+
+2022/07/07 11:17:48  Thread:55  Login.btnLogin_Click(Object sender, EventArgs e) in c:\website\pdftag\Login.aspx.cs Line:31
+Login account=admin ,isLogin=True
+
+2022/07/07 11:29:35  Thread:53  Login.btnLogin_Click(Object sender, EventArgs e) in c:\website\pdftag\Login.aspx.cs Line:31
+Login account=admin ,isLogin=True
+
+2022/07/07 12:21:50  Thread:57  Login.btnLogin_Click(Object sender, EventArgs e) in c:\website\pdftag\Login.aspx.cs Line:31
+Login account=admin ,isLogin=True
+
+2022/07/07 12:34:24  Thread:47  Passport_Passport_A000.ParsePDF(String pipid) in c:\website\pdftag\PDFManage\PDF_Manage_001.aspx.cs Line:963
+type = fabric  self  | Front & back body panels  | 106-0423  | Approved with Limitation s  | Naturals Silverescent Spun Tencel Tech Jersey Solid 190gsm Wicking QD  | Brimadona Industrial Co. Ltd.  | 90  | 0  | 0.7730  | Yard  | $10.3660  | $8.0129  |  
+type = fabric  self  | neck facing & sleeves  | 106-0423  | Approved with Limitation s  | Naturals Silverescent Spun Tencel Tech Jersey Solid 190gsm Wicking QD  | Brimadona Industrial Co. Ltd.  | 90  | 0  | 0.7730  | Yard  | $10.3660  | $8.0129  |  
+type = fabric  contrast1  | underarm / side panels  | RT16121 99  | Approved with Limitation s  | Brushed Pique Mesh (Black Lycra)  | Eclat Textiles Co. Ltd.  | 80  | 0  | 0.2480  | Yard  | $6.6972  | $1.6609  |  
+type = fabric trim  
+type = trim   | THREAD  | FA85140  | Approved  | Seamsoft Protect tex 24  | Coats Plc  | 0  | 30  | 380.0000  | Yard  | $0.0014  | $0.5215  | DTM  
+type = trim   |  |  |  |  |  |  |  |  |  |  |  |  | ----
+type = trim   |  |  |  |  |  |  |  |  |  |  |  |  
+type = trim   | THREAD  | 5AC3140  | Approved  | GRAMAX PROTECT TEX 21  | Coats Plc  | 0  | 45  | 165.0000  | Yard  | $0.0009  | $0.1485  | DTM  
+type = trim   | THREAD  | 2A94180  | Approved  | EPIC PROTECT TEX 18  | Coats Plc  | 0  | 45  | 90.0000  | Yard  | $0.0010  | $0.0906  | DTM  
+type = trim   | REFLECT IVE SEAM TAPE @armhol e seams  | 5541 DREAM REFLECT IVE 1000 mm - Framis  | Approved  | 5541 DREAM REFLECTIVE FRAMIS 1000 mm - sheet  | FRAMIS ITALIA HK LTD  | 0  | 20  | 1.3000  | Yard  | $20.9515  | $27.2370  |  
+type = trim   | BONDED BACK NECK 10mm  | SRT5000- 6mil- 10mm  | Approved with Limitation s  | SRT5000- 6mil-10mm (Stretch Woven)  | Bemis  | 0  | 3  | 0.4000  | Yard  | $0.4100  | $0.1640  | Dark Shado w  | ----
+type = trim   | Mobilon  | QE1/4"M OBILON  | Approved  | 1/4" Clear Mobilon Elastic (factory- sourced)  | Factory Sourced  | 0  | 0  | 0.7000  | Each  | $0.0001  | $0.0001  | Clear  
+type = trim   | Bonding glue @ sleeve opening - 3914- 4mil-6mm  | 3914- 4mil- sheet 54"  | Approved  | 3914-4mil- sheet 54"  | Bemis  | 0  | 3  | 1.3000  | Yard  | $13.4200  | $17.4460  | Clear  
+type = trim   | Bonding glue @bottom hem  | 3914- 4mil- 10mm  | Approved  | 3914-4mil- 10mm  | Bemis  | 0  | 14  | 1.8000  | Yard  | $0.1170  | $0.2106  | Clear  
+type = trim   | EXTERIO R LOGO  | LUFK170 50169  | Approved  | TR00044A - 0.5mm Raised Color Reflective Mens Lumen Logo Heat Transfer ¡V 13x13mm  | E.Textint  | 0  | 40  | 1.0500  | Each  | $0.1200  | $0.1260  | Magnu m  
+type = trim   | INTERIO R LOGO CF Back neck  | LUFK180 80120  | Approved  | TR00070 - Robert Geller Flat Matte With Mens Lumen Logo Heat Transfer - 53.34mm x 24.13mm  | E.Textint  | 0  | 40  | 1.0500  | Each  | $0.2500  | $0.2625  | Magnu m  | ----
+type = labels  seeConstructionMa nual  | CB Waist Seam  | CC00035  | Approved  | CC00035- LLL- GARMENT- MENS  | Shanghai Jml Apparel Co. Ltd.  | 0  | 15  | 1.0500  | Each  | $0.0450  | $0.0473  | Black  
+type = labels packaging  
+type = packaging  seeQAManual  | pin on wears left back underarm gusset seam - English Only for USA / USA e- commerc e/ USA wholesale /Communi ty USA/ Middle east/ Australia/ Australia e- commerc e/ Mexico/E urope/Eur ope e- commerc e channels  | LHT- Geller- 1011  | In Developm ent  | LHT-Geller- 1011 Take The Moment Short Sleeve  | Avery/Paxar  | 0  | 0  | 1.0000  | Each  | $0.6384  | $0.6384  | Multi- Colour  
+type = packaging  seeQAManual  | pin on wears left back underarm gusset seam - Chinese for China Retail/ China T- Mall e- comm channels  | LHT- Geller- 1011EC  | Approved  | LHT-Geller- 1011EC Take The Moment Short Sleeve  | Avery/Paxar  | 0  | 0  | 1.0000  | Each  | $0.6384  | $0.6384  | Multi- Colour  | ----
+type = packaging  seeQAManual  | pin on wears left back underarm gusset seam - English/Fr ench for Canada/C anada e- commerc e/ Can communit y channels  | LHT- Geller- 1011EF  | In Developm ent  | LHT-Geller- 1011EF Take The Moment Short Sleeve  | Avery/Paxar  | 0  | 0  | 1.0000  | Each  | $0.6384  | $0.6384  | Multi- Colour  
+type = packaging  seeQAManual  | pin on wears left back underarm gusset seam - Korean/Ja panese/E nglish (HK DC to remove the not needed language) for Asia/Asia e- commerc e channels  | LHT- Geller- 1011EKJ  | Approved  | LHT-Geller- 1011EKJ Take The Moment Short Sleeve  | Avery/Paxar  | 0  | 0  | 1.0000  | Each  | $0.6384  | $0.6384  | Multi- Colour  
+type = packaging  seeQAManual  |  | LBarcode  | Approved  | Barcode Sticker  | Avery/Paxar  | 0  | 0  | 1.0300  | Each  | $0.0155  | $0.0160  | White  
+type = packaging  seeQAManual  | US, Canada and Australia Retail Sales channels  | ZLAMT72 00-B  | Approved  | HZLAMT720 0-B - Source Tag - Black Tag ** Please Also Spec Pin Hmj70- H**  | Tyco  | 0  | 0  | 1.0300  | Set  | $0.1130  | $0.1164  | Black  | ----
+type = packaging  seeQAManual  | US, Canada and Australia Retail Sales channels  | MJ70-H  | Approved  | HMJ70-H - Source Tag - Silver Pin ** Please Also Spec Tag Hzlamt7200- B**  | Tyco  | 0  | 0  | 1.0300  | Set  | $0.1130  | $0.1164  | Silver  
+type = packaging finishing  
+type = finishing   |  |  |  |  |  | 0  | 0  | 0.0000  |  | $0.0000  | $0.0000  |  
+type = finishing Total = $66.743  | ----
+
+
+2022/07/07 12:38:23  Thread:56  Passport_Passport_A000.ParsePDF(String pipid) in c:\website\pdftag\PDFManage\PDF_Manage_001.aspx.cs Line:978
+type = fabric  self  | Front & back body panels  | 106-0423  | Approved with Limitation s  | Naturals Silverescent Spun Tencel Tech Jersey Solid 190gsm Wicking QD  | Brimadona Industrial Co. Ltd.  | 90  | 0  | 0.7730  | Yard  | $10.3660  | $8.0129  |  
+type = fabric  self  | neck facing & sleeves  | 106-0423  | Approved with Limitation s  | Naturals Silverescent Spun Tencel Tech Jersey Solid 190gsm Wicking QD  | Brimadona Industrial Co. Ltd.  | 90  | 0  | 0.7730  | Yard  | $10.3660  | $8.0129  |  
+type = fabric  contrast1  | underarm / side panels  | RT16121 99  | Approved with Limitation s  | Brushed Pique Mesh (Black Lycra)  | Eclat Textiles Co. Ltd.  | 80  | 0  | 0.2480  | Yard  | $6.6972  | $1.6609  |  
+type = fabric trim  
+type = trim   | THREAD  | FA85140  | Approved  | Seamsoft Protect tex 24  | Coats Plc  | 0  | 30  | 380.0000  | Yard  | $0.0014  | $0.5215  | DTM  
+type = trim   |  |  |  |  |  |  |  |  |  |  |  |  | ----
+type = trim   |  |  |  |  |  |  |  |  |  |  |  |  
+type = trim   | THREAD  | 5AC3140  | Approved  | GRAMAX PROTECT TEX 21  | Coats Plc  | 0  | 45  | 165.0000  | Yard  | $0.0009  | $0.1485  | DTM  
+type = trim   | THREAD  | 2A94180  | Approved  | EPIC PROTECT TEX 18  | Coats Plc  | 0  | 45  | 90.0000  | Yard  | $0.0010  | $0.0906  | DTM  
+type = trim   | REFLECT IVE SEAM TAPE @armhol e seams  | 5541 DREAM REFLECT IVE 1000 mm - Framis  | Approved  | 5541 DREAM REFLECTIVE FRAMIS 1000 mm - sheet  | FRAMIS ITALIA HK LTD  | 0  | 20  | 1.3000  | Yard  | $20.9515  | $27.2370  |  
+type = trim   | BONDED BACK NECK 10mm  | SRT5000- 6mil- 10mm  | Approved with Limitation s  | SRT5000- 6mil-10mm (Stretch Woven)  | Bemis  | 0  | 3  | 0.4000  | Yard  | $0.4100  | $0.1640  | Dark Shado w  | ----
+type = trim   | Mobilon  | QE1/4"M OBILON  | Approved  | 1/4" Clear Mobilon Elastic (factory- sourced)  | Factory Sourced  | 0  | 0  | 0.7000  | Each  | $0.0001  | $0.0001  | Clear  
+type = trim   | Bonding glue @ sleeve opening - 3914- 4mil-6mm  | 3914- 4mil- sheet 54"  | Approved  | 3914-4mil- sheet 54"  | Bemis  | 0  | 3  | 1.3000  | Yard  | $13.4200  | $17.4460  | Clear  
+type = trim   | Bonding glue @bottom hem  | 3914- 4mil- 10mm  | Approved  | 3914-4mil- 10mm  | Bemis  | 0  | 14  | 1.8000  | Yard  | $0.1170  | $0.2106  | Clear  
+type = trim   | EXTERIO R LOGO  | LUFK170 50169  | Approved  | TR00044A - 0.5mm Raised Color Reflective Mens Lumen Logo Heat Transfer ¡V 13x13mm  | E.Textint  | 0  | 40  | 1.0500  | Each  | $0.1200  | $0.1260  | Magnu m  
+type = trim   | INTERIO R LOGO CF Back neck  | LUFK180 80120  | Approved  | TR00070 - Robert Geller Flat Matte With Mens Lumen Logo Heat Transfer - 53.34mm x 24.13mm  | E.Textint  | 0  | 40  | 1.0500  | Each  | $0.2500  | $0.2625  | Magnu m  | ----
+type = labels  seeConstructionMa nual  | CB Waist Seam  | CC00035  | Approved  | CC00035- LLL- GARMENT- MENS  | Shanghai Jml Apparel Co. Ltd.  | 0  | 15  | 1.0500  | Each  | $0.0450  | $0.0473  | Black  
+type = labels packaging  
+type = packaging  seeQAManual  | pin on wears left back underarm gusset seam - English Only for USA / USA e- commerc e/ USA wholesale /Communi ty USA/ Middle east/ Australia/ Australia e- commerc e/ Mexico/E urope/Eur ope e- commerc e channels  | LHT- Geller- 1011  | In Developm ent  | LHT-Geller- 1011 Take The Moment Short Sleeve  | Avery/Paxar  | 0  | 0  | 1.0000  | Each  | $0.6384  | $0.6384  | Multi- Colour  
+type = packaging  seeQAManual  | pin on wears left back underarm gusset seam - Chinese for China Retail/ China T- Mall e- comm channels  | LHT- Geller- 1011EC  | Approved  | LHT-Geller- 1011EC Take The Moment Short Sleeve  | Avery/Paxar  | 0  | 0  | 1.0000  | Each  | $0.6384  | $0.6384  | Multi- Colour  | ----
+type = packaging  seeQAManual  | pin on wears left back underarm gusset seam - English/Fr ench for Canada/C anada e- commerc e/ Can communit y channels  | LHT- Geller- 1011EF  | In Developm ent  | LHT-Geller- 1011EF Take The Moment Short Sleeve  | Avery/Paxar  | 0  | 0  | 1.0000  | Each  | $0.6384  | $0.6384  | Multi- Colour  
+type = packaging  seeQAManual  | pin on wears left back underarm gusset seam - Korean/Ja panese/E nglish (HK DC to remove the not needed language) for Asia/Asia e- commerc e channels  | LHT- Geller- 1011EKJ  | Approved  | LHT-Geller- 1011EKJ Take The Moment Short Sleeve  | Avery/Paxar  | 0  | 0  | 1.0000  | Each  | $0.6384  | $0.6384  | Multi- Colour  
+type = packaging  seeQAManual  |  | LBarcode  | Approved  | Barcode Sticker  | Avery/Paxar  | 0  | 0  | 1.0300  | Each  | $0.0155  | $0.0160  | White  
+type = packaging  seeQAManual  | US, Canada and Australia Retail Sales channels  | ZLAMT72 00-B  | Approved  | HZLAMT720 0-B - Source Tag - Black Tag ** Please Also Spec Pin Hmj70- H**  | Tyco  | 0  | 0  | 1.0300  | Set  | $0.1130  | $0.1164  | Black  | ----
+type = packaging  seeQAManual  | US, Canada and Australia Retail Sales channels  | MJ70-H  | Approved  | HMJ70-H - Source Tag - Silver Pin ** Please Also Spec Tag Hzlamt7200- B**  | Tyco  | 0  | 0  | 1.0300  | Set  | $0.1130  | $0.1164  | Silver  
+type = packaging finishing  
+type = finishing   |  |  |  |  |  | 0  | 0  | 0.0000  |  | $0.0000  | $0.0000  |  
+type = finishing Total = $66.743  | ----
+
+
+2022/07/07 12:49:59  Thread:38  Passport_Passport_A000.ParsePDF(String pipid) in c:\website\pdftag\PDFManage\PDF_Manage_001.aspx.cs Line:996
+type = fabric  self  | Front & back body panels  | 106-0423  | Approved with Limitation s  | Naturals Silverescent Spun Tencel Tech Jersey Solid 190gsm Wicking QD  | Brimadona Industrial Co. Ltd.  | 90  | 0  | 0.7730  | Yard  | $10.3660  | $8.0129  |  
+type = fabric  self  | neck facing & sleeves  | 106-0423  | Approved with Limitation s  | Naturals Silverescent Spun Tencel Tech Jersey Solid 190gsm Wicking QD  | Brimadona Industrial Co. Ltd.  | 90  | 0  | 0.7730  | Yard  | $10.3660  | $8.0129  |  
+type = fabric  contrast1  | underarm / side panels  | RT16121 99  | Approved with Limitation s  | Brushed Pique Mesh (Black Lycra)  | Eclat Textiles Co. Ltd.  | 80  | 0  | 0.2480  | Yard  | $6.6972  | $1.6609  |  
+type = fabric trim  
+type = trim   | THREAD  | FA85140  | Approved  | Seamsoft Protect tex 24  | Coats Plc  | 0  | 30  | 380.0000  | Yard  | $0.0014  | $0.5215  | DTM  
+type = trim   |  |  |  |  |  |  |  |  |  |  |  |  | ----
+type = trim   |  |  |  |  |  |  |  |  |  |  |  |  
+type = trim   | THREAD  | 5AC3140  | Approved  | GRAMAX PROTECT TEX 21  | Coats Plc  | 0  | 45  | 165.0000  | Yard  | $0.0009  | $0.1485  | DTM  
+type = trim   | THREAD  | 2A94180  | Approved  | EPIC PROTECT TEX 18  | Coats Plc  | 0  | 45  | 90.0000  | Yard  | $0.0010  | $0.0906  | DTM  
+type = trim   | REFLECT IVE SEAM TAPE @armhol e seams  | 5541 DREAM REFLECT IVE 1000 mm - Framis  | Approved  | 5541 DREAM REFLECTIVE FRAMIS 1000 mm - sheet  | FRAMIS ITALIA HK LTD  | 0  | 20  | 1.3000  | Yard  | $20.9515  | $27.2370  |  
+type = trim   | BONDED BACK NECK 10mm  | SRT5000- 6mil- 10mm  | Approved with Limitation s  | SRT5000- 6mil-10mm (Stretch Woven)  | Bemis  | 0  | 3  | 0.4000  | Yard  | $0.4100  | $0.1640  | Dark Shado w  | ----
+type = trim   | Mobilon  | QE1/4"M OBILON  | Approved  | 1/4" Clear Mobilon Elastic (factory- sourced)  | Factory Sourced  | 0  | 0  | 0.7000  | Each  | $0.0001  | $0.0001  | Clear  
+type = trim   | Bonding glue @ sleeve opening - 3914- 4mil-6mm  | 3914- 4mil- sheet 54"  | Approved  | 3914-4mil- sheet 54"  | Bemis  | 0  | 3  | 1.3000  | Yard  | $13.4200  | $17.4460  | Clear  
+type = trim   | Bonding glue @bottom hem  | 3914- 4mil- 10mm  | Approved  | 3914-4mil- 10mm  | Bemis  | 0  | 14  | 1.8000  | Yard  | $0.1170  | $0.2106  | Clear  
+type = trim   | EXTERIO R LOGO  | LUFK170 50169  | Approved  | TR00044A - 0.5mm Raised Color Reflective Mens Lumen Logo Heat Transfer ¡V 13x13mm  | E.Textint  | 0  | 40  | 1.0500  | Each  | $0.1200  | $0.1260  | Magnu m  
+type = trim   | INTERIO R LOGO CF Back neck  | LUFK180 80120  | Approved  | TR00070 - Robert Geller Flat Matte With Mens Lumen Logo Heat Transfer - 53.34mm x 24.13mm  | E.Textint  | 0  | 40  | 1.0500  | Each  | $0.2500  | $0.2625  | Magnu m  | ----
+type = labels  seeConstructionMa nual  | CB Waist Seam  | CC00035  | Approved  | CC00035- LLL- GARMENT- MENS  | Shanghai Jml Apparel Co. Ltd.  | 0  | 15  | 1.0500  | Each  | $0.0450  | $0.0473  | Black  
+type = labels packaging  
+type = packaging  seeQAManual  | pin on wears left back underarm gusset seam - English Only for USA / USA e- commerc e/ USA wholesale /Communi ty USA/ Middle east/ Australia/ Australia e- commerc e/ Mexico/E urope/Eur ope e- commerc e channels  | LHT- Geller- 1011  | In Developm ent  | LHT-Geller- 1011 Take The Moment Short Sleeve  | Avery/Paxar  | 0  | 0  | 1.0000  | Each  | $0.6384  | $0.6384  | Multi- Colour  
+type = packaging  seeQAManual  | pin on wears left back underarm gusset seam - Chinese for China Retail/ China T- Mall e- comm channels  | LHT- Geller- 1011EC  | Approved  | LHT-Geller- 1011EC Take The Moment Short Sleeve  | Avery/Paxar  | 0  | 0  | 1.0000  | Each  | $0.6384  | $0.6384  | Multi- Colour  | ----
+type = packaging  seeQAManual  | pin on wears left back underarm gusset seam - English/Fr ench for Canada/C anada e- commerc e/ Can communit y channels  | LHT- Geller- 1011EF  | In Developm ent  | LHT-Geller- 1011EF Take The Moment Short Sleeve  | Avery/Paxar  | 0  | 0  | 1.0000  | Each  | $0.6384  | $0.6384  | Multi- Colour  
+type = packaging  seeQAManual  | pin on wears left back underarm gusset seam - Korean/Ja panese/E nglish (HK DC to remove the not needed language) for Asia/Asia e- commerc e channels  | LHT- Geller- 1011EKJ  | Approved  | LHT-Geller- 1011EKJ Take The Moment Short Sleeve  | Avery/Paxar  | 0  | 0  | 1.0000  | Each  | $0.6384  | $0.6384  | Multi- Colour  
+type = packaging  seeQAManual  |  | LBarcode  | Approved  | Barcode Sticker  | Avery/Paxar  | 0  | 0  | 1.0300  | Each  | $0.0155  | $0.0160  | White  
+type = packaging  seeQAManual  | US, Canada and Australia Retail Sales channels  | ZLAMT72 00-B  | Approved  | HZLAMT720 0-B - Source Tag - Black Tag ** Please Also Spec Pin Hmj70- H**  | Tyco  | 0  | 0  | 1.0300  | Set  | $0.1130  | $0.1164  | Black  | ----
+type = packaging  seeQAManual  | US, Canada and Australia Retail Sales channels  | MJ70-H  | Approved  | HMJ70-H - Source Tag - Silver Pin ** Please Also Spec Tag Hzlamt7200- B**  | Tyco  | 0  | 0  | 1.0300  | Set  | $0.1130  | $0.1164  | Silver  
+type = packaging finishing  
+type = finishing   |  |  |  |  |  | 0  | 0  | 0.0000  |  | $0.0000  | $0.0000  |  
+type = finishing Total = $66.743  | ----
+
+
+2022/07/07 13:45:56  Thread:6  Login.btnLogin_Click(Object sender, EventArgs e) in c:\website\pdftag\Login.aspx.cs Line:31
+Login account=admin ,isLogin=True
+

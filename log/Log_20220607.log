@@ -1,0 +1,31 @@
+2022/06/07 09:40:44  Thread:8  Login.btnLogin_Click(Object sender, EventArgs e) in c:\website\pdftag\Login.aspx.cs Line:31
+Login account=admin ,isLogin=True
+
+2022/06/07 09:45:36  Thread:21  Passport_Passport_A000.ParsePDF(String pipid) in c:\website\pdftag\PDFManage\PDF_Manage_001.aspx.cs Line:685
+type = fabric  self  | body, waistband , front pocket bags  | RT19110 55  | Approved with Limitation s  | Nulu 1.5 Black Lycra With Wet Print  | Eclat Textiles Co. Ltd.  | 83  | 0  | 1.2700  | Yard  | $12.7800  | $16.2306  | Heritag e 365 Camo Deep Coal Multi  
+type = fabric  lining1  | CB pocket bag  | R204030 99  | Approved  | Coolmax  | Eclat Textiles Co. Ltd.  | 63  | 0  | 0.0500  | Yard  | $2.8900  | $0.1445  | Black  
+type = fabric  lining2  | media pocket  | DN92- DA-1  | Approved  | Power mesh wider width 146gsm  | Yu Yuang Textile Co., Ltd  | 55  | 0  | 0.0010  | Yard  | $3.1300  | $0.0031  | Black  
+type = fabric trim  
+type = trim  seeQAManual  | Needle 607, 605 & 602  | 5H43140  | Approved  | GRAMAX HL TEX 21  | Coats PLC  | 0  | 45  | 1.0000  | Yard  | $0.0007  | $0.0007  | DTM  
+type = trim  seeQAManual  | Looper 607  | F7A5140  | Approved  | Seamsoft AS,Tex 24, tkt 140  | Coats PLC  | 0  | 45  | 1.0000  | Yard  | $0.0014  | $0.0014  | DTM  
+type = trim  seeQAManual  | Looper 605, 602 & Spreader 602 & Serge 605  | F7A5120  | Approved  | Seamsoft AS Tex 16  | Coats PLC  | 0  | 45  | 1.0000  | Yard  | $0.0010  | $0.0010  | DTM  
+type = trim  seeQAManual  | Spreader 607 & 605  | 03A3120  | Approved  | ELOFLEX AS Tex 27 Ticket 120  | Coats Plc  | 0  | 60  | 1.0000  | Yard  | $0.0034  | $0.0034  | DTM  | ----
+type = trim  seeQAManual  |  | 2994180  | Approved  | Epic Tex 18, Ticket 180 Thread  | Coats Plc  | 0  | 45  | 1.0000  | Yard  | $0.0007  | $0.0007  | DTM  
+type = trim  seeTechnicalSketc h  | back waistband  | EFLEXR UBBER- 9MMx0.8 MM  | Approved  | EFlexRubber - Flex Rubber Elastic - 0.8mm X 9mm  | Fratelli Leoni Srl  | 0  | 15  | 0.6500  | Yard  | $0.0338  | $0.0220  | Black  
+type = trim  seeTechnicalSketc h  | pocket openings  | QE1/4"M OBILON  | Approved  | 1/4" Clear Mobilon Elastic (factory- sourced)  | Factory Sourced  | 0  | 0  | 0.2500  | Yard  | $0.0001  | $0.0000  | Clear  
+type = trim  seeTechnicalSketc h  |  | LUF2014 08067  | Approved with Limitation s  | T00185N - Silver Reflective Lulu Logo, Hero Quality - 13mm (Effective SU15 and Onwards)  | E. Textint  | 0  | 40  | 1.0000  | Each  | $0.0670  | $0.0670  | Silver  
+type = trim   | Pocket reinforce ment  | Freeform - SRT5000 LLLCP98- 25mm x 25mm Stock Colors - Solid Circle  | Approved  | Freeform - SRT5000 LLLCP98- 25mm x 25mm Stock Colors - Solid Circle  | Bemis  | 0  | 22  | 1.0000  | Each  | $0.0570  | $0.0570  | Cool Grey - PANTO NE 428C  
+type = trim labels  
+type = labels  seeQAManual  |  | CC00001- AD  | Approved  | CC00001- LLL- GARMENT  | Avery/Paxar  | 0  | 15  | 1.0000  | Each  | $0.0370  | $0.0370  | White  | ----
+type = labels  seeTechnicalSketc h  |  | TRACE00 001  | Approved  | TRACE00001 - Size and Traceability Label  | Avery/Paxar  | 0  | 14  | 1.0000  | Each  | $0.0300  | $0.0300  | White/ Grey  
+type = labels packaging  
+type = packaging  seeQAManual  |  | ZLAMT72 00R-B  | Approved  | HZLAMT720 0R-B - Source Tag - Black Tag ** Please Also Spec Pin Hmj70-H**  | Tyco  | 0  | 0  | 1.0000  | Each  | $0.0803  | $0.0803  | Black  
+type = packaging  seeQAManual  |  | MJ70-H  | Approved  | HMJ70-H - Source Tag - Silver Pin ** Please Also Spec Tag Hzlamt7200R -B**  | Tyco  | 0  | 0  | 1.0000  | Each  | $0.0227  | $0.0227  | Silver  
+type = packaging  seeQAManual  |  | LWWMT Barcode  | Approved  | WWMT Barcode Sticker  | Avery/Paxar  | 0  | 0  | 1.0000  | Each  | $0.0987  | $0.0987  | White  | ----
+type = packaging  seeQAManual  |  | LHT- WWMT- 001  | Approved  | LHT - lululemon WWMT Hangtag - White  | Avery/Paxar  | 0  | 14  | 1.0000  | Each  | $0.0369  | $0.0369  | White  
+type = packaging  seeQAManual  |  | HTT1002- ST-2IN  | Approved  | Hangtag Trim - Swiftach Fastener - 2inch  | Factory Sourced  | 0  | 0  | 1.0000  | Each  | $0.0000  | $0.0000  | White  
+type = packaging finishing  
+type = finishing   |  |  |  |  |  | 0  | 0  | 0.0000  |  | $0.0000  | $0.0000  |  
+type = finishing Total = $16.837  | ----
+
+

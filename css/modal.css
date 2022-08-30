@@ -1,0 +1,37 @@
+.modal-body dl {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+}
+
+.modal-body dl dt {
+  margin-right: 20px;
+}
+
+.modal-body dl dt img {
+  width: 100%;
+  height: auto;
+}
+
+.modal-body dl dd {
+  width: 65%;
+  text-align: left;
+}
+
+@media screen and (max-width: 480px) {
+  .modal-body dl {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+  }
+  .modal-body dl dt {
+    margin-right: 0px;
+    margin-bottom: 20px;
+  }
+}
+/*# sourceMappingURL=modal.css.map */

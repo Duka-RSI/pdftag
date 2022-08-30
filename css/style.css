@@ -1,0 +1,207 @@
+* {
+    font-family: '微軟正黑體';
+    margin: 0;
+    padding: 0;
+}
+
+ul,
+li {
+    margin: 0;
+    padding: 0;
+}
+
+#login a,
+#register a {
+    text-decoration: none;
+    transition: all .5s;
+}
+
+#login a:hover,
+#register a:hover {
+    color: #FA7800 !important;
+}
+
+img.bg {
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.carousel-item:nth-child(1) img.bg {
+    background-position: center -144px;
+}
+
+#back2Top {
+    display: inline-block;
+    height: 40px;
+    width: 40px;
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    text-align: center;
+    color: #fff;
+    line-height: 40px;
+    background: rgba(232, 98, 86, 0.8);
+    visibility: hidden;
+    opacity: 0;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+#back2Top.cd-is-visible {
+    visibility: visible;
+    opacity: 1;
+}
+
+footer {
+    background-color: #333;
+    padding-bottom: 3rem;
+    margin-top: 3rem;
+}
+
+footer .text-grey {
+    color: #d0d0d0;
+}
+
+/* 0614 依 word 需求更新 覆蓋原本 css */
+.carousel-item {
+    height: 23rem;
+}
+
+.carousel {
+    margin-bottom: 3rem;
+}
+
+.container.marketing {
+    max-width: 1420px;
+}
+
+.btn-group-vertical {
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.btn-group-vertical .btn {
+    text-align: left;
+    font-size: 1.1rem;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    background-color: cadetblue;
+    border-color: #fff !important;
+    color: white !important;
+}
+
+.btn-group-vertical .btn:hover,
+.btn-group-vertical .btn.active {
+    background-color: darkcyan !important;
+}
+
+.container.marketing>.row>.col {
+    display: none;
+}
+
+.container.marketing>.row>.col.active,
+.container.marketing.index>.row>.col {
+    display: block;
+}
+
+.modal-body table th {
+    background-color: #f5e8dc
+}
+
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 
+@media screen and (orientation: portrait) {
+    html {
+        width: 100vmin;
+        height: 100vmax;
+    }
+
+    body {
+        width: 100vmin;
+        height: 100vmax;
+    }
+
+    #gyroContain {
+        width: 100vmax;
+        height: 100vmin;
+        transform-origin: top left;
+        transform: rotate(90deg) translate(0, -100vmin);
+    }
+}
+
+@media screen and (orientation: landscape) {
+    html {
+        width: 100vmax;
+        height: 100vmin;
+    }
+
+    body {
+        width: 100vmax;
+        height: 100vmin;
+    }
+
+    #gyroContain {
+        width: 100vmax;
+        height: 100vmin;
+    }
+} */
+
+#multi-item-slider{
+  position: relative;
+}
+
+#multi-item-slider .card-body{
+  text-align: center;
+  color: #fff;
+  background-color: #138496;
+  padding: 0.8rem;
+}
+
+#multi-item-slider .card-body h4{
+ margin-bottom: 0;
+}
+
+#multi-item-slider .carousel-control-prev-icon,
+#multi-item-slider .carousel-control-next-icon {
+  height: 100px;
+  width: 100px;
+  outline: #117a8b;
+  background-size: 100%, 100%;
+  border-radius: 50%;
+  border: 1px solid #117a8b;
+  background-image: none;
+}
+
+#multi-item-slider .carousel-control-next{
+    right: -183px;
+}
+
+#multi-item-slider .carousel-control-next-icon:after
+{
+  content: '>';
+  font-size: 55px;
+  color: #138496;
+}
+
+#multi-item-slider .carousel-control-prev{
+    left: -183px;
+}
+
+#multi-item-slider .carousel-control-prev-icon:after {
+  content: '<';
+  font-size: 55px;
+  color: #138496;
+}
+
+#multi-item-slider .carousel-item{
+  height: auto;   
+}

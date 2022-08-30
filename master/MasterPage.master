@@ -1,0 +1,90 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPage.master.cs"
+    Inherits="MasterPage" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>信源企業股份有限公司</title>
+    <link rel="stylesheet" href="../css/icofont.min.css" type="text/css" />
+    <link rel="stylesheet" href="../css/login.css" type="text/css">
+	 <link rel="stylesheet" href="../css/index.css" type="text/css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+    </script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+    </script>
+    <script type="text/javascript" src="<%=Request.ApplicationPath %>/js/script.js"></script>
+    
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+    <script type="text/javascript" language="javascript"></script>
+</head>
+<body>
+    <form id="form2" runat="server">
+        <header>
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top">
+          <div class="container"> 
+            <a id="logo" class="navbar-brand" href="Login.aspx">
+                <img src="./img/205104_logo.jpg" alt="" srcset="" width="150" height="auto">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">                
+                  <ul class="navbar-nav mr-auto  ml-auto">
+                      
+                  </ul>
+                
+                <div id="tool">
+                  <%--<div id="lang" class="form-inline mt-2 mt-md-0">
+                      ▶&nbsp;<a href="#">繁中</a>｜<a href="#">簡中</a>｜<a href="#">EN</a>
+                  </div>--%>
+                  <div id="login" class="form-inline mt-2 mt-md-0 active">
+                      <a href="Login.aspx">會員登入</a>
+                  </div>
+                </div>                
+            </div></div>
+        </nav>
+    </header>
+        <main role="main">
+        <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+        </asp:ContentPlaceHolder>
+        <div id="contact-us-box" class="container">
+            <h2 class="mb-3 main-color">
+                聯絡我們
+            </h2>
+            <div class="d-flex mt-md-5 mt-3 content">
+                <div class="mr-5">
+                    <h5>成為合作夥伴</h5>
+                    <p>
+                        Office:+886-2-2791-7456<br/>                            
+                        
+                    </p>
+					 <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.1140266047396!2d121.58298341500692!3d25.064124083958298!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3442ac802bde34b7%3A0x6546df197839b97d!2zMTE05Y-w5YyX5biC5YWn5rmW5Y2A6KGM5ZaE6LevNDU26Jmf!5e0!3m2!1szh-TW!2stw!4v1630992669335!5m2!1szh-TW!2stw"
+                        width="600" height="450"  frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+                </div>
+                <div>
+                    
+                </div>
+            </div>
+        </div>
+    </main>
+        <!-- FOOTER -->
+         <footer class="text-center">
+        <div class="container position-relative">
+            <div>Copyright © by Reliable Source Industrial Co., Ltd.</div>
+           
+        </div>
+       
+    </footer>
+    </form>
+</body>
+</html>

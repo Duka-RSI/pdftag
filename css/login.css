@@ -1,0 +1,249 @@
+﻿@charset "UTF-8";
+@import url("./bootstrap.min.css");
+@font-face {
+  font-family: "AdobeMingStd";
+  src: url("./../fonts/AdobeMingStd-Light.otf") format("opentype");
+  font-weight: lighter;
+}
+
+@font-face {
+  font-family: "Arial-bold";
+  src: url("./../fonts/Arial Bold.ttf") format("truetype");
+  font-weight: bold;
+}
+
+.main-color {
+  color: #0087A6;
+}
+
+.secondary-color {
+  color: #4C4948;
+}
+
+.bg-main-color {
+  background-color: #0087A6;
+}
+
+h1, h2, h3, h4, h5 {
+  font-weight: bold;
+  font-family: '微軟正黑體';
+}
+
+h1 {
+  font-size: 50px;
+}
+
+h2 {
+  font-size: 35px;
+}
+
+* {
+  font-family: Arial, '微軟正黑體', 'AdobeMingStd';
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+img.bg {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+body {
+  padding-top: 97px;
+}
+
+
+
+@media screen and (max-width: 480px) {
+  h1 {
+    font-size: 26px;
+  }
+  h2 {
+    font-size: 17px;
+  }
+ 
+    padding-top: 3rem;
+  }
+ 
+}
+
+/* Nav */
+.navbar {
+  height: 97px;
+  background: #fff;
+}
+
+.navbar a:hover {
+  color: #575757 !important;
+}
+
+.navbar.navbar-dark .navbar-nav .nav-link, .navbar.navbar-dark .navbar-nav .active > .nav-link {
+  color: #717071;
+}
+
+.navbar.navbar-dark .navbar-nav .active {
+  border-bottom: 3px solid #0087A6;
+}
+
+.navbar.navbar-dark .navbar-nav .active > .nav-link {
+  color: #0087A6;
+}
+
+#login a,
+#lang a {
+  text-decoration: none;
+  -webkit-transition: all .5s;
+  transition: all .5s;
+  color: #717071;
+}
+
+#tool {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -ms-flex-line-pack: center;
+      align-content: center;
+  height: 65px;
+}
+
+#tool #login a {
+  border: 1px solid #717071;
+  border-top-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+  width: 134px;
+  line-height: 1.9;
+  text-align: center;
+}
+
+#tool #login.active a {
+  border-width: 0;
+  background-color: #0087A6;
+  color: #fff !important;
+}
+
+#tool #login.active a:hover {
+  color: #fff !important;
+}
+
+@media screen and (max-width: 480px) {
+  .navbar-toggler {
+    background: #ddd;
+  }
+  #navbarCollapse {
+    background-color: #ddd;
+    padding: 10px 20px 30px;
+    width: 100vw !important;
+    position: absolute;
+    left: 0;
+    top: 96px;
+  }
+}
+
+#banner {
+  background-color: #CFD0D0;
+  width: 100%;
+}
+
+#banner #banner-title-box {
+  width: 80%;
+  height: 50px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  margin: 0 auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  background-color: rgba(0, 135, 166, 0.8);
+  color: white;
+}
+
+#banner #banner-title-box article {
+  width: 66%;
+}
+
+#accordion {
+  margin-bottom: 2rem;
+}
+
+#main-content ul {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -ms-flex-line-pack: distribute;
+      align-content: space-around;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  overflow: hidden;
+}
+
+#main-content ul li {
+  width: calc(100% / 4);
+  margin-bottom: 1rem;
+}
+
+#main-content ul li .card {
+  margin: 0 7.5px;
+  cursor: pointer;
+}
+
+
+@media screen and (max-width: 480px) {
+  #banner {
+    height: auto;
+    background-size: cover;
+  }
+  #banner #banner-title-box {
+    padding: 35px 0;
+    width: 90%;
+  }
+  #banner #banner-title-box article {
+    width: 70vw;
+  }
+  #banner #banner-title-box article #caption {
+    margin-bottom: 30px;
+  }
+  #banner #banner-title-box article #caption h1 {
+    font-size: 28px;
+  }
+  #accordion .btn.btn-link, #accordion .list-group-item-action {
+    text-align: center;
+    width: 100%;
+  }
+  #main-content ul li {
+    width: 100%;
+  }
+  #main-content ul li .card {
+    margin: 0;
+  }
+  #main-content table {
+    min-width: 100%;
+  }
+}
+/*# sourceMappingURL=login.css.map */

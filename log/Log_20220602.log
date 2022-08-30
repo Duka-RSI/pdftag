@@ -1,0 +1,6 @@
+2022/06/02 11:03:14  Thread:30  Login.btnLogin_Click(Object sender, EventArgs e) in c:\website\pdftag\Login.aspx.cs Line:31
+Login account=admin ,isLogin=True
+
+2022/06/02 15:47:22  Thread:27  Login.btnLogin_Click(Object sender, EventArgs e) in c:\website\pdftag\Login.aspx.cs Line:31
+Login account=admin ,isLogin=True
+

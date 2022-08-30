@@ -1,0 +1,171 @@
+@import url('./bootstrap.min.css');
+
+@font-face {
+    font-family: "AdobeMingStd";
+    src:url('./../fonts/AdobeMingStd-Light.otf') format('opentype');
+    font-weight: lighter;
+}
+
+@font-face {
+    font-family: "Arial-bold";
+    src: url('./../fonts/Arial Bold.ttf') format('truetype');
+    font-weight: bold;
+}
+
+$nav-link-color: #303030;
+$main-color: #0087A6;
+$secondary-color: #4C4948;
+
+* {
+    // font-family: '微軟正黑體';
+    // font: 1vw/1.1 Arial, '微軟正黑體', 'AdobeMingStd';
+    font-size: 1vw;
+    line-height: 1.4;
+    font-family: Arial, '微軟正黑體', 'AdobeMingStd';
+    margin: 0;
+    padding: 0;
+}
+
+ul,
+li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+img.bg {
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.main-color{
+    color:$main-color;
+}
+
+.secondary-color{
+    color: $secondary-color;
+}
+
+.bg-main-color{
+    background-color:$main-color;
+}
+
+
+h1, h2, h3, h4, h5{
+    font-weight: bold;
+    font-family: '微軟正黑體';
+}
+
+h1{
+    font-size: 50px;
+}
+
+h2{
+    font-size: 35px;
+}
+
+   
+body {
+    padding-top: 97px;
+}
+
+#wrapper{
+    width: 1920px;
+    margin: 0 auto;
+    border: 1px solid #000;
+}
+
+/* contact-us */
+#contact-us-box{
+    margin: auto;
+    .content{
+        justify-content: space-between;
+        color: $secondary-color;
+        h5{
+            margin-bottom: 15px;
+        }
+        P{
+            letter-spacing: 1.5px;
+            font-family: "微軟正黑體";
+        }
+    }
+    .bi.bi-envelope{
+      margin-bottom: -3px;
+    }
+}
+
+footer {
+    background-color: #fff;
+    padding-top: 9rem;
+    padding-bottom: 3rem;
+    color: $secondary-color;
+    #footer-logo{
+        position: absolute;
+        top: -110px;
+        right: 0;
+        width: 160px;
+        img{
+            width: 100%;
+            height: auto;
+        }
+    }
+}
+
+footer .text-grey {
+    color: #d0d0d0;
+}
+
+@media screen and (max-width: 480px){
+    * {
+        font-size: 13.5px;
+    }
+
+    h1{
+        font-size: 26px;
+    }
+    
+    h2{
+        font-size: 17px;
+    }
+
+    /* contact-us */
+    #contact-us-box{
+      width: 100%;
+      padding: 0 25px;
+      h2{
+        font-size: 26px;
+      }
+      h5{
+        font-size: 15px;
+      }
+      .content{
+        flex-direction: column;
+        p{
+          font-size: 13px;
+        }
+      }
+    }
+    
+    footer {
+        padding-top: 3rem;
+        .container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column-reverse;
+            #footer-logo{
+                position: static;
+                img {
+                    width: 71%;
+                    height: auto;
+                }
+            }
+        }
+    }
+
+    #wrapper{
+        width: auto;
+    }
+    
+}
