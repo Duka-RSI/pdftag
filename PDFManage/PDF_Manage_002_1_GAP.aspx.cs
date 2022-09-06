@@ -124,9 +124,11 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                 string style = dt.Rows[0]["style"].ToString();
                 string styledesc = dt.Rows[0]["styledesc"].ToString();
                 string productsize = dt.Rows[0]["productsize"].ToString();
+                string ProductDescription = dt.Rows[0]["ProductDescription"].ToString();
                 string brand = dt.Rows[0]["brand"].ToString();
                 string dividion = dt.Rows[0]["dividion"].ToString();
                 string pod = dt.Rows[0]["pod"].ToString();
+                string strClass = dt.Rows[0]["class"].ToString();
                 string stylestatus = dt.Rows[0]["stylestatus"].ToString();
                 string generateddate = dt.Rows[0]["generateddate"].ToString();
                 bool isEditHeader = (dt.Rows[0]["isEdit"].ToString().ToLower() == "true" ? true : false);
@@ -159,10 +161,9 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                 sb.Append(" <th scope='col'>Season</th>");
                 sb.Append(" <th scope='col'>Style</th>");
                 sb.Append(" <th scope='col'>Style Desc</th>");
-                sb.Append(" <th scope='col'>Product Size</th>");
+                sb.Append(" <th scope='col'>Product Description</th>");
                 sb.Append(" <th scope='col'>Brand</th>");
-                sb.Append(" <th scope='col'>Dividion</th>");
-                sb.Append(" <th scope='col'>Pod</th>");
+                sb.Append(" <th scope='col'>Class</th>");
                 sb.Append(" <th scope='col'>Style Status</th>");
                 sb.Append(" <th scope='col'>Generated Date</th>");
                 sb.Append(" <th scope='col'></th>");
@@ -171,10 +172,9 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                 sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='Season' onclick='editHeader(this)'>" + season + "</td>");
                 sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='style' onclick='editHeader(this)'>" + style + "</td>");
                 sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='styledesc' onclick='editHeader(this)'>" + styledesc + "</td>");
-                sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='productsize' onclick='editHeader(this)'>" + productsize + "</td>");
+                sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='productdescription' onclick='editHeader(this)'>" + ProductDescription + "</td>");
                 sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='brand' onclick='editHeader(this)'>" + brand + "</td>");
-                sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='dividion' onclick='editHeader(this)'>" + dividion + "</td>");
-                sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='pod' onclick='editHeader(this)'>" + pod + "</td>");
+                sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='class' onclick='editHeader(this)'>" + strClass + "</td>");
                 sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='stylestatus' onclick='editHeader(this)'>" + stylestatus + "</td>");
                 sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='generateddate' onclick='editHeader(this)'>" + generateddate + "</td>");
 
@@ -252,8 +252,8 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                     sb.Append("<table class='table table-hover'>");
                     sb.Append("<tr>");
                     sb.Append(" <th scope='col'>Standard Placement</th>");
-                    sb.Append(" <th scope='col'>Supplier Article</th>");
-                    sb.Append(" <th scope='col'>Supplier</th>");
+                    sb.Append(" <th scope='col'>Placement</th>");
+                    sb.Append(" <th scope='col'>Supplier / Supplier Article</th>");;
 
                     sSql = "select * \n";
                     sSql += "from PDFTAG.dbo.GAP_BOMGarmentcolor a              \n";
@@ -303,10 +303,13 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
                         string standardPlacement = drBom["StandardPlacement"].ToString();
                         //string placement = drBom["Placement"].ToString();
+                        string usage = drBom["Usage"].ToString();
                         string supplierArticle = drBom["SupplierArticle"].ToString();
                         //bool IsMappingSupplierArticle = (drBom["IsMappingSupplierArticle"].ToString().ToLower() == "true" ? true : false);
                         bool IsMappingSupplierArticle = false;
                         string supplier = drBom["Supplier"].ToString();
+
+                        
 
                         string PARTS_TYPE = drBom["PARTS_TYPE"].ToString();
                         string PARTS_CODE = drBom["PARTS_CODE"].ToString();
@@ -349,8 +352,9 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                         iSeq++;
                         sb.Append("<tr data-rowid='" + drBom["rowid"].ToString() + "' id='row" + iSeq + "'>");
                         sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='StandardPlacement' onclick='editBom(this)'>" + standardPlacement + "</td>");
+                        sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' " + parts + " data-col='usage' onclick='editBom(this)'>" + usage + "</td>");
                         sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' " + parts + " data-col='SupplierArticle' onclick='editBom(this)'>" + supplierArticle + "</td>");
-                        sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='Supplier' onclick='editBom(this)'>" + supplier + "</td>");
+                      
 
                         for (int i = 1; i <= iColorCnt; i++)
                         {

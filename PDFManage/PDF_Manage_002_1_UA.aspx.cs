@@ -124,6 +124,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                 string style = dt.Rows[0]["style"].ToString();
                 string styledesc = dt.Rows[0]["styledesc"].ToString();
                 string productsize = dt.Rows[0]["productsize"].ToString();
+                string productfamily = dt.Rows[0]["class"].ToString();
                 string brand = dt.Rows[0]["brand"].ToString();
                 string dividion = dt.Rows[0]["dividion"].ToString();
                 string pod = dt.Rows[0]["pod"].ToString();
@@ -145,11 +146,12 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                         style = Compare(drOrgHeader["style"].ToString(), style, FilterNote(arrNotes, luhid, "style"));
                         styledesc = Compare(drOrgHeader["styledesc"].ToString(), styledesc, FilterNote(arrNotes, luhid, "styledesc"));
                         productsize = Compare(drOrgHeader["productsize"].ToString(), productsize, FilterNote(arrNotes, luhid, "productsize"));
-                        brand = Compare(drOrgHeader["brand"].ToString(), brand, FilterNote(arrNotes, luhid, "brand"));
-                        dividion = Compare(drOrgHeader["dividion"].ToString(), dividion, FilterNote(arrNotes, luhid, "dividion"));
-                        pod = Compare(drOrgHeader["pod"].ToString(), pod, FilterNote(arrNotes, luhid, "pod"));
+                        productfamily = Compare(drOrgHeader["class"].ToString(), productfamily, FilterNote(arrNotes, luhid, "productfamily"));
+                        //brand = Compare(drOrgHeader["brand"].ToString(), brand, FilterNote(arrNotes, luhid, "brand"));
+                        //dividion = Compare(drOrgHeader["dividion"].ToString(), dividion, FilterNote(arrNotes, luhid, "dividion"));
+                        //pod = Compare(drOrgHeader["pod"].ToString(), pod, FilterNote(arrNotes, luhid, "pod"));
                         stylestatus = Compare(drOrgHeader["stylestatus"].ToString(), stylestatus, FilterNote(arrNotes, luhid, "stylestatus"));
-                        generateddate = Compare(drOrgHeader["generateddate"].ToString(), generateddate, FilterNote(arrNotes, luhid, "generateddate"));
+                        //generateddate = Compare(drOrgHeader["generateddate"].ToString(), generateddate, FilterNote(arrNotes, luhid, "generateddate"));
                     }
 
                 }
@@ -160,11 +162,8 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                 sb.Append(" <th scope='col'>Style</th>");
                 sb.Append(" <th scope='col'>Style Desc</th>");
                 sb.Append(" <th scope='col'>Product Size</th>");
-                sb.Append(" <th scope='col'>Brand</th>");
-                sb.Append(" <th scope='col'>Dividion</th>");
-                sb.Append(" <th scope='col'>Pod</th>");
+                sb.Append(" <th scope='col'>Product Family</th>");
                 sb.Append(" <th scope='col'>Style Status</th>");
-                sb.Append(" <th scope='col'>Generated Date</th>");
                 sb.Append(" <th scope='col'></th>");
                 sb.Append("</tr>");
                 sb.Append("<tr id='row" + iSeq + "'>");
@@ -172,11 +171,8 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                 sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='style' onclick='editHeader(this)'>" + style + "</td>");
                 sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='styledesc' onclick='editHeader(this)'>" + styledesc + "</td>");
                 sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='productsize' onclick='editHeader(this)'>" + productsize + "</td>");
-                sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='brand' onclick='editHeader(this)'>" + brand + "</td>");
-                sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='dividion' onclick='editHeader(this)'>" + dividion + "</td>");
-                sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='pod' onclick='editHeader(this)'>" + pod + "</td>");
+                sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='class' onclick='editHeader(this)'>" + productfamily + "</td>");
                 sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='stylestatus' onclick='editHeader(this)'>" + stylestatus + "</td>");
-                sb.Append(" <td scope='col'  data-luhid='" + luhid + "' data-org_luhid='" + org_luhid + "'data-col='generateddate' onclick='editHeader(this)'>" + generateddate + "</td>");
 
                 sb.Append(" <td scope='col'>");
                 sb.Append("   <input typ='button' class='btn btn-danger btn-sm' value='整筆刪除' onclick='deleteHeader(" + luhid + "," + iSeq + ")' />");
@@ -252,6 +248,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                     sb.Append("<table class='table table-hover'>");
                     sb.Append("<tr>");
                     sb.Append(" <th scope='col'>Standard Placement</th>");
+                    sb.Append(" <th scope='col'>Usage</th>");
                     sb.Append(" <th scope='col'>Supplier Article</th>");
                     sb.Append(" <th scope='col'>Supplier</th>");
 
@@ -302,6 +299,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                         bool isEdit = (drBom["isEdit"].ToString().ToLower() == "true" ? true : false);
 
                         string standardPlacement = drBom["StandardPlacement"].ToString();
+                        string usage = drBom["Usage"].ToString();
                         string supplierArticle = drBom["SupplierArticle"].ToString();
                         //bool IsMappingSupplierArticle = (drBom["IsMappingSupplierArticle"].ToString().ToLower() == "true" ? true : false);
                         bool IsMappingSupplierArticle = false;
@@ -323,6 +321,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                                 DataRow drOrgBom = drOrgBoms[0];
 
                                 standardPlacement = Compare(drOrgBom["StandardPlacement"].ToString(), standardPlacement, FilterNote(arrNotes, lubid, "StandardPlacement"));
+                                usage = Compare(drOrgBom["usage"].ToString(), usage, FilterNote(arrNotes, lubid, "usage"));
                                 supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"), IsMappingSupplierArticle);
                                 supplier = Compare(drOrgBom["supplier"].ToString(), supplier, FilterNote(arrNotes, lubid, "supplier"));
                             }
@@ -348,6 +347,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                         iSeq++;
                         sb.Append("<tr data-rowid='" + drBom["rowid"].ToString() + "' id='row" + iSeq + "'>");
                         sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='StandardPlacement' onclick='editBom(this)'>" + standardPlacement + "</td>");
+                        sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' " + parts + " data-col='usage' onclick='editBom(this)'>" + usage + "</td>");
                         sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' " + parts + " data-col='SupplierArticle' onclick='editBom(this)'>" + supplierArticle + "</td>");
                         sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='Supplier' onclick='editBom(this)'>" + supplier + "</td>");
 

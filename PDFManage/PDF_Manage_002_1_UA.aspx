@@ -190,13 +190,13 @@
             $('#rowCompareColor').hide();
 
             objTd = $(td);
-            saveUrl = "Lu_Header.ashx?fun=saveByCol"
+            saveUrl = "UA_Header.ashx?fun=saveByCol"
             saveId = $(td).attr('data-luhid');
             saveCol = $(td).attr('data-col');
             isSaveRecord = false;
 
 
-            orgUrl = "Lu_Header.ashx?fun=get_org"
+            orgUrl = "UA_Header.ashx?fun=get_org"
             orgId = $(td).attr('data-org_luhid');
 
             getOrgTest();
@@ -210,7 +210,7 @@
             //$('#editText').val(text);
 
             objTd = $(td);
-            saveUrl = "Lu_BOM.ashx?fun=saveByCol"
+            saveUrl = "UA_BOM.ashx?fun=saveByCol"
             saveId = $(td).attr('data-lubid');
             saveCol = $(td).attr('data-col');
             saveColorCol = "";
@@ -237,7 +237,7 @@
                 
             }
 
-            orgUrl = "Lu_BOM.ashx?fun=get_org"
+            orgUrl = "UA_BOM.ashx?fun=get_org"
             orgId = $(td).attr('data-org_lubid');
             getOrgTest();
             getChNote("lubid");
@@ -260,12 +260,12 @@
             $('#rowCompareColor').hide();
 
             objTd = $(td);
-            saveUrl = "Lu_SizeTable.ashx?fun=saveByCol"
+            saveUrl = "UA_SizeTable.ashx?fun=saveByCol"
             saveId = $(td).attr('data-lustid');
             saveCol = $(td).attr('data-col');
             isSaveRecord = false;
 
-            orgUrl = "Lu_SizeTable.ashx?fun=get_org"
+            orgUrl = "UA_SizeTable.ashx?fun=get_org"
             orgId = $(td).attr('data-org_lustid');
 
             getOrgTest();
@@ -328,7 +328,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "Lu_Ch_Note.ashx?fun=get",
+                url: "UA_Ch_Note.ashx?fun=get",
                 data: data,
                 dataType: 'json',
                 success: function (res) {
@@ -355,7 +355,7 @@
             let text = $('#editText').val();
             let note = $('#noteText').val();
 
-            //Lu_BOM
+            //UA_BOM
             let PARTS_TYPE = $('#dlPARTS_TYPE').val();
             let PARTS_CODE = $('#dlPARTS_CODE').val();
             let PARTS_DESC = $('#dlPARTS_DESC').val();
@@ -435,7 +435,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: "Lu_Header.ashx?fun=delete",
+                    url: "UA_Header.ashx?fun=delete",
                     data: data,
                     dataType: 'json',
                     success: function (res) {
@@ -469,7 +469,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: "Lu_BOM.ashx?fun=delete",
+                    url: "UA_BOM.ashx?fun=delete",
                     data: data,
                     dataType: 'json',
                     success: function (res) {
@@ -504,7 +504,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: "Lu_SizeTable.ashx?fun=delete",
+                    url: "UA_SizeTable.ashx?fun=delete",
                     data: data,
                     dataType: 'json',
                     success: function (res) {
@@ -539,7 +539,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "Lu_Header.ashx?fun=copy",
+                url: "UA_Header.ashx?fun=copy",
                 data: data,
                 dataType: 'json',
                 success: function (res) {
@@ -571,7 +571,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "Lu_BOM.ashx?fun=copy",
+                url: "UA_BOM.ashx?fun=copy",
                 data: data,
                 dataType: 'json',
                 success: function (res) {
@@ -603,7 +603,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "Lu_SizeTable.ashx?fun=copy",
+                url: "UA_SizeTable.ashx?fun=copy",
                 data: data,
                 dataType: 'json',
                 success: function (res) {
