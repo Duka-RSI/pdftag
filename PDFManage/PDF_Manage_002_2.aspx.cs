@@ -1805,24 +1805,35 @@ order by a.pidate,a.pipid";
                                                 catch (Exception) { }
                                                 try
                                                 {
-                                                    otherHeaderCompare = tmpSizetable["H" + i].ToString();
-                                                    otherValueCompare = tmpSizetable["A" + i].ToString();
+                                                    int tmpCompare = 0;
+                                                    for (int tmp = 1; tmp <= 15; tmp++)
+                                                    {
+                                                        otherHeaderCompare = tmpSizetable["H" + tmp].ToString();
+                                                        if (otherHeaderCompare == otherHeader)
+                                                        {
+                                                            tmpCompare = tmp;
+                                                            break;
+                                                        }
+                                                    }
+                                                    otherHeaderCompare = tmpSizetable["H" + tmpCompare].ToString();
+                                                    otherValueCompare = tmpSizetable["A" + tmpCompare].ToString();
                                                     //otherHeaderCompare = drCompareSizeTables[s]["H" + i].ToString();
                                                     //otherValueCompare = drCompareSizeTables[s]["A" + i].ToString();
-                                                    otherNoteCompare = FilterNote(arrNotesCompare, lustid_compare, "A" + i);
+                                                    otherNoteCompare = FilterNote(arrNotesCompare, lustid_compare, "A" + tmpCompare);
                                                 }
                                                 catch (Exception) { }
 
                                                 if (header == otherHeaderCompare)
                                                 {
                                                     double d = 0;
+
                                                     if (otherValue.Contains("/") && Double.TryParse(otherValue.Split('/')[1], out d)) otherValue = otherValue.Replace(" ", "-");
                                                     if (otherValueCompare.Contains("/") && Double.TryParse(otherValueCompare.Split('/')[1], out d)) otherValueCompare = otherValueCompare.Replace(" ", "-");
 
                                                     string other = Compare(sType, otherValue, otherValueCompare, otherNoteCompare);
 
-
                                                     sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='A" + i + "' >" + other + "</td>");
+                                                    
                                                     isFind = true;
                                                     break;
                                                 }
