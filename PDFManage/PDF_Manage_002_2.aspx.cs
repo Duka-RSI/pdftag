@@ -935,6 +935,7 @@ order by a.pidate,a.pipid";
 
                 List<string> arrExistTypes_notCompare = new List<string>();
                 List<Lu_Bom> arrNotCompareData = new List<Lu_Bom>();
+                StringBuilder sbNotExit_header = new StringBuilder();
                 StringBuilder sbNotExit_itemtype = new StringBuilder();
                 StringBuilder sbNotExit_table = new StringBuilder();
                 StringBuilder sbNotExit_tablebody = new StringBuilder();
@@ -1062,7 +1063,7 @@ order by a.pidate,a.pipid";
                 #endregion
 
                 #region  資料列
-                sbNotExit.Append("<h4>資料列</h4>");
+                sbNotExit_header.Append("<h4>資料列</h4>");
                 arrExistTypes_notCompare = new List<string>();
                 foreach (var itemType in arrTypes_notCompare)
                 {
@@ -1330,6 +1331,11 @@ order by a.pidate,a.pipid";
                     {
                         sbNotExit_itemtype.Clear();
                     }
+                    if (sbNotExit_itemtype.Length == 0)
+                    {
+                        sbNotExit_header.Clear();
+                    }
+                    sbNotExit.Append(sbNotExit_header.ToString());
                     sbNotExit.Append(sbNotExit_itemtype.ToString());
                     sbNotExit.Append(sbNotExit_table.ToString());
                     sbNotExit_itemtype.Clear();
