@@ -128,18 +128,18 @@
                                         <asp:LinkButton ID="LinkButton2" CommandName="del" CommandArgument='<%# Eval("pipid")%>'
                                             runat="server" OnClientClick="return confirm('是否要刪除 ?');"><input type="button" value="刪除" class="btn btn-danger"></asp:LinkButton>
 
-                                          <span <%# (int)Eval("pver")==1?"":"style='display:none'"%>>
+                                          <span <%# ((int)Eval("pver")==1 && string.IsNullOrEmpty(Eval("mdate").ToString()))?"":"style='display:none'"%>>
                                         <asp:LinkButton ID="LinkButton1" CommandName="parsePDF" CommandArgument='<%# Eval("pipid")%>'
                                             runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>
                                               </span>
 
-                                           <span <%# (int)Eval("pver")==2?"":"style='display:none'"%>>
+                                           <span <%# ((int)Eval("pver")==2 && string.IsNullOrEmpty(Eval("mdate").ToString()))?"":"style='display:none'"%>>
                                          <%--<a href="#" onclick="showExecuteGAP('<%# Eval("pipid")%>');return false;"><input type="button" value="執行" class="btn btn-secondary"></a>--%>
                                             <asp:LinkButton ID="LinkButton4" CommandName="parsePDF_UA" CommandArgument='<%# Eval("pipid")%>'
                                             runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>
                                             </span>
 
-                                        <span <%# (int)Eval("pver")==3?"":"style='display:none'"%>>
+                                        <span <%# ((int)Eval("pver")==3 && string.IsNullOrEmpty(Eval("mdate").ToString()))?"":"style='display:none'"%>>
                                          <%--<a href="#" onclick="showExecuteGAP('<%# Eval("pipid")%>');return false;"><input type="button" value="執行" class="btn btn-secondary"></a>--%>
                                             <asp:LinkButton ID="LinkButton3" CommandName="parsePDF_GAP" CommandArgument='<%# Eval("pipid")%>'
                                             runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>
