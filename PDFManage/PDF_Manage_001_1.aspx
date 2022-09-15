@@ -42,10 +42,7 @@
                         </div>
                         <div class="col">
                             <asp:Button ID="btnQuery" runat="server" Text="查詢" CssClass="btn btn-secondary" OnClick="btnQuery_Click" />
-
-                            <% if (LoginUser.role == LoginUser.ROLE_ADMIN) {%>
                             <button type="button" class="btn btn-secondary" onclick="showAdd();">新增</button>
-                            <%} %>
                         </div>
                     </div>
 
