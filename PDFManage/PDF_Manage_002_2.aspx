@@ -76,7 +76,8 @@
                         </div>--%>
                         <div class="col">
                             <%-- <asp:Button ID="Button1" runat="server" Text="執行" CssClass="btn btn-warning" OnClick="btnQuery_Click" OnClientClick="return onQuery()" />--%>
-                            <input type="button" value="執行" class="btn btn-warning" onclick="onQuery()" />
+                            <%--<input type="button" value="執行" class="btn btn-warning" onclick="onQuery()" />--%>
+                            <asp:Button ID="Button1" runat="server" Text="執行" CssClass="btn btn-warning" OnClick="btnQuery_Click" OnClientClick="return onQuery2()" />
                         </div>
                     </div>
                 </th>
@@ -86,6 +87,7 @@
                     <font color="red">紅色部分為差異(比對來源)</font><br>
                      1.來源文件 與 比對目的 都有的欄位 ，欄位底色顯示 <font color="#00FFFF">水藍色</font><br>
                      2.來源文件 有的欄位，但 比對目的 沒有的欄位，欄位底色顯示 <font color="#FF9224">橘色</font><br>
+                     3.尺寸表只比對全段尺寸表<br>
                     <br>
                     <input type="button" value="比對結果" onclick="onShow(1)" id="btnSwitch1" class="btnActive"/>
                     <input type="button" value="目的文件沒被比對到的資料" id="btnSwitch2" onclick="onShow(2)"/>

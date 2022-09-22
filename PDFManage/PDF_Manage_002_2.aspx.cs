@@ -1064,6 +1064,7 @@ order by a.pidate,a.pipid";
 
                 #region  資料列
                 sbNotExit_header.Append("<h4>資料列</h4>");
+                bool headerFlag = true;
                 arrExistTypes_notCompare = new List<string>();
                 foreach (var itemType in arrTypes_notCompare)
                 {
@@ -1335,7 +1336,7 @@ order by a.pidate,a.pipid";
                     {
                         sbNotExit_header.Clear();
                     }
-                    sbNotExit.Append(sbNotExit_header.ToString());
+                    if (headerFlag && sbNotExit_header.Length > 0) { sbNotExit.Append(sbNotExit_header.ToString()); headerFlag = false; }
                     sbNotExit.Append(sbNotExit_itemtype.ToString());
                     sbNotExit.Append(sbNotExit_table.ToString());
                     sbNotExit_itemtype.Clear();
@@ -1348,816 +1349,689 @@ order by a.pidate,a.pipid";
 
                 #endregion
 
-                #region Lu_SizeTable
-                //沒有勾尺寸表的話就不用跑這段
-                if (hid_Source_lusthid.Value.Replace(",", "") != "" || hid_Compare_lusthid.Value.Replace(",", "") != "")
+                #region Lu_SizeTable                
+                List<string> listSourceSizeTableHeader = new List<string>();       //來源的尺寸
+                List<string> listCompareSizeTableHeader = new List<string>();    //目的的尺寸
+                //List<string> listSizeTableHeader = new List<string>();
+
+                //撈出全部的尺寸表
+                sSql = @"select a.*,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15
+                    from PDFTAG.dbo.Lu_SizeTable a
+                    join  PDFTAG.dbo.Lu_SizeTable_Header b on a.lusthid=b.lusthid
+                    where 1=1
+                    and a.luhid =@luhid
+                    --and a.lusthid in ('" + hid_Source_lusthid.Value.Replace(",", "','") + @"')--直接全抓
+                    and trim(H1) <> 'Requested'     --排除樣品尺寸表
+                    order by lusthid,rowid asc ";
+                Response.Write("<!--" + sSql + "-->");
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                cm.Parameters.AddWithValue("@luhid", luhid);
+                dt = new DataTable();
+                using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
                 {
-                    
-                    sSql = "select a.*,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15 \n";
-                    sSql += "from PDFTAG.dbo.Lu_SizeTable a              \n";
-                    sSql += "join  PDFTAG.dbo.Lu_SizeTable_Header b on a.lusthid=b.lusthid               \n";
-                    sSql += " where 1=1   \n";
-                    sSql += " and a.luhid =@luhid   \n";
-                    sSql += " and a.lusthid in ('" + hid_Source_lusthid.Value.Replace(",", "','") + "')   \n";
-                    sSql += " order by lusthid,rowid asc    \n";
+                    da.Fill(dt);
+                }
+
+                //這邊找出有幾頁，並撈出樣衣尺寸
+                var arr_lusthids = dt.AsEnumerable().Select(s => s.Field<long>("lusthid")).Distinct().OrderBy(o => o).ToList();
+
+                Dictionary<string, List<string>> dicHeardersSource = new Dictionary<string, List<string>>();
+                //List<string> arrHeardersSource = new List<string>();
+
+                for (int h = 0; h < arr_lusthids.Count; h++)
+                {
+                    string lusthid = arr_lusthids[h].ToString();
+                    List<string> tmpSize = new List<string>();
+                       
+                    sSql = @"select *
+                        from PDFTAG.dbo.Lu_SizeTable_Header a
+                        where a.lusthid in ('" + lusthid + "') ";
+                    cm.CommandText = sSql;
+                    DataTable dtLu_SizeTable_Header = new DataTable();
+                    using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                    {
+                        da.Fill(dtLu_SizeTable_Header);
+                    }
+                    for (int i = 1; i <= 15; i++)
+                    {
+                        string sH = dtLu_SizeTable_Header.Rows[0]["H" + i].ToString();
+                        if (string.IsNullOrEmpty(sH)) { dicHeardersSource.Add(lusthid, tmpSize); break; }
+                        if (!tmpSize.Contains(sH)) { tmpSize.Add(sH); listSourceSizeTableHeader.Add(sH); }
+                        //if(!arrHeardersSource.Contains(sH)) arrHeardersSource.Add(sH);
+                    }
+                }
+
+                //撈出全部的尺寸表
+                sSql = @"select a.*,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15
+                    from PDFTAG.dbo.Lu_SizeTable a
+                    join  PDFTAG.dbo.Lu_SizeTable_Header b on a.lusthid=b.lusthid
+                    where 1=1
+                    and a.luhid =@luhid
+                    --and a.lusthid in ('" + hid_Compare_lusthid.Value.Replace(",", "','") + @"')
+                    and trim(H1) <> 'Requested'     --排除樣品尺寸表
+                    order by lusthid,rowid asc ";
+
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                cm.Parameters.AddWithValue("@luhid", compare_luhid);
+                dtCompare = new DataTable();
+                DataTable getSizeTable = new DataTable();
+                using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                {
+                    da.Fill(dtCompare);
+                    //複製一份Compare的，比對時找codeid的第一筆然後刪掉
+                    da.Fill(getSizeTable);
+                }
+
+                //這邊找出有幾頁，並撈出樣衣尺寸
+                var arr_Comparelusthids = dtCompare.AsEnumerable().Select(s => s.Field<long>("lusthid")).Distinct().OrderBy(o => o).ToList();
+                Response.Write("<!--luhid=" + luhid + ";compare_luhid=" + compare_luhid + "-->");
+
+                Dictionary<string, List<string>> dicHeardersCompare = new Dictionary<string, List<string>>();
+                //List<string> arrHeardersCompare = new List<string>();
+
+                for (int h = 0; h < arr_Comparelusthids.Count; h++)
+                {
+                    string lusthidCompare = arr_Comparelusthids[h].ToString();
+                    List<string> tmpSize = new List<string>();
+
+                    sSql = @"select *
+                        from PDFTAG.dbo.Lu_SizeTable_Header a
+                        where a.lusthid in ('" + lusthidCompare + "') ";
+                    cm.CommandText = sSql;
+                    DataTable dtLu_SizeTable_Header = new DataTable();
+                    using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                    {
+                        da.Fill(dtLu_SizeTable_Header);
+                    }
+                    for (int i = 1; i <= 15; i++)
+                    {
+                        string sH = dtLu_SizeTable_Header.Rows[0]["H" + i].ToString();
+                        if (string.IsNullOrEmpty(sH)) { dicHeardersCompare.Add(lusthidCompare, tmpSize); break; }
+                        if (!tmpSize.Contains(sH)) { tmpSize.Add(sH); listCompareSizeTableHeader.Add(sH); }
+                        //if (!arrHeardersCompare.Contains(sH)) arrHeardersCompare.Add(sH);
+                    }
+                }
+
+
+                arrNotes = new List<Lu_Ch_Note>();
+                arrNotesCompare = new List<Lu_Ch_Note>();
+                //if (sType == "2")
+                {
+                    #region 中文備註
+
+                    sSql = "select * \n";
+                    sSql += "from PDFTAG.dbo.Lu_Ch_Note  a             \n";
+                    sSql += "where 1=1 \n";
+                    sSql += " and a.IdName='lustid'  and a.Id in (select lustid as id from PDFTAG.dbo.Lu_SizeTable where luhid = @luhid ) \n";
                     Response.Write("<!--" + sSql + "-->");
                     cm.CommandText = sSql;
                     cm.Parameters.Clear();
                     cm.Parameters.AddWithValue("@luhid", luhid);
-                    dt = new DataTable();
+                    DataTable dt2 = new DataTable();
                     using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
                     {
-                        da.Fill(dt);
+                        da.Fill(dt2);
                     }
 
-                    var arr_lusthids = dt.AsEnumerable().Select(s => s.Field<long>("lusthid")).Distinct().OrderBy(o => o).ToList();
-
-
-                    sSql = "select a.*,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15 \n";
-                    sSql += "from PDFTAG.dbo.Lu_SizeTable a              \n";
-                    sSql += "join  PDFTAG.dbo.Lu_SizeTable_Header b on a.lusthid=b.lusthid               \n";
-                    sSql += " where 1=1   \n";
-                    sSql += " and a.luhid =@luhid   \n";
-                    sSql += " and a.lusthid in ('" + hid_Compare_lusthid.Value.Replace(",", "','") + "')   \n";
-                    sSql += " order by lusthid,rowid asc    \n";
+                    arrNotes = dt2.AsEnumerable().Select(s => new Lu_Ch_Note { Id = s.Field<long>("Id"), ColName = s.Field<string>("ColName"), Note = s.Field<string>("Note") }).ToList();
 
                     cm.CommandText = sSql;
                     cm.Parameters.Clear();
                     cm.Parameters.AddWithValue("@luhid", compare_luhid);
-                    dtCompare = new DataTable();
-                    DataTable getSizeTable = new DataTable();
+                    DataTable dtCompare2 = new DataTable();
                     using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
                     {
-                        da.Fill(dtCompare);
-                        //複製一份Compare的，比對時找codeid的第一筆然後刪掉
-                        da.Fill(getSizeTable);
+                        da.Fill(dtCompare2);
                     }
 
-                    var arr_Comparelusthids = dtCompare.AsEnumerable().Select(s => s.Field<long>("lusthid")).Distinct().OrderBy(o => o).ToList();
-                    Response.Write("<!--luhid=" + luhid + ";compare_luhid=" + compare_luhid + "-->");
+                    arrNotesCompare = dtCompare2.AsEnumerable().Select(s => new Lu_Ch_Note { Id = s.Field<long>("Id"), ColName = s.Field<string>("ColName"), Note = s.Field<string>("Note") }).ToList();
 
-                    arrNotes = new List<Lu_Ch_Note>();
-                    arrNotesCompare = new List<Lu_Ch_Note>();
-                    //if (sType == "2")
+                    #endregion
+                }
+                #region 比對
+                for (int h = 0; h < arr_lusthids.Count; h++)
+                {
+                    List<string> curSourceSize = new List<string>();
+                    List<string> tmpCompareSize = new List<string>();
+                    List<string> listComparelusthids = new List<string>();
+                    bool isMatch = false;
+                    if (dicHeardersSource.ContainsKey(arr_lusthids[h].ToString()))
                     {
-                        #region 中文備註
+                        string lusthid = arr_lusthids[h].ToString();
+                        curSourceSize = dicHeardersSource[arr_lusthids[h].ToString()];
+                        foreach (string compareKey in dicHeardersCompare.Keys)
+                        {
+                            //找有沒有相同的尺寸
+                            if (dicHeardersCompare[compareKey].SequenceEqual(curSourceSize))
+                            {
+                                listComparelusthids.Add(compareKey);
+                                isMatch = true;
+                            }                                
+                        }
+                        //這邊找多的或是少的，以完全包含出發
+                        if (!isMatch)
+                        {
+                            foreach (string compareKey in dicHeardersCompare.Keys)
+                            {
+                                if (curSourceSize.All(x => dicHeardersCompare[compareKey].Any(y => y == x)) || dicHeardersCompare[compareKey].All(x => curSourceSize.Any(y => y == x)))
+                                {
+                                    listComparelusthids.Add(compareKey);
+                                    foreach (string tmpSize in dicHeardersCompare[compareKey])
+                                    {
+                                        if (!tmpCompareSize.Contains(tmpSize))
+                                            tmpCompareSize.Add(tmpSize);
+                                    }
+                                }
+                            }
+                        }
+                        //剩下是同時有少跟有多
+                        if (listComparelusthids == null)
+                        { }
 
-                        sSql = "select * \n";
-                        sSql += "from PDFTAG.dbo.Lu_Ch_Note  a             \n";
-                        sSql += "where 1=1 \n";
-                        sSql += " and a.IdName='lustid'  and a.Id in (select lustid as id from PDFTAG.dbo.Lu_SizeTable where luhid = @luhid ) \n";
+                        DataTable dtLu_SizeTableCompare_Header = new DataTable();
+                        string lusthid_compare = string.Join("','", listComparelusthids);
+
+                        sSql = @"select * 
+                            from PDFTAG.dbo.Lu_SizeTable_Header a
+                            where a.lusthid in ('" + lusthid_compare + "') ";
                         Response.Write("<!--" + sSql + "-->");
                         cm.CommandText = sSql;
-                        cm.Parameters.Clear();
-                        cm.Parameters.AddWithValue("@luhid", luhid);
-                        DataTable dt2 = new DataTable();
+
                         using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
                         {
-                            da.Fill(dt2);
+                            da.Fill(dtLu_SizeTableCompare_Header);
                         }
 
-                        arrNotes = dt2.AsEnumerable().Select(s => new Lu_Ch_Note { Id = s.Field<long>("Id"), ColName = s.Field<string>("ColName"), Note = s.Field<string>("Note") }).ToList();
-
-                        cm.CommandText = sSql;
-                        cm.Parameters.Clear();
-                        cm.Parameters.AddWithValue("@luhid", compare_luhid);
-                        DataTable dtCompare2 = new DataTable();
-                        using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                        if (h == 0)
                         {
-                            da.Fill(dtCompare2);
+                            sb.Append("<h4>Size Table</h4>");
+                        }
+                        sb.Append("<table class='table table-hover'>");
+                        sb.Append("<tr>");
+                        sb.Append(" <th scope='col'>#</th>");
+                        sb.Append(" <th scope='col'>Name</th>");
+                        sb.Append(" <th scope='col'>Criticality</th>");
+                        sb.Append(" <th scope='col'>Tol(-)</th>");
+                        sb.Append(" <th scope='col'>Tol(+)</th>");
+                                                        
+                        foreach (var size in curSourceSize)
+                        {
+                            if (isMatch)
+                            {
+                                sb.Append(" <th scope='col' style='background-color:#00FFFF'>" + size + "</th>");
+                            }
+                            else
+                            {
+                                var isExistCompare = tmpCompareSize.Any(x => x == size);
+                                if (!isExistCompare)
+                                    sb.Append(" <th scope='col' style='background-color:#FF9224'>" + size + "</th>");
+                                else
+                                    sb.Append(" <th scope='col' style='background-color:#00FFFF'>" + size + "</th>");
+                            }
                         }
 
-                        arrNotesCompare = dtCompare2.AsEnumerable().Select(s => new Lu_Ch_Note { Id = s.Field<long>("Id"), ColName = s.Field<string>("ColName"), Note = s.Field<string>("Note") }).ToList();
+                        sb.Append("</tr>");
 
-                        #endregion
-                    }
-                    #region 比對                    
-                    int PageCount = arr_lusthids.Count > arr_Comparelusthids.Count ? arr_lusthids.Count : arr_Comparelusthids.Count;
-                    //foreach (var lusthid in arr_lusthids)
-                    //for (int h = 0; h < arr_lusthids.Count; h++)
-                    for (int h = 0; h < PageCount; h++)
-                    {                        
-                        string lusthid = "";
-                        string lusthid_compare = "";
-                        try
+                        DataRow[] drSizeTables = dt.Select("lusthid='" + lusthid + "'", "rowid asc");
+                        //DataRow[] drCompareSizeTables = dtCompare.Select("lusthid in ('" + lusthid_compare + "')", "rowid asc");
+
+                        for (int s = 0; s < drSizeTables.Length; s++)
                         {
+                            //找compare codeid符合的第一筆
+                            var tmpSizetable = getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("codeid").ToString().Replace(" ", "") == drSizeTables[s]["codeid"].ToString().Replace(" ", "")
+                                && x.Field<string>("H2") == drSizeTables[s]["H2"].ToString());
+
+                            string lustid = "";
+                            string org_lustid = "";
+
+                            string codeid_source = "";
+                            string name_source = "";
+                            string criticality_source = "";
+                            string tolA_source = "";
+                            string tolB_source = "";
+                            string hTMInstruction_source = "";
+
+                            string codeid = "";
+                            string name = "";
+                            string criticality = "";
+                            string tolA = "";
+                            string tolB = "";
+                            string hTMInstruction = "";
+
+                            string codeid_note = "";
+                            string name_note = "";
+                            string criticality_note = "";
+                            string tolA_note = "";
+                            string tolB_note = "";
+                            string hTMInstruction_note = "";
+
+
+                            string lustid_compare = "";
+                            string lustid_org_compare = "";
+                            string codeid_compare = "";
+                            string name_compare = "";
+                            string criticality_compare = "";
+                            string tolA_compare = "";
+                            string tolB_compare = "";
+                            string hTMInstruction_compare = "";
+
+                            string codeid_compare_note = "";
+                            string name_compare_note = "";
+                            string criticality_compare_note = "";
+                            string tolA_compare_note = "";
+                            string tolB_compare_note = "";
+                            string hTMInstruction_compare_note = "";
+
                             try
                             {
-                                lusthid = arr_lusthids[h].ToString();
+                                lustid = drSizeTables[s]["lustid"].ToString();
+                                org_lustid = drSizeTables[s]["org_lustid"].ToString();
+
+                                codeid_source = drSizeTables[s]["codeid"].ToString();
+                                name_source = drSizeTables[s]["Name"].ToString();
+                                criticality_source = drSizeTables[s]["Criticality"].ToString();
+                                tolA_source = drSizeTables[s]["TolA"].ToString();
+                                tolB_source = drSizeTables[s]["TolB"].ToString();
+                                hTMInstruction_source = drSizeTables[s]["HTMInstruction"].ToString();
+
+                                codeid = drSizeTables[s]["codeid"].ToString();
+                                name = drSizeTables[s]["Name"].ToString();
+                                criticality = drSizeTables[s]["Criticality"].ToString();
+                                tolA = drSizeTables[s]["TolA"].ToString();
+                                tolB = drSizeTables[s]["TolB"].ToString();
+                                hTMInstruction = drSizeTables[s]["HTMInstruction"].ToString();
+
+                                codeid_note = FilterNote(arrNotes, lustid, "codeid");
+                                name_note = FilterNote(arrNotes, lustid, "name");
+                                criticality_note = FilterNote(arrNotes, lustid, "criticality");
+                                tolA_note = FilterNote(arrNotes, lustid, "tolA");
+                                tolB_note = FilterNote(arrNotes, lustid, "tolB");
+                                hTMInstruction_note = FilterNote(arrNotes, lustid, "hTMInstruction");
                             }
-                            catch (Exception ex)
-                            {
-                                lusthid = "0";
-                            }
+                            catch (Exception ex) { }
+
                             try
                             {
-                                lusthid_compare = arr_Comparelusthids[h].ToString();
+                                lustid_compare = tmpSizetable["lustid"].ToString();
+                                lustid_org_compare = tmpSizetable["org_lustid"].ToString();
+                                codeid_compare = tmpSizetable["codeid"].ToString();
+                                name_compare = tmpSizetable["Name"].ToString();
+                                criticality_compare = tmpSizetable["Criticality"].ToString();
+                                tolA_compare = tmpSizetable["TolA"].ToString();
+                                tolB_compare = tmpSizetable["TolB"].ToString();
+                                hTMInstruction_compare = tmpSizetable["HTMInstruction"].ToString();
+
+                                codeid_compare_note = FilterNote(arrNotesCompare, lustid_compare, "codeid");
+                                name_compare_note = FilterNote(arrNotesCompare, lustid_compare, "name");
+                                criticality_compare_note = FilterNote(arrNotesCompare, lustid_compare, "criticality");
+                                tolA_compare_note = FilterNote(arrNotesCompare, lustid_compare, "tolA");
+                                tolB_compare_note = FilterNote(arrNotesCompare, lustid_compare, "tolB");
+                                hTMInstruction_compare_note = FilterNote(arrNotesCompare, lustid_compare, "hTMInstruction");
                             }
-                            catch (Exception ex)
+                            catch (Exception ex) { }
+
+                            try
                             {
-                                lusthid_compare = "0";
-                            }
-
-
-                            sSql = "select * \n";
-                            sSql += "from PDFTAG.dbo.Lu_SizeTable_Header a              \n";
-                            sSql += " where a.lusthid in ('" + lusthid + "')   \n";
-                            Response.Write("<!--" + sSql + "-->");
-                            cm.CommandText = sSql;
-                            DataTable dtLu_SizeTable_Header = new DataTable();
-                            using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
-                            {
-                                da.Fill(dtLu_SizeTable_Header);
-                            }
-
-                            sSql = "select * \n";
-                            sSql += "from PDFTAG.dbo.Lu_SizeTable_Header a              \n";
-                            sSql += " where a.lusthid in ('" + lusthid_compare + "')   \n";
-                            Response.Write("<!--" + sSql + "-->");
-                            cm.CommandText = sSql;
-                            DataTable dtLu_SizeTableCompare_Header = new DataTable();
-                            using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
-                            {
-                                da.Fill(dtLu_SizeTableCompare_Header);
-                            }
-
-                            if (lusthid != "0")
-                            { 
-                                if (h == 0)
+                                #region 
+                                    
+                                if (sType == "2")
                                 {
-                                    sb.Append("<h4>Size Table</h4>");
+
+                                    codeid = codeid_note;
+                                    name = name_note;
+                                    criticality = criticality_note;
+                                    tolA = tolA_note;
+                                    tolB = tolB_note;
+                                    hTMInstruction = hTMInstruction_note;
+
+
+                                    codeid_compare = codeid_compare_note;
+                                    name_compare = name_compare_note;
+                                    criticality_compare = criticality_compare_note;
+                                    tolA_compare = tolA_compare_note;
+                                    tolB_compare = tolB_compare_note;
+                                    hTMInstruction_compare = hTMInstruction_compare_note;
                                 }
-                                sb.Append("<table class='table table-hover'>");
-                                sb.Append("<tr>");
-                                sb.Append(" <th scope='col'>#</th>");
-                                sb.Append(" <th scope='col'>Name</th>");
-                                sb.Append(" <th scope='col'>Criticality</th>");
-                                sb.Append(" <th scope='col'>Tol(-)</th>");
-                                sb.Append(" <th scope='col'>Tol(+)</th>");
-                                //sb.Append(" <th scope='col'>HTM Instruction</th>");
 
-                                List<string> arrHearders = new List<string>();
-                                List<string> arrHeardersSource = new List<string>();
-                                List<string> arrHeardersCompare = new List<string>();
-
-                                int iOtherCnt = 0;
-
-                                if (dtLu_SizeTable_Header.Rows.Count > 0)
-                                {
-                                    for (int i = 1; i <= 15; i++)
-                                    {
-                                        string sH = dtLu_SizeTable_Header.Rows[0]["H" + i].ToString();
-                                        if (!string.IsNullOrEmpty(sH))
-                                        {
-                                            //sb.Append(" <th scope='col'>" + sH + "</th>");
-                                            iOtherCnt++;
-
-                                            arrHeardersSource.Add(sH);
-                                            arrHearders.Add(sH);
-                                        }
-                                        else
-                                        {
-                                            break;
-                                        }
-                                    }
-                                }
-                                //foreach (DataRow drSize in dtLu_SizeTableCompare_Header.Rows)
-                                //{
-                                //    for (int i = 1; i <= 15; i++)
-                                //    {
-                                //        string sH = drSize["H" + i].ToString();
-
-                                //        if (string.IsNullOrEmpty(sH))
-                                //        {
-                                //            break;
-                                //        }
-
-                                //        var isExistCompare = arrHearders.Any(x => x == sH);
-
-                                //        if (!isExistCompare)
-                                //            sb.Append(" <th scope='col' style='background-color:#FF9224'>" + sH + "</th>");
-                                //        else
-                                //            sb.Append(" <th scope='col' style='background-color:#00FFFF'>" + sH + "</th>");
-                                //        arrHearders.Add(sH);
-                                //    }
-                                //}
-
-                                if (dtLu_SizeTableCompare_Header.Rows.Count > 0)
-                                {
-                                    for (int i = 1; i <= 15; i++)
-                                    {
-                                        string sH = dtLu_SizeTableCompare_Header.Rows[0]["H" + i].ToString();
-                                        if (!string.IsNullOrEmpty(sH) && !arrHeardersCompare.Contains(sH))
-                                        {
-                                            //sb.Append(" <th scope='col' style='background-color:#00FFFF'>" + sH + "</th>");
-                                            arrHeardersCompare.Add(sH);
-                                        }
-                                        if (!string.IsNullOrEmpty(sH) && !arrHearders.Contains(sH))
-                                        {
-                                            //sb.Append(" <th scope='col' style='background-color:#FF9224'>" + sH + "</th>");
-                                            //sb.Append(" <th scope='col' compareHeader>" + sH + "</th>");
-                                            iOtherCnt++;
-                                            arrHearders.Add(sH);
-                                        }
-                                    }
-                                }
-                                foreach (var size in arrHeardersSource)
-                                {
-                                    var isExistCompare = arrHeardersCompare.Any(x => x == size);
-                                    if (!isExistCompare)
-                                        sb.Append(" <th scope='col' style='background-color:#FF9224'>" + size + "</th>");
-                                    else
-                                        sb.Append(" <th scope='col' style='background-color:#00FFFF'>" + size + "</th>");
-                                }
-                                //foreach (var size in arrHeardersCompare)
-                                //{
-                                //    var isExistCompare = arrHeardersSource.Any(x => x == size);
-                                //    if (!isExistCompare)
-                                //        sb.Append(" <th scope='col' style='background-color:red'>" + size + "</th>");                                
-                                //}
-
-                                sb.Append("</tr>");
-
-                                Response.Write("<!--lusthid=" + lusthid + ";lusthid_compare=" + lusthid_compare + "-->");
-
-                                DataRow[] drSizeTables = dt.Select("lusthid='" + lusthid + "'", "rowid asc");
-                                DataRow[] drCompareSizeTables = dtCompare.Select("lusthid='" + lusthid_compare + "'", "rowid asc");
-
-                                //if (drSizeTables.Length != drCompareSizeTables.Length)
-                                //{
-                                //    //script = string.Format("alert('{0} 資料筆數不同! 文件來源={1} 比對來源={2}')", "SizeTable", drSizeTables.Length, drCompareSizeTables.Length);
-                                //    Response.Write("<!--資料筆數不同 drSizeTables.Length=" + drSizeTables.Length + ";drCompareSizeTables.Length=" + drCompareSizeTables.Length + "-->");
-                                //    //return;
-                                //}
-
-
-                                //foreach (DataRow drSizeTable in drSizeTables)
-                                for (int s = 0; s < drSizeTables.Length; s++)
-                                {
-                                    //找compare codeid符合的第一筆
-                                    //var tmpSizetable = getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("Name") == drSizeTables[s]["Name"].ToString()
-                                    //    && x.Field<string>("codeid").ToString().Replace(" ","") == drSizeTables[s]["codeid"].ToString().Replace(" ", ""));
-                                    var tmpSizetable = getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("codeid").ToString().Replace(" ", "") == drSizeTables[s]["codeid"].ToString().Replace(" ", ""));
-
-                                    string lustid = "";
-                                    string org_lustid = "";
-
-                                    string codeid_source = "";
-                                    string name_source = "";
-                                    string criticality_source = "";
-                                    string tolA_source = "";
-                                    string tolB_source = "";
-                                    string hTMInstruction_source = "";
-
-                                    string codeid = "";
-                                    string name = "";
-                                    string criticality = "";
-                                    string tolA = "";
-                                    string tolB = "";
-                                    string hTMInstruction = "";
-
-                                    string codeid_note = "";
-                                    string name_note = "";
-                                    string criticality_note = "";
-                                    string tolA_note = "";
-                                    string tolB_note = "";
-                                    string hTMInstruction_note = "";
-
-
-                                    string lustid_compare = "";
-                                    string lustid_org_compare = "";
-                                    string codeid_compare = "";
-                                    string name_compare = "";
-                                    string criticality_compare = "";
-                                    string tolA_compare = "";
-                                    string tolB_compare = "";
-                                    string hTMInstruction_compare = "";
-
-                                    string codeid_compare_note = "";
-                                    string name_compare_note = "";
-                                    string criticality_compare_note = "";
-                                    string tolA_compare_note = "";
-                                    string tolB_compare_note = "";
-                                    string hTMInstruction_compare_note = "";
-
-                                    try
-                                    {
-                                        lustid = drSizeTables[s]["lustid"].ToString();
-                                        org_lustid = drSizeTables[s]["org_lustid"].ToString();
-
-                                        codeid_source = drSizeTables[s]["codeid"].ToString();
-                                        name_source = drSizeTables[s]["Name"].ToString();
-                                        criticality_source = drSizeTables[s]["Criticality"].ToString();
-                                        tolA_source = drSizeTables[s]["TolA"].ToString();
-                                        tolB_source = drSizeTables[s]["TolB"].ToString();
-                                        hTMInstruction_source = drSizeTables[s]["HTMInstruction"].ToString();
-
-                                        codeid = drSizeTables[s]["codeid"].ToString();
-                                        name = drSizeTables[s]["Name"].ToString();
-                                        criticality = drSizeTables[s]["Criticality"].ToString();
-                                        tolA = drSizeTables[s]["TolA"].ToString();
-                                        tolB = drSizeTables[s]["TolB"].ToString();
-                                        hTMInstruction = drSizeTables[s]["HTMInstruction"].ToString();
-
-                                        codeid_note = FilterNote(arrNotes, lustid, "codeid");
-                                        name_note = FilterNote(arrNotes, lustid, "name");
-                                        criticality_note = FilterNote(arrNotes, lustid, "criticality");
-                                        tolA_note = FilterNote(arrNotes, lustid, "tolA");
-                                        tolB_note = FilterNote(arrNotes, lustid, "tolB");
-                                        hTMInstruction_note = FilterNote(arrNotes, lustid, "hTMInstruction");
-                                    }
-                                    catch (Exception ex) { }
-
-                                    try
-                                    {
-                                        lustid_compare = tmpSizetable["lustid"].ToString();
-                                        lustid_org_compare = tmpSizetable["org_lustid"].ToString();
-                                        codeid_compare = tmpSizetable["codeid"].ToString();
-                                        name_compare = tmpSizetable["Name"].ToString();
-                                        criticality_compare = tmpSizetable["Criticality"].ToString();
-                                        tolA_compare = tmpSizetable["TolA"].ToString();
-                                        tolB_compare = tmpSizetable["TolB"].ToString();
-                                        hTMInstruction_compare = tmpSizetable["HTMInstruction"].ToString();
-                                        //lustid_compare = drCompareSizeTables[s]["lustid"].ToString();
-                                        //lustid_org_compare = drCompareSizeTables[s]["org_lustid"].ToString();
-                                        //codeid_compare = drCompareSizeTables[s]["codeid"].ToString();
-                                        //name_compare = drCompareSizeTables[s]["Name"].ToString();
-                                        //criticality_compare = drCompareSizeTables[s]["Criticality"].ToString();
-                                        //tolA_compare = drCompareSizeTables[s]["TolA"].ToString();
-                                        //tolB_compare = drCompareSizeTables[s]["TolB"].ToString();
-                                        //hTMInstruction_compare = drCompareSizeTables[s]["HTMInstruction"].ToString();
-
-                                        codeid_compare_note = FilterNote(arrNotesCompare, lustid_compare, "codeid");
-                                        name_compare_note = FilterNote(arrNotesCompare, lustid_compare, "name");
-                                        criticality_compare_note = FilterNote(arrNotesCompare, lustid_compare, "criticality");
-                                        tolA_compare_note = FilterNote(arrNotesCompare, lustid_compare, "tolA");
-                                        tolB_compare_note = FilterNote(arrNotesCompare, lustid_compare, "tolB");
-                                        hTMInstruction_compare_note = FilterNote(arrNotesCompare, lustid_compare, "hTMInstruction");
-                                    }
-                                    catch (Exception ex) { }
-
-                                    try
-                                    {
-                                        #region 
-
-
-
-                                        if (sType == "2")
-                                        {
-
-                                            codeid = codeid_note;
-                                            name = name_note;
-                                            criticality = criticality_note;
-                                            tolA = tolA_note;
-                                            tolB = tolB_note;
-                                            hTMInstruction = hTMInstruction_note;
-
-
-                                            codeid_compare = codeid_compare_note;
-                                            name_compare = name_compare_note;
-                                            criticality_compare = criticality_compare_note;
-                                            tolA_compare = tolA_compare_note;
-                                            tolB_compare = tolB_compare_note;
-                                            hTMInstruction_compare = hTMInstruction_compare_note;
-                                        }
-
-                                        sb.Append("<tr data-rowid='" + drSizeTables[s]["rowid"].ToString() + "'>");
-                                        sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='codeid' >" + codeid_source + (string.IsNullOrEmpty(codeid_note) ? "" : "<br>中:" + codeid_note) + "</td>");
-                                        sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Name' >" + name_source + (string.IsNullOrEmpty(name_note) ? "" : "<br>中:" + name_note) + "</td>");
-                                        sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Criticality' >" + criticality_source + (string.IsNullOrEmpty(criticality_note) ? "" : "<br>中:" + criticality_note) + "</td>");
-                                        sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolA' >" + tolA_source + (string.IsNullOrEmpty(tolA_note) ? "" : "<br>中:" + tolA_note) + "</td>");
-                                        sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolB' >" + tolB_source + (string.IsNullOrEmpty(tolB_note) ? "" : "<br>中:" + tolB_note) + "</td>");
-                                        //sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='HTMInstruction' onclick='editSizeTable(this)'>" + hTMInstruction_source + (string.IsNullOrEmpty(hTMInstruction_note) ? "" : "<br>中:" + hTMInstruction_note) + "</td>");
-
-                                        //for (int i = 1; i <= iOtherCnt; i++)
-                                        //{
-                                        //    string other = drSizeTables[s]["A" + i].ToString();
-                                        //    double d = 0;
-                                        //    if (other.Contains("/") && Double.TryParse(other.Split('/')[1], out d)) other = other.Replace(" ", "-");
-                                        //    sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' onclick='editSizeTable(this)' data-col='A" + i + "' >" + other + "</td>");
-                                        //}
-
-                                        //foreach (var header in arrHearders)
-                                        foreach (var header in arrHeardersSource)
-                                        {
-                                            bool isFind = false;
-                                            for (int i = 1; i <= 15; i++)
-                                            {
-                                                string otherHeader = drSizeTables[s]["H" + i].ToString();
-                                                if (header == otherHeader)
-                                                {
-                                                    string otherValue = drSizeTables[s]["A" + i].ToString();
-                                                    double d = 0;
-                                                    if (otherValue.Contains("/") && Double.TryParse(otherValue.Split('/')[1], out d)) otherValue = otherValue.Replace(" ", "-");
-                                                    sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='A" + i + "' >" + otherValue + "</td>");
-                                                    isFind = true;
-                                                    break;
-                                                }
-                                            }
-                                            if (!isFind)
-                                                sb.Append(" <td scope='col'></td>");
-                                        }
-                                        sb.Append("</tr>");
-
-                                        sb.Append("<tr  class='rowCompare'>");
-                                        sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='codeid' >" + (string.IsNullOrEmpty(codeid_compare) ? "" : Compare(sType, codeid, codeid_compare, codeid_compare_note)) + "</td>");
-                                        sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='Name' >" + (string.IsNullOrEmpty(name_compare) ? "" : Compare(sType, name, name_compare, name_compare_note)) + "</td>");
-                                        sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='Criticality' >" + (string.IsNullOrEmpty(criticality_compare) ? "" : Compare(sType, criticality, criticality_compare, criticality_compare_note)) + "</td>");
-                                        sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='TolA' >" + (string.IsNullOrEmpty(tolA_compare) ? "" : Compare(sType, tolA, tolA_compare, tolA_compare_note)) + "</td>");
-                                        sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='TolB' >" + (string.IsNullOrEmpty(tolB_compare) ? "" : Compare(sType, tolB, tolB_compare, tolB_compare_note)) + "</td>");
-                                        //sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' onclick='editSizeTable(this,1)' data-col='HTMInstruction' >" + Compare(sType, hTMInstruction, hTMInstruction_compare, hTMInstruction_compare_note) + "</td>");
-
-                                        //for (int i = 1; i <= iOtherCnt; i++)
-                                        //{
-                                        //    string other = drSizeTables[s]["A" + i].ToString();
-                                        //    string other_compare = drCompareSizeTables[s]["A" + i].ToString();
-
-                                        //    string other_note = FilterNote(arrNotes, lustid, "A" + i);
-                                        //    string other_compare_note = FilterNote(arrNotesCompare, lustid_compare, "A" + i);
-                                        //    if (sType == "2")
-                                        //    {
-                                        //        other = other_note;
-                                        //        other_compare = other_compare_note;
-                                        //    }
-
-                                        //    double d = 0;
-                                        //    if (other.Contains("/") && Double.TryParse(other.Split('/')[1], out d)) other = other.Replace(" ", "-");
-                                        //    if (other_compare.Contains("/") && Double.TryParse(other_compare.Split('/')[1], out d)) other_compare = other_compare.Replace(" ", "-");
-
-                                        //    other = Compare(sType, other, other_compare, other_compare_note);
-
-
-                                        //    sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' onclick='editSizeTable(this,1)' data-col='A" + i + "' >"
-                                        //        + other + "</td>");
-                                        //}
-                                        foreach (var header in arrHeardersSource)
-                                        {
-                                            bool isFind = false;
-                                            for (int i = 1; i <= 15; i++)
-                                            {
-                                                string otherHeader = "";
-                                                string otherValue = "";
-                                                string otherNote = "";
-                                                string otherHeaderCompare = "";
-                                                string otherValueCompare = "";
-                                                string otherNoteCompare = "";
-
-                                                try
-                                                {
-                                                    otherHeader = drSizeTables[s]["H" + i].ToString();
-                                                    otherValue = drSizeTables[s]["A" + i].ToString();
-                                                    otherNote = FilterNote(arrNotes, lustid, "A" + i);
-                                                }
-                                                catch (Exception) { }
-                                                try
-                                                {
-                                                    int tmpCompare = 0;
-                                                    for (int tmp = 1; tmp <= 15; tmp++)
-                                                    {
-                                                        otherHeaderCompare = tmpSizetable["H" + tmp].ToString();
-                                                        if (otherHeaderCompare == otherHeader)
-                                                        {
-                                                            tmpCompare = tmp;
-                                                            break;
-                                                        }
-                                                    }
-                                                    otherHeaderCompare = tmpSizetable["H" + tmpCompare].ToString();
-                                                    otherValueCompare = tmpSizetable["A" + tmpCompare].ToString();
-                                                    //otherHeaderCompare = drCompareSizeTables[s]["H" + i].ToString();
-                                                    //otherValueCompare = drCompareSizeTables[s]["A" + i].ToString();
-                                                    otherNoteCompare = FilterNote(arrNotesCompare, lustid_compare, "A" + tmpCompare);
-                                                }
-                                                catch (Exception) { }
-
-                                                if (header == otherHeaderCompare)
-                                                {
-                                                    double d = 0;
-
-                                                    if (otherValue.Contains("/") && Double.TryParse(otherValue.Split('/')[1], out d)) otherValue = otherValue.Replace(" ", "-");
-                                                    if (otherValueCompare.Contains("/") && Double.TryParse(otherValueCompare.Split('/')[1], out d)) otherValueCompare = otherValueCompare.Replace(" ", "-");
-
-                                                    string other = Compare(sType, otherValue, otherValueCompare, otherNoteCompare);
-
-                                                    sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='A" + i + "' >" + other + "</td>");
-                                                    
-                                                    isFind = true;
-                                                    break;
-                                                }
-
-                                            }
-                                            if (!isFind)
-                                                sb.Append(" <td scope='col'>X</td>");
-                                            else
-                                            {
-
-                                            }
-                                        }
-
-                                        sb.Append("</tr>");
-
-                                        #endregion
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Response.Write("<!--" + ex.ToString() + "-->");
-                                    }
-                                    //如果有找到就刪掉，剩下的就是目的文件多的
-                                    if (!string.IsNullOrEmpty(codeid_compare))
-                                        getSizeTable.Rows.Remove(getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("codeid").ToString().Replace(" ", "") == drSizeTables[s]["codeid"].ToString().Replace(" ", "")));
-                                }
-                                sb.Append("</table>");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Response.Write("<!--SizeTable=" + ex.ToString() + "-->");
-                        }
-                    }
-                    #endregion
-                    #region 沒比對到的
-                    #region 尺寸
-                    StringBuilder sbNotExitSizeHeader = new StringBuilder();
-                    StringBuilder sbNotExitSizeTableHeader = new StringBuilder();
-                    StringBuilder sbNotExitSizeTableBody = new StringBuilder();
-                    bool initFlag = true;
-                    //for (int h = 0; h < arr_Comparelusthids.Count; h++)
-                    for (int h = 0; h < PageCount; h++)
-                    {     
-                        StringBuilder sbNotExitSizeTmpTable = new StringBuilder();
-                        if (initFlag)
-                        {
-                            sbNotExitSizeHeader.Append("<h4>尺寸</h4>");
-                            sbNotExitSizeHeader.Append("<h4>Size Table</h4>");
-                            initFlag = false;
-                        }
-                        sbNotExitSizeTmpTable.Append("<table class='table table-hover'>");
-                        sbNotExitSizeTmpTable.Append("<tr>");
-                        sbNotExitSizeTmpTable.Append(" <th scope='col'>#</th>");
-                        sbNotExitSizeTmpTable.Append(" <th scope='col'>Name</th>");
-                        sbNotExitSizeTmpTable.Append(" <th scope='col'>Criticality</th>");
-                        sbNotExitSizeTmpTable.Append(" <th scope='col'>Tol(-)</th>");
-                        sbNotExitSizeTmpTable.Append(" <th scope='col'>Tol(+)</th>");
-                        DataRow[] drTmpSizeTableSource = null;
-                        if (!string.IsNullOrEmpty(arr_lusthids[h].ToString()))
-                        {
-                            drTmpSizeTableSource = dt.Select("lusthid='" + arr_lusthids[h].ToString() + "'", "rowid asc");
-                        }
-                        DataRow[] drTmpSizetable = dtCompare.Select("lusthid='" + arr_Comparelusthids[h].ToString() + "'", "rowid asc");
-
-                        List<string> arrHearders = new List<string>();
-                        List<string> arrHeardersSource = new List<string>();
-                        if (drTmpSizeTableSource.Count() > 0)
-                        {
-                            foreach (var tmpSize in drTmpSizeTableSource)
-                            {
-                                for (int i = 1; i <= 15; i++)
-                                {
-                                    string sH = tmpSize["H" + i].ToString();
-                                    if (!string.IsNullOrEmpty(sH) && !arrHeardersSource.Contains(sH))
-                                    {
-                                        arrHeardersSource.Add(sH);
-                                    }
-                                    else if (string.IsNullOrEmpty(sH))
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        if (drTmpSizetable.Count() > 0)
-                        {
-                            foreach (var tmpSize in drTmpSizetable)
-                            {
-                                for (int i = 1; i <= 15; i++)
-                                {
-                                    string sH = tmpSize["H" + i].ToString();
-                                    if (!string.IsNullOrEmpty(sH) && !arrHearders.Contains(sH) && !arrHeardersSource.Any(x => x == sH))
-                                    {
-                                        sbNotExitSizeTmpTable.Append("  <th scope='col' style='background-color:red'>" + sH + "</th>");
-                                        arrHearders.Add(sH);
-                                    }
-                                    else if (string.IsNullOrEmpty(sH))
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        sbNotExitSizeTmpTable.Append("</tr>");
-                        //string lusthid_compare = "";
-                        //lusthid_compare = arr_Comparelusthids[h].ToString();
-                        //sSql = "select * \n";
-                        //sSql += "from PDFTAG.dbo.Lu_SizeTable_Header a              \n";
-                        //sSql += " where a.lusthid in ('" + lusthid_compare + "')   \n";
-                        //Response.Write("<!--" + sSql + "-->");
-                        //cm.CommandText = sSql;
-                        //DataTable dtLu_SizeTableCompare_Header = new DataTable();
-                        //using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
-                        //{
-                        //    da.Fill(dtLu_SizeTableCompare_Header);
-                        //}
-                        //DataRow[] drSizeTables = dtCompare.Select("lusthid='" + lusthid_compare + "'", "rowid asc");
-                        if (arrHearders.Count > 0)
-                        {
-                            foreach (var tmpSizetable in drTmpSizetable)
-                            {
-                                string lustid = "";
-                                string org_lustid = "";
-
-                                string codeid_source = "";
-                                string name_source = "";
-                                string criticality_source = "";
-                                string tolA_source = "";
-                                string tolB_source = "";
-                                string hTMInstruction_source = "";
-
-                                lustid = tmpSizetable["lustid"].ToString();
-                                org_lustid = tmpSizetable["org_lustid"].ToString();
-
-                                codeid_source = tmpSizetable["codeid"].ToString();
-                                name_source = tmpSizetable["Name"].ToString();
-                                criticality_source = tmpSizetable["Criticality"].ToString();
-                                tolA_source = tmpSizetable["TolA"].ToString();
-                                tolB_source = tmpSizetable["TolB"].ToString();
-                                hTMInstruction_source = tmpSizetable["HTMInstruction"].ToString();
-
-                                sbNotExitSizeTableBody.Append("<tr data-rowid='" + tmpSizetable["rowid"].ToString() + "'>");
-                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='codeid' >" + codeid_source + "</td>");
-                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Name' >" + name_source + "</td>");
-                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Criticality' >" + criticality_source + "</td>");
-                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolA' >" + tolA_source + "</td>");
-                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolB' >" + tolB_source + "</td>");
-
-                                foreach (var header in arrHearders)
+                                sb.Append("<tr data-rowid='" + drSizeTables[s]["rowid"].ToString() + "'>");
+                                sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='codeid' >" + codeid_source + (string.IsNullOrEmpty(codeid_note) ? "" : "<br>中:" + codeid_note) + "</td>");
+                                sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Name' >" + name_source + (string.IsNullOrEmpty(name_note) ? "" : "<br>中:" + name_note) + "</td>");
+                                sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Criticality' >" + criticality_source + (string.IsNullOrEmpty(criticality_note) ? "" : "<br>中:" + criticality_note) + "</td>");
+                                sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolA' >" + tolA_source + (string.IsNullOrEmpty(tolA_note) ? "" : "<br>中:" + tolA_note) + "</td>");
+                                sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolB' >" + tolB_source + (string.IsNullOrEmpty(tolB_note) ? "" : "<br>中:" + tolB_note) + "</td>");
+                                    
+                                foreach (var header in curSourceSize)
                                 {
                                     bool isFind = false;
                                     for (int i = 1; i <= 15; i++)
                                     {
-                                        string otherHeader = tmpSizetable["H" + i].ToString();
+                                        string otherHeader = drSizeTables[s]["H" + i].ToString();
                                         if (header == otherHeader)
                                         {
-                                            string otherValue = tmpSizetable["A" + i].ToString();
+                                            string otherValue = drSizeTables[s]["A" + i].ToString();
                                             double d = 0;
                                             if (otherValue.Contains("/") && Double.TryParse(otherValue.Split('/')[1], out d)) otherValue = otherValue.Replace(" ", "-");
-                                            sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='A" + i + "' >" + otherValue + "</td>");
+                                            sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='A" + i + "' >" + otherValue + "</td>");
                                             isFind = true;
                                             break;
                                         }
                                     }
                                     if (!isFind)
-                                        sbNotExitSizeTableBody.Append(" <td scope='col'></td>");
+                                        sb.Append(" <td scope='col'></td>");
+                                }
+                                sb.Append("</tr>");
+
+                                sb.Append("<tr  class='rowCompare'>");
+                                sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='codeid' >" + (string.IsNullOrEmpty(codeid_compare) ? "" : Compare(sType, codeid, codeid_compare, codeid_compare_note)) + "</td>");
+                                sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='Name' >" + (string.IsNullOrEmpty(name_compare) ? "" : Compare(sType, name, name_compare, name_compare_note)) + "</td>");
+                                sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='Criticality' >" + (string.IsNullOrEmpty(criticality_compare) ? "" : Compare(sType, criticality, criticality_compare, criticality_compare_note)) + "</td>");
+                                sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='TolA' >" + (string.IsNullOrEmpty(tolA_compare) ? "" : Compare(sType, tolA, tolA_compare, tolA_compare_note)) + "</td>");
+                                sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='TolB' >" + (string.IsNullOrEmpty(tolB_compare) ? "" : Compare(sType, tolB, tolB_compare, tolB_compare_note)) + "</td>");
+                                    
+                                foreach (var header in curSourceSize)
+                                {
+                                    bool isFind = false;
+                                    for (int i = 1; i <= 15; i++)
+                                    {
+                                        string otherHeader = "";
+                                        string otherValue = "";
+                                        string otherNote = "";
+                                        string otherHeaderCompare = "";
+                                        string otherValueCompare = "";
+                                        string otherNoteCompare = "";
+
+                                        try
+                                        {
+                                            otherHeader = drSizeTables[s]["H" + i].ToString();
+                                            otherValue = drSizeTables[s]["A" + i].ToString();
+                                            otherNote = FilterNote(arrNotes, lustid, "A" + i);
+                                        }
+                                        catch (Exception) { }
+                                        try
+                                        {
+                                            int tmpCompare = 0;
+                                            for (int tmp = 1; tmp <= 15; tmp++)
+                                            {
+                                                otherHeaderCompare = tmpSizetable["H" + tmp].ToString();
+                                                if (otherHeaderCompare == otherHeader)
+                                                {
+                                                    tmpCompare = tmp;
+                                                    break;
+                                                }
+                                            }
+                                            otherHeaderCompare = tmpSizetable["H" + tmpCompare].ToString();
+                                            otherValueCompare = tmpSizetable["A" + tmpCompare].ToString();
+                                            otherNoteCompare = FilterNote(arrNotesCompare, lustid_compare, "A" + tmpCompare);
+                                        }
+                                        catch (Exception) { }
+
+                                        if (header == otherHeaderCompare)
+                                        {
+                                            double d = 0;
+
+                                            if (otherValue.Contains("/") && Double.TryParse(otherValue.Split('/')[1], out d)) otherValue = otherValue.Replace(" ", "-");
+                                            if (otherValueCompare.Contains("/") && Double.TryParse(otherValueCompare.Split('/')[1], out d)) otherValueCompare = otherValueCompare.Replace(" ", "-");
+
+                                            string other = Compare(sType, otherValue, otherValueCompare, otherNoteCompare);
+
+                                            sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='A" + i + "' >" + other + "</td>");
+
+                                            isFind = true;
+                                            break;
+                                        }
+
+                                    }
+                                    if (!isFind)
+                                        sb.Append(" <td scope='col'>X</td>");
+                                    else
+                                    {
+
+                                    }
+                                }
+
+                                sb.Append("</tr>");
+
+                                #endregion
+                            }
+                            catch (Exception ex)
+                            {
+                                Response.Write("<!--" + ex.ToString() + "-->");
+                            }
+                            //如果不存在就表示是來源多的
+                            if (tmpSizetable == null) { continue; }
+                            //如果有找到就刪掉，剩下的就是目的文件多的
+                            if (!string.IsNullOrEmpty(codeid_compare))
+                                getSizeTable.Rows.Remove(getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("codeid").ToString().Replace(" ", "") == drSizeTables[s]["codeid"].ToString().Replace(" ", "")
+                                        && x.Field<string>("H2") == drSizeTables[s]["H2"].ToString()));
+
+                        }
+                        sb.Append("</table>");
+
+                    }
+                }
+                #endregion                    
+                #region 沒比對到的
+                #region 尺寸
+                StringBuilder sbNotExitSizeHeader = new StringBuilder();
+                StringBuilder sbNotExitSizeTableHeader = new StringBuilder();
+                StringBuilder sbNotExitSizeTableBody = new StringBuilder();
+                bool initFlag = true;
+                for (int h = 0; h < arr_Comparelusthids.Count; h++)
+                {
+                    List<string> curCompareSize = new List<string>();
+                    List<string> tmpSize = new List<string>();
+                    List<string> listSourcelusthids = new List<string>();                        
+                    bool isMatch = false;
+                    if (dicHeardersCompare.ContainsKey(arr_Comparelusthids[h].ToString()))
+                    {
+                        string lusthidCompare = arr_Comparelusthids[h].ToString();
+                        curCompareSize = dicHeardersCompare[arr_Comparelusthids[h].ToString()];
+                        foreach (string compareKey in dicHeardersSource.Keys)
+                        {
+                            //找有沒有相同的尺寸
+                            if (dicHeardersSource[compareKey].SequenceEqual(curCompareSize))
+                            {
+                                listSourcelusthids.Add(compareKey);
+                                isMatch = true;
+                            }
+                        }
+                        //這邊找多的尺寸
+                        if (!isMatch)
+                        {
+                            foreach (string SourceKey in dicHeardersSource.Keys)
+                            {
+                                //if (curCompareSize.All(x => dicHeardersSource[compareKey].Any(y => y == x)) || dicHeardersSource[compareKey].All(x => curCompareSize.Any(y => y == x)))
+                                if (dicHeardersSource[SourceKey].All(x => curCompareSize.Any(y => y == x)))
+                                {
+                                    listSourcelusthids.Add(SourceKey);
+                                    foreach (string Size in curCompareSize)
+                                    {
+                                        if (!dicHeardersSource[SourceKey].Contains(Size) && !tmpSize.Contains(Size))
+                                            tmpSize.Add(Size);
+                                    }
+                                }
+                            }
+                        }
+                        //剩下是同時有少跟有多
+                        if (listSourcelusthids == null)
+                        { }
+
+                        //這邊是沒比對到的，所以沒MATCH且目的文件多的才繼續
+                        if (!isMatch && tmpSize.Count > 0)
+                        {
+                            DataTable dtLu_SizeTableSource_Header = new DataTable();
+                            string lusthid_compare = string.Join("','", listSourcelusthids);
+
+                            sSql = @"select * 
+                            from PDFTAG.dbo.Lu_SizeTable_Header a
+                            where a.lusthid in ('" + lusthid_compare + "') ";
+                            Response.Write("<!--" + sSql + "-->");
+                            cm.CommandText = sSql;
+
+                            using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                            {
+                                da.Fill(dtLu_SizeTableSource_Header);
+                            }
+
+                            StringBuilder sbNotExitSizeTmpTable = new StringBuilder();
+                            if (initFlag)
+                            {
+                                sbNotExitSizeHeader.Append("<h4>尺寸</h4>");
+                                sbNotExitSizeHeader.Append("<h4>Size Table</h4>");
+                                initFlag = false;
+                            }
+                            bool sizeTableFlag = false;
+                            sbNotExitSizeTmpTable.Append("<table class='table table-hover'>");
+                            sbNotExitSizeTmpTable.Append("<tr>");
+                            sbNotExitSizeTmpTable.Append(" <th scope='col'>#</th>");
+                            sbNotExitSizeTmpTable.Append(" <th scope='col'>Name</th>");
+                            sbNotExitSizeTmpTable.Append(" <th scope='col'>Criticality</th>");
+                            sbNotExitSizeTmpTable.Append(" <th scope='col'>Tol(-)</th>");
+                            sbNotExitSizeTmpTable.Append(" <th scope='col'>Tol(+)</th>");
+                            sbNotExitSizeTmpTable.Append(" <th scope='col'>HTM Instruction</th>");
+
+                            foreach (var size in tmpSize)
+                            {
+                                sbNotExitSizeTmpTable.Append(" <th scope='col' style='background-color:red'>" + size + "</th>");                                    
+                            }
+
+                            sbNotExitSizeTmpTable.Append("</tr>");
+
+                            //DataRow[] drSizeTables = dt.Select("lusthid='" + lusthid + "'", "rowid asc");
+                            DataRow[] drCompareSizeTables = dtCompare.Select("lusthid='" + lusthidCompare + "'", "rowid asc");
+
+                            for (int s = 0; s < drCompareSizeTables.Length; s++)
+                            {                                    
+                                string lustid = "";
+                                string org_lustid = "";
+                                    
+                                string codeid = "";
+                                string name = "";
+                                string criticality = "";
+                                string tolA = "";
+                                string tolB = "";
+                                string hTMInstruction = "";
+
+                                codeid = drCompareSizeTables[s]["codeid"].ToString();
+                                name = drCompareSizeTables[s]["Name"].ToString();
+                                criticality = drCompareSizeTables[s]["Criticality"].ToString();
+                                tolA = drCompareSizeTables[s]["TolA"].ToString();
+                                tolB = drCompareSizeTables[s]["TolB"].ToString();
+                                hTMInstruction = drCompareSizeTables[s]["HTMInstruction"].ToString();
+
+                                sbNotExitSizeTableBody.Append("<tr data-rowid='" + drCompareSizeTables[s]["rowid"].ToString() + "'>");
+                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='codeid' >" + codeid + "</td>");
+                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Name' >" + name + "</td>");
+                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Criticality' >" + criticality + "</td>");
+                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolA' >" + tolA + "</td>");
+                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolB' >" + tolB + "</td>");
+                                    
+                                bool bodyFlag = false;
+                                for (int i = 1; i <= 15; i++)
+                                {
+                                    string compareHeader = drCompareSizeTables[s]["H" + i].ToString();
+                                    if (string.IsNullOrEmpty(compareHeader)) { break; }
+                                    else if (i == 1)
+                                    {
+                                        sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='A" + i + "' >" + drCompareSizeTables[s]["A" + i].ToString() + "</td>");
+                                    }
+                                    else if (tmpSize.Contains(compareHeader))
+                                    {
+                                        sizeTableFlag = true;
+                                        bodyFlag = true;
+                                        sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='A" + i + "' >" + drCompareSizeTables[s]["A" + i].ToString() + "</td>");
+                                    }
                                 }
                                 sbNotExitSizeTableBody.Append("</tr>");
+                                if (!bodyFlag) { sbNotExitSizeTableBody.Clear(); }
+                                sbNotExitSizeTmpTable.Append(sbNotExitSizeTableBody.ToString());
+                                sbNotExitSizeTableBody.Clear();
                             }
-                            sbNotExitSizeTmpTable.Append(sbNotExitSizeTableBody.ToString());
-                            sbNotExitSizeTableBody.Clear();
                             sbNotExitSizeTmpTable.Append("</table>");
-                        }
-                        else sbNotExitSizeTmpTable.Clear();
-                        sbNotExitSizeTableHeader.Append(sbNotExitSizeTmpTable.ToString());
-                        sbNotExitSizeTmpTable.Clear();
-                    }
-                    if (sbNotExitSizeTableHeader.Length == 0) sbNotExitSizeHeader.Clear();
-                    sbNotExit.Append(sbNotExitSizeHeader);
-                    sbNotExit.Append(sbNotExitSizeTableHeader);
+                            if (!sizeTableFlag) { sbNotExitSizeTmpTable.Clear(); }
+                            sbNotExitSizeTableHeader.Append(sbNotExitSizeTmpTable.ToString());
+                            sbNotExitSizeTmpTable.Clear();
+                        }                            
+                    }                        
+                }
+                if (sbNotExitSizeTableHeader.Length == 0) sbNotExitSizeHeader.Clear();
+                sbNotExit.Append(sbNotExitSizeHeader);
+                sbNotExit.Append(sbNotExitSizeTableHeader);
+                #endregion
+                #region 資料列
+                //如果有代表有沒比對到的，沒有就不跑
+                initFlag = true;
+                if (getSizeTable.Rows.Count > 0)
+                {
+                    List<List<string>> getHeader = new List<List<string>>();
 
-                    #endregion
-                    #region 資料列
-                    //如果有代表有沒比對到的，沒有就不跑
-                    initFlag = true;
-                    if (getSizeTable.Rows.Count > 0)
+                    foreach (DataRow getdata in getSizeTable.Rows)
                     {
-                        //for (int h = 0; h < arr_Comparelusthids.Count; h++)
-                        for (int h = 0; h < PageCount; h++)
+                        List<string> sizeHeader = new List<string>();
+
+                        for (int i = 1; i <= 15; i++)
                         {
-                            if (!string.IsNullOrEmpty(arr_Comparelusthids[h].ToString()))
+                            string sH = getdata["H" + i].ToString();
+                            if (!string.IsNullOrEmpty(sH))
                             {
-                                if (initFlag)
-                                {
-                                    sbNotExit.Append("<h4>資料列</h4>");
-                                    sbNotExit.Append("<h4>Size Table</h4>");
-                                    initFlag = false;
-                                }
-                                sbNotExit.Append("<table class='table table-hover'>");
-                                sbNotExit.Append("<tr>");
-                                sbNotExit.Append(" <th scope='col'>#</th>");
-                                sbNotExit.Append(" <th scope='col'>Name</th>");
-                                sbNotExit.Append(" <th scope='col'>Criticality</th>");
-                                sbNotExit.Append(" <th scope='col'>Tol(-)</th>");
-                                sbNotExit.Append(" <th scope='col'>Tol(+)</th>");
-
-                                DataRow[] drTmpSizeTableSource = null;
-                                if (!string.IsNullOrEmpty(arr_lusthids[h].ToString()))
-                                {
-                                    drTmpSizeTableSource = dt.Select("lusthid='" + arr_lusthids[h].ToString() + "'", "rowid asc");
-                                }
-                                DataRow[] drTmpSizetable = getSizeTable.Select("lusthid='" + arr_Comparelusthids[h].ToString() + "'", "rowid asc");
-
-                                List<string> arrHearders = new List<string>();
-                                List<string> arrHeardersSource = new List<string>();
-                                if (drTmpSizeTableSource.Count() > 0)
-                                {
-                                    foreach (var tmpSize in drTmpSizeTableSource)
-                                    {
-                                        for (int i = 1; i <= 15; i++)
-                                        {
-                                            string sH = tmpSize["H" + i].ToString();
-                                            if (!string.IsNullOrEmpty(sH) && !arrHeardersSource.Contains(sH))
-                                            {
-                                                arrHeardersSource.Add(sH);
-                                            }
-                                            else if (string.IsNullOrEmpty(sH))
-                                            {
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                                if (drTmpSizetable.Count() > 0)
-                                {
-                                    foreach (var tmpSize in drTmpSizetable)
-                                    {
-                                        for (int i = 1; i <= 15; i++)
-                                        {
-                                            string sH = tmpSize["H" + i].ToString();
-                                            if (!string.IsNullOrEmpty(sH) && !arrHearders.Contains(sH))
-                                            {
-                                                if (arrHeardersSource.Any(x => x == sH))
-                                                {
-                                                    sbNotExit.Append("  <th scope='col'>" + sH + "</th>");
-                                                }
-                                                else
-                                                {
-                                                    sbNotExit.Append("  <th scope='col' style='background-color:red'>" + sH + "</th>");
-                                                }
-                                                arrHearders.Add(sH);
-                                            }
-                                            else if (string.IsNullOrEmpty(sH))
-                                            {
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                                sbNotExit.Append("</tr>");
-                                foreach (var tmpSizetable in drTmpSizetable)
-                                {
-                                    string lustid = "";
-                                    string org_lustid = "";
-
-                                    string codeid_source = "";
-                                    string name_source = "";
-                                    string criticality_source = "";
-                                    string tolA_source = "";
-                                    string tolB_source = "";
-                                    string hTMInstruction_source = "";
-
-                                    lustid = tmpSizetable["lustid"].ToString();
-                                    org_lustid = tmpSizetable["org_lustid"].ToString();
-
-                                    codeid_source = tmpSizetable["codeid"].ToString();
-                                    name_source = tmpSizetable["Name"].ToString();
-                                    criticality_source = tmpSizetable["Criticality"].ToString();
-                                    tolA_source = tmpSizetable["TolA"].ToString();
-                                    tolB_source = tmpSizetable["TolB"].ToString();
-                                    hTMInstruction_source = tmpSizetable["HTMInstruction"].ToString();
-
-                                    sbNotExit.Append("<tr data-rowid='" + tmpSizetable["rowid"].ToString() + "'>");
-                                    sbNotExit.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='codeid' >" + codeid_source + "</td>");
-                                    sbNotExit.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Name' >" + name_source + "</td>");
-                                    sbNotExit.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Criticality' >" + criticality_source + "</td>");
-                                    sbNotExit.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolA' >" + tolA_source + "</td>");
-                                    sbNotExit.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolB' >" + tolB_source + "</td>");
-
-                                    foreach (var header in arrHearders)
-                                    {
-                                        bool isFind = false;
-                                        for (int i = 1; i <= 15; i++)
-                                        {
-                                            string otherHeader = tmpSizetable["H" + i].ToString();
-                                            if (header == otherHeader)
-                                            {
-                                                string otherValue = tmpSizetable["A" + i].ToString();
-                                                double d = 0;
-                                                if (otherValue.Contains("/") && Double.TryParse(otherValue.Split('/')[1], out d)) otherValue = otherValue.Replace(" ", "-");
-                                                sbNotExit.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='A" + i + "' >" + otherValue + "</td>");
-                                                isFind = true;
-                                                break;
-                                            }
-                                        }
-                                        if (!isFind)
-                                            sbNotExit.Append(" <td scope='col'></td>");
-                                    }
-                                    sbNotExit.Append("</tr>");
-                                }
-                                sbNotExit.Append("</table>");
+                                sizeHeader.Add(sH);
                             }
                         }
-                    }
-                    #endregion
-                    #endregion
+                        if (!(getHeader.Any(x => x.SequenceEqual(sizeHeader))))
+                        {
+                            if (initFlag)
+                            {
+                                sbNotExit.Append("<h4>資料列</h4>");
+                                sbNotExit.Append("<h4>Size Table</h4>");
+                                initFlag = false;
+                            }
+                            else if (!initFlag) sbNotExit.Append("</table>");
+                            sbNotExit.Append("<table class='table table-hover'>");
+                            sbNotExit.Append("<tr>");
+                            sbNotExit.Append(" <th scope='col'>#</th>");
+                            sbNotExit.Append(" <th scope='col'>Name</th>");
+                            sbNotExit.Append(" <th scope='col'>Criticality</th>");
+                            sbNotExit.Append(" <th scope='col'>Tol(-)</th>");
+                            sbNotExit.Append(" <th scope='col'>Tol(+)</th>");
 
-                }//end if
+                            for (int i = 1; i <= 15; i++)
+                            {
+                                string sH = getdata["H" + i].ToString();
+                                if (!string.IsNullOrEmpty(sH))
+                                {
+                                    if (listSourceSizeTableHeader.Any(x => x == sH))
+                                    {
+                                        sbNotExit.Append("  <th scope='col'>" + sH + "</th>");
+                                    }
+                                    else
+                                    {
+                                        sbNotExit.Append("  <th scope='col' style='background-color:red'>" + sH + "</th>");
+                                    }
+                                }
+                            }
+                            getHeader.Add(sizeHeader);
+                        }
+
+                        sbNotExit.Append("<tr data-rowid='" + getdata["rowid"].ToString() + "'>");
+                        sbNotExit.Append(" <td scope='col' data-lustid='" + getdata["lustid"].ToString() + "' data-org_lustid='" + getdata["org_lustid"].ToString() + "' data-col='codeid' >" + getdata["codeid"].ToString() + "</td>");
+                        sbNotExit.Append(" <td scope='col' data-lustid='" + getdata["lustid"].ToString() + "' data-org_lustid='" + getdata["org_lustid"].ToString() + "' data-col='Name' >" + getdata["Name"].ToString() + "</td>");
+                        sbNotExit.Append(" <td scope='col' data-lustid='" + getdata["lustid"].ToString() + "' data-org_lustid='" + getdata["org_lustid"].ToString() + "' data-col='Criticality' >" + getdata["Criticality"].ToString() + "</td>");
+                        sbNotExit.Append(" <td scope='col' data-lustid='" + getdata["lustid"].ToString() + "' data-org_lustid='" + getdata["org_lustid"].ToString() + "' data-col='TolA' >" + getdata["TolA"].ToString() + "</td>");
+                        sbNotExit.Append(" <td scope='col' data-lustid='" + getdata["lustid"].ToString() + "' data-org_lustid='" + getdata["org_lustid"].ToString() + "' data-col='TolB' >" + getdata["TolB"].ToString() + "</td>");
+                        for (int i = 1; i <= 15; i++)
+                        {
+                            if ((string.IsNullOrEmpty(getdata["A" + i].ToString()) || getdata["A" + i].ToString() == "----") && getdata["H" + i].ToString().Replace(" ", "") != "Comments") break;
+                            sbNotExit.Append(" <td scope='col' data-lustid='" + getdata["lustid"].ToString() + "' data-org_lustid='" + getdata["org_lustid"].ToString() + "' data-col='A" + i + "' >" + getdata["A" + i].ToString() + "</td>");
+                        }
+                        sbNotExit.Append("</tr>");                            
+                    }
+                    if (getSizeTable.Rows.Count > 0) sbNotExit.Append("</table>");                        
+                }
+                #endregion
+                #endregion
+                
                 #endregion
             }
             divHeader.InnerHtml = sb.ToString();
