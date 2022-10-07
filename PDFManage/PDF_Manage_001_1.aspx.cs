@@ -34,6 +34,24 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
         string sSql = "";
 
 
+        if (LoginUser.CUST_NO.Contains("1"))
+        {
+            //dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
+            //ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
+            dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
+        }
+        if (LoginUser.CUST_NO.Contains("2"))
+        {
+            //dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
+            //ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
+            dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
+        }
+        if (LoginUser.CUST_NO.Contains("3"))
+        {
+            //dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
+            //ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
+            dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
+        }
     }
 
 
@@ -53,6 +71,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
             sSql += "from PDFTAG.dbo.GroupManage a              \n";
             sSql += " where 1=1 and a.isshow=0  \n";
 
+            sSql += " and a.gmcate in ('" + string.Join("','", LoginUser.CUST_NO) + "') \n";
 
             if (!string.IsNullOrEmpty(txt))
                 sSql += " and (a.gmname like '%" + txt + "%'  ) \n";

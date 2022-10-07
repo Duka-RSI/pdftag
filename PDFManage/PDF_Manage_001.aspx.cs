@@ -53,9 +53,11 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 		sSql = "select gmid,gmname \n";
 		sSql += "from PDFTAG.dbo.GroupManage a              \n";
 		sSql += " where 1=1 and a.isshow=0  \n";
+
+		sSql += " and a.gmcate in ('" + string.Join("','", LoginUser.CUST_NO) + "') \n";
 		sSql += "order by a.gmname \n";
 
-
+		Response.Write("<!--" + sSql + "-->");
 		using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
 		{
 			using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
@@ -63,10 +65,10 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 				da.Fill(dt);
 			}
 
-			ddlGroup.DataTextField = "gmname";
-			ddlGroup.DataValueField = "gmid";
-			ddlGroup.DataSource = dt;
-			ddlGroup.DataBind();
+			//ddlGroup.DataTextField = "gmname";
+			//ddlGroup.DataValueField = "gmid";
+			//ddlGroup.DataSource = dt;
+			//ddlGroup.DataBind();
 			ddlGroup.Items.Insert(0, new System.Web.UI.WebControls.ListItem("全部", ""));
 
 
@@ -80,6 +82,29 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 		}
 
 
+		if (LoginUser.CUST_NO.Contains("1"))
+		{
+			dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
+			ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
+			dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
+		}
+		if (LoginUser.CUST_NO.Contains("2"))
+		{
+			dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
+			ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
+			dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
+		}
+		if (LoginUser.CUST_NO.Contains("3"))
+		{
+			dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
+			ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
+			dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
+		}
+
+		if (dlVersion.Items.Count > 0)
+		{
+			dlVersion_SelectedIndexChanged(null, null);
+		}
 	}
 
 
@@ -299,7 +324,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 			arrLu_LearnmgrItemDto = cn.Query<Lu_LearnmgrItemDto>(sSql, new { }).ToList();
 		}
 		//20220714 不做取代,改成修改
-		//arrLu_LearnmgrItemDto = new List<Lu_LearnmgrItemDto>();
+		arrLu_LearnmgrItemDto = new List<Lu_LearnmgrItemDto>();
 
 		using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
 		{
@@ -313,17 +338,17 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 				da.Fill(dt);
 			}
 
-            //sSql = "select * from PDftag.dbo.Lu_LearnmgrItem  \n";
+			//sSql = "select * from PDftag.dbo.Lu_LearnmgrItem  \n";
 
-            //cm.CommandText = sSql;
-            //cm.Parameters.Clear();
-            //DataTable dtLu_LearnmgrItem = new DataTable();
-            //using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
-            //{
-            //    da.Fill(dtLu_LearnmgrItem);
-            //}
+			//cm.CommandText = sSql;
+			//cm.Parameters.Clear();
+			//DataTable dtLu_LearnmgrItem = new DataTable();
+			//using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+			//{
+			//    da.Fill(dtLu_LearnmgrItem);
+			//}
 
-            string titleType = dt.Rows[0]["titleType"].ToString();
+			string titleType = dt.Rows[0]["titleType"].ToString();
 			string sPDFPath = Server.MapPath("~/PDFManage/" + dt.Rows[0]["piuploadfile"].ToString());
 			//string sSaveTxtPath = Server.MapPath("~/PdfToText/" + Path.GetFileNameWithoutExtension(dt.Rows[0]["piuploadfile"].ToString()) + ".txt");
 			string sSaveTxtPath = Server.MapPath("~/PDFManage/" + dt.Rows[0]["piuploadfile"].ToString().Replace(".pdf", ".txt")); ;
@@ -575,11 +600,9 @@ values
 									string B9 = (iDataLength >= 21 ? arrRowValue[20].Trim() : "");
 									string B10 = (iDataLength >= 22 ? arrRowValue[21].Trim() : "");
 
-                                    #region 比對詞彙
+									#region 比對詞彙
 
-                                    //StandardPlacement、Placement、Supplier在原文件直接插入學習後的詞
-                                    //SupplierArticle原文件保留，之後UPDATE在編輯的版本，並顯示修改
-                                    var res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "StandardPlacement"
+									var res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "StandardPlacement"
 									 && x.Termname_org == StandardPlacement.Trim().Replace(" ", "").ToLower());
 
 									if (res != null)
@@ -590,12 +613,12 @@ values
 
 									if (res != null)
 										Placement = res.Termname;
-                                                                        
-									//res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "SupplierArticle"
-									//&& x.Termname_org == SupplierArticle.Trim().Replace(" ", "").ToLower());
 
-									//if (res != null)
-									//	SupplierArticle = res.Termname;
+									res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "SupplierArticle"
+									&& x.Termname_org == SupplierArticle.Trim().Replace(" ", "").ToLower());
+
+									if (res != null)
+										SupplierArticle = res.Termname;
 
 									res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "Supplier"
 								  && x.Termname_org == Supplier.Trim().Replace(" ", "").ToLower());
@@ -605,8 +628,7 @@ values
 
 									if (false)
 									{
-                                        #region color
-                                        bool isUpdateColor = false;
+										bool isUpdateColor = false;
 										for (int a = 1; a <= 10; a++)
 										{
 											if (a > arrBOMGarmentcolorHeaders.Count)
@@ -722,16 +744,17 @@ values
 														isUpdateColor = true;
 													}
 													break;
+
 											}
+
 										}
-                                        #endregion
-                                    }
+									}
 
 
-                                    #endregion
+									#endregion
 
 
-                                    bool isEdit = false;
+									bool isEdit = false;
 
 
 									sSql = @"insert into PDFTAG.dbo.Lu_BOM 
@@ -1607,29 +1630,27 @@ insert into PDFTAG.dbo.Lu_SizeTable
 					bool isUpdate = false;
 					bool IsMappingSupplierArticle = false;
 
-                    #region 比對詞彙
+					#region 比對詞彙
 
-                    //StandardPlacement、Placement、Supplier原文件已被取代這邊不須再更新
-                    //SupplierArticle找出學習的詞，並顯示修改
-                    //var res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "StandardPlacement"
-                    // && x.Termname_org == StandardPlacement.Trim().Replace(" ", "").ToLower());
+					var res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "StandardPlacement"
+					 && x.Termname_org == StandardPlacement.Trim().Replace(" ", "").ToLower());
 
-                    //if (res != null)
-                    //{
-                    //	StandardPlacement = res.Termname;
-                    //	isUpdate = true;
-                    //}
+					if (res != null)
+					{
+						StandardPlacement = res.Termname;
+						isUpdate = true;
+					}
 
-                    //res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "Placement"
-                    // && x.Termname_org == Placement.Trim().Replace(" ", "").ToLower());
+					res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "Placement"
+					 && x.Termname_org == Placement.Trim().Replace(" ", "").ToLower());
 
-                    //if (res != null)
-                    //{
-                    //	Placement = res.Termname;
-                    //	isUpdate = true;
-                    //}
+					if (res != null)
+					{
+						Placement = res.Termname;
+						isUpdate = true;
+					}
 
-                    var res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "SupplierArticle"
+					res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "SupplierArticle"
 				&& x.Termname_org == SupplierArticle.Trim().Replace(" ", "").ToLower());
 
 					if (res != null)
@@ -1656,17 +1677,16 @@ insert into PDFTAG.dbo.Lu_SizeTable
 						}
 					}
 
-                    //res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "Supplier"
-                    // && x.Termname_org == Supplier.Trim().Replace(" ", "").ToLower());
+					res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "Supplier"
+				  && x.Termname_org == Supplier.Trim().Replace(" ", "").ToLower());
 
-                    //if (res != null)
-                    //{
-                    //	Supplier = res.Termname;
-                    //	isUpdate = true;
-                    //}
+					if (res != null)
+					{
+						Supplier = res.Termname;
+						isUpdate = true;
+					}
 
-                    #region color
-                    bool isUpdateColor = false;
+					bool isUpdateColor = false;
 					for (int a = 1; a <= 10; a++)
 					{
 						//20220803 不會針對0002-WHT做判斷，只會針對White的內容做取代，並顯示 修: PreWhite。trm 也有一個 0002-WHT。點[學習]後，不會把 DTM 變成 PreWhite
@@ -1805,15 +1825,14 @@ insert into PDFTAG.dbo.Lu_SizeTable
 						}
 
 					}
-                    #endregion
 
-                    #endregion
+					#endregion
 
-                    if (isUpdate)
+					if (isUpdate)
 					{
 						bool isEdit = false;
 
-						//if (isUpdateColor)
+						if (isUpdateColor)
 							isEdit = true;
 
 						sSql = "update PDFTAG.dbo.Lu_BOM \n";
@@ -2097,9 +2116,9 @@ insert into PDFTAG.dbo.Lu_SizeTable
 						sSql = "delete PDFTAG.dbo.GAP_BOM where pipid=@pipid;";
 						sSql += "delete PDFTAG.dbo.GAP_BOMGarmentcolor where pipid=@pipid;";
 						sSql += "delete PDFTAG.dbo.GAP_SizeTable where pipid=@pipid;";
-						sSql += "delete PDFTAG.dbo.GAP_SizeTable_1 where pipid=@pipid;";
+						//sSql += "delete PDFTAG.dbo.GAP_SizeTable_1 where pipid=@pipid;";
 						sSql += "delete PDFTAG.dbo.GAP_SizeTable_Header where pipid=@pipid;";
-						sSql += "delete PDFTAG.dbo.GAP_SizeTable_Header_1 where pipid=@pipid;";
+						//sSql += "delete PDFTAG.dbo.GAP_SizeTable_Header_1 where pipid=@pipid;";
 						sSql += "delete PDFTAG.dbo.GAP_Header where pipid=@pipid;";
 						sSql += @"insert into PDFTAG.dbo.GAP_Header 
 (pipid, season, style, styledesc,ProductDescription, productsize, brand, dividion,class,pod,stylestatus,generateddate,stylesketch,creator,createordate,mdate,isEdit) 
@@ -2438,6 +2457,12 @@ values
 										else
 										{
 											iColumnLen = iLen - iStartIdx - 1;
+
+											if ((i + 1) == iBomHeadersStartIdxCount)
+											{
+												//最後一個欄位
+												iColumnLen = iLen - iStartIdx;
+											}
 										}
 										if ((iStartIdx + iColumnLen) > iLen)
 											iColumnLen = iLen - iStartIdx - 1;
@@ -2661,7 +2686,8 @@ values
 												int iSizeTotalLen = sLine.Length - iTolAddEndIdx;
 												int iSizeCount = iSizeTotalLen / iSizeColumn;
 												string sSize = sLine.Substring(iTolAddEndIdx, iSizeTotalLen).TrimStart();
-												var arrSizeVals = SplitString(sSize, iSizeCount).ToArray();
+												//var arrSizeVals = SplitString(sSize, iSizeCount).ToArray();
+												string[] arrSizeVals = sSize.Trim().Replace("  ", "@").Split('@').Where(w => !string.IsNullOrWhiteSpace(w)).ToArray();
 												sColVal = arrSizeVals[iSizeValueIdx].Trim();
 											}
 											catch (Exception ex) { }
@@ -3181,7 +3207,8 @@ insert into PDFTAG.dbo.GAP_SizeTable
 						if (string.IsNullOrEmpty(ua_HeaderDto.style))
 						{
 							//@Row: Status: Prototype1363621 - BaseSeason: FW22Lifecycle: CarryoverUA Tech 6in Novelty 2 PackRegional Fit: US %% 
-							string sTempLine = sLine.Replace("@Row:", "").Replace("Status: Prototype", "@Row").Replace("Season:", "@Row");
+							//@Row: Status: Pre-Production1361426 - MCSSeason: SS22Lifecycle: CarryoverUA Training Vent 2.0 SSRegional Fit: US %% 
+							string sTempLine = sLine.Replace("@Row:", "").Replace("Status: Prototype", "@Row").Replace("Status: Pre-Production", "@Row").Replace("Season:", "@Row");
 							string style = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Split('-')[0].Trim();
 
 							sTempLine = sLine.Replace("@Row:", "").Replace("Lifecycle:", "@Row").Replace("Regional Fit:", "@Row");
@@ -3231,9 +3258,9 @@ insert into PDFTAG.dbo.GAP_SizeTable
 						sSql = "delete PDFTAG.dbo.UA_BOM where pipid=@pipid;";
 						sSql += "delete PDFTAG.dbo.UA_BOMGarmentcolor where pipid=@pipid;";
 						sSql += "delete PDFTAG.dbo.UA_SizeTable where pipid=@pipid;";
-						sSql += "delete PDFTAG.dbo.UA_SizeTable_1 where pipid=@pipid;";
+						//sSql += "delete PDFTAG.dbo.UA_SizeTable_1 where pipid=@pipid;";
 						sSql += "delete PDFTAG.dbo.UA_SizeTable_Header where pipid=@pipid;";
-						sSql += "delete PDFTAG.dbo.UA_SizeTable_Header_1 where pipid=@pipid;";
+						//sSql += "delete PDFTAG.dbo.UA_SizeTable_Header_1 where pipid=@pipid;";
 						sSql += "delete PDFTAG.dbo.UA_Header where pipid=@pipid;";
 						sSql += @"insert into PDFTAG.dbo.UA_Header 
 (pipid, season, style, styledesc, productsize, brand, dividion,class,pod,stylestatus,generateddate,stylesketch,creator,createordate,mdate,isEdit) 
@@ -3241,7 +3268,7 @@ values
 (@pipid, @season, @style, @styledesc, @productsize, @brand, @dividion, @class, @pod, @stylestatus, @generateddate, @stylesketch, @creator, @createordate, @mdate,0); SELECT SCOPE_IDENTITY();";
 
 
-						Response.Write("<!--[PaseUA_Header] pipid="+ pipid + " sSql=" + sSql + "-->");
+						Response.Write("<!--[PaseUA_Header] pipid=" + pipid + " sSql=" + sSql + "-->");
 						cm.CommandText = sSql;
 						cm.Parameters.Clear();
 
@@ -4406,4 +4433,39 @@ values
 	}
 
 
+
+	protected void dlVersion_SelectedIndexChanged(object sender, EventArgs e)
+	{
+		var sql = new SQLHelper();
+		var dt = new DataTable();
+
+		string sSql = "";
+
+		string version = dlVersion.SelectedItem.Value;
+
+		sSql = "select gmid,gmname \n";
+		sSql += "from PDFTAG.dbo.GroupManage a              \n";
+		sSql += " where 1=1 and a.isshow=0  \n";
+
+		sSql += " and a.gmcate in ('" + version + "') \n";
+		sSql += "order by a.gmname \n";
+
+		Response.Write("<!--" + sSql + "-->");
+		using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
+		{
+			using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+			{
+				da.Fill(dt);
+			}
+
+			ddlGroup.DataTextField = "gmname";
+			ddlGroup.DataValueField = "gmid";
+			ddlGroup.DataSource = dt;
+			ddlGroup.DataBind();
+			ddlGroup.Items.Insert(0, new System.Web.UI.WebControls.ListItem("全部", ""));
+
+
+		}
+
+	}
 }

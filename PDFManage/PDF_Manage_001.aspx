@@ -35,11 +35,11 @@
                             </label>
                         </div>
                         <div class="col-4 col-md-3">
-                            <asp:DropDownList ID="dlVersion" runat="server" CssClass="form-control">
+                            <asp:DropDownList ID="dlVersion" runat="server" CssClass="form-control" OnSelectedIndexChanged="dlVersion_SelectedIndexChanged" AutoPostBack="true">
                                <%-- <asp:ListItem Value="" Text="全部"></asp:ListItem>--%>
-                                <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
+                               <%-- <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
                                 <asp:ListItem Value="2" Text="UA"></asp:ListItem>
-                                <asp:ListItem Value="3" Text="GAP"></asp:ListItem>
+                                <asp:ListItem Value="3" Text="GAP"></asp:ListItem>--%>
                             </asp:DropDownList>
                         </div>
                         <div class="col-0">
@@ -139,7 +139,7 @@
                                             runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>
                                             </span>
 
-                                        <span <%# ((int)Eval("pver")==3 && string.IsNullOrEmpty(Eval("mdate").ToString()))?"":"style='display:none'"%>>
+                                        <span <%# LoginUser.role==LoginUser.ROLE_ADMIN || ((int)Eval("pver")==3 && string.IsNullOrEmpty(Eval("mdate").ToString()))?"":"style='display:none'"%>>
                                          <%--<a href="#" onclick="showExecuteGAP('<%# Eval("pipid")%>');return false;"><input type="button" value="執行" class="btn btn-secondary"></a>--%>
                                             <asp:LinkButton ID="LinkButton3" CommandName="parsePDF_GAP" CommandArgument='<%# Eval("pipid")%>'
                                             runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>
@@ -211,9 +211,9 @@
                             </th>
                             <td align="left">
                                 <asp:DropDownList ID="ddlpver" runat="server" CssClass="form-control">
-                                    <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
+                                  <%--  <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
                                     <asp:ListItem Value="2" Text="UA"></asp:ListItem>
-                                    <asp:ListItem Value="3" Text="GAP"></asp:ListItem>
+                                    <asp:ListItem Value="3" Text="GAP"></asp:ListItem>--%>
                                 </asp:DropDownList>
                             </td>
                         </tr>
@@ -230,9 +230,9 @@
                         <tr>
                             <td align="left" colspan="2">群組類別:
                                 <asp:DropDownList ID="dlgmcate" runat="server">
-                                    <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
+                                   <%-- <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
                                     <asp:ListItem Value="2" Text="UA"></asp:ListItem>
-                                    <asp:ListItem Value="3" Text="GAP"></asp:ListItem>
+                                    <asp:ListItem Value="3" Text="GAP"></asp:ListItem>--%>
                                 </asp:DropDownList>
                                 <asp:HiddenField ID="hidgmid" runat="server" />
                                 群組名稱:<input type="text" id="txtSearch2" /><input type="button" value="查詢" onclick="onQuery()" />

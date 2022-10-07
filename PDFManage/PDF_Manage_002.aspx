@@ -37,9 +37,9 @@
                         <div class="col-4 col-md-3">
                             <asp:DropDownList ID="dlVersion" runat="server" CssClass="form-control">
                                 <asp:ListItem Value="" Text="全部"></asp:ListItem>
-                                <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
+                               <%-- <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
                                 <asp:ListItem Value="2" Text="UA"></asp:ListItem>
-                                <asp:ListItem Value="3" Text="GAP"></asp:ListItem>
+                                <asp:ListItem Value="3" Text="GAP"></asp:ListItem>--%>
                             </asp:DropDownList>
                         </div>
                         <div class="col-0">
@@ -172,9 +172,9 @@
                             </th>
                             <td align="left">
                                 <asp:DropDownList ID="ddlpver" runat="server" CssClass="form-control" onchange="ddlpver_change()">
-                                    <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
+                                   <%-- <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
                                     <asp:ListItem Value="2" Text="UA"></asp:ListItem>
-                                    <asp:ListItem Value="3" Text="GAP"></asp:ListItem>
+                                    <asp:ListItem Value="3" Text="GAP"></asp:ListItem>--%>
                                 </asp:DropDownList>
                             </td>
                         </tr>
