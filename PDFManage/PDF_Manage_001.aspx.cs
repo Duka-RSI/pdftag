@@ -16,6 +16,8 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 {
 	protected string script;
 	protected string parse = "0";
+    List<string> listSampleStep = new List<string>();
+    List<string> listSampleSize = new List<string>();
 
 	protected void Page_Load(object sender, EventArgs e)
 	{
@@ -376,6 +378,9 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 			int iRowid = 1;
 			long luhid = 0;
 			string type = "";
+            string sample = "";
+            string sampleStep = "";
+            int countHeader = -1;
 
 			using (StreamReader data = new StreamReader(sSaveTxtPath))
 			{
@@ -473,6 +478,10 @@ values
 							isMaterialColorReport = true;
 						else if (sLine.Contains("@Row: #  | Name  | Criticality"))
 							isMaterialColorReport = false;
+                        else if (sLine.Contains("@Row: Request Name"))
+                        {
+                            countHeader++;//找到樣衣尺寸
+                        }
 
 
 						if (isMaterialColorReport)
@@ -600,7 +609,7 @@ values
 									string B9 = (iDataLength >= 21 ? arrRowValue[20].Trim() : "");
 									string B10 = (iDataLength >= 22 ? arrRowValue[21].Trim() : "");
 
-									#region 比對詞彙
+                                    #region 比對詞彙
 
                                     //StandardPlacement、Placement、Supplier在原文件直接插入學習後的詞
                                     //SupplierArticle原文件保留，之後UPDATE在編輯的版本，並顯示修改
@@ -756,7 +765,7 @@ values
                                     #endregion
 
 
-                                    bool isEdit = false;
+									bool isEdit = false;
 
 
 									sSql = @"insert into PDFTAG.dbo.Lu_BOM 
@@ -816,182 +825,197 @@ values
 							#region Lu_SizeTable
 
 							string[] arrRow = sLine.Split(new string[] { "@Row:" }, StringSplitOptions.None);
-							if (sLine.Contains("@Row: #  | Name"))
-							{
-								List<Lu_SizeTableDto> arrLu_SizeTableDtos = new List<Lu_SizeTableDto>();
-								iRowid = 1;
-								long lusthid = 0;
-								int idxOfHTMInstruction = 0;
-								for (int i = 0; i < arrRow.Length; i++)
-								{
-									string sRowLine = arrRow[i].Trim().TrimStart('|').TrimEnd('|');
-									if (i == 1)
-									{
-										#region Lu_SizeTable_Header
+                            if (sLine.Contains("@Row: #  | Name"))
+                            {
+                                List<Lu_SizeTableDto> arrLu_SizeTableDtos = new List<Lu_SizeTableDto>();
+                                iRowid = 1;
+                                long lusthid = 0;
+                                int idxOfHTMInstruction = 0;
 
-										string[] arrRowValue = sRowLine.Split(new string[] { "|" }, StringSplitOptions.None);
+                                for (int i = 0; i < arrRow.Length; i++)
+                                {
+                                    string sRowLine = arrRow[i].Trim().TrimStart('|').TrimEnd('|');
+                                    if (i == 1)
+                                    {
+                                        #region Lu_SizeTable_Header
 
+                                        string[] arrRowValue = sRowLine.Split(new string[] { "|" }, StringSplitOptions.None);
 
 										sSql = @"insert into PDFTAG.dbo.Lu_SizeTable_Header 
-(pipid,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15) 
+(pipid,SAMPLE,SAMPLESTEP,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15) 
 values 
-(@pipid,@H1,@H2,@H3,@H4,@H5,@H6,@H7,@H8,@H9,@H10,@H11,@H12,@H13,@H14,@H15); SELECT SCOPE_IDENTITY();";
+(@pipid,@sample,@sampleStep,@H1,@H2,@H3,@H4,@H5,@H6,@H7,@H8,@H9,@H10,@H11,@H12,@H13,@H14,@H15); SELECT SCOPE_IDENTITY();";
 
 										cm.CommandText = sSql;
 										cm.Parameters.Clear();
 										cm.Parameters.AddWithValue("@pipid", pipid);
 
+                                        for (int h = 0; h < 20; h++)
+                                        {
+                                            if (h < arrRowValue.Length)
+                                            {
+                                                if (arrRowValue[h].Replace(" ", "").Trim().ToLower() == "htminstruction")
+                                                {
+                                                    idxOfHTMInstruction = h;
+                                                }
+                                            }
+                                        }
 
-										for (int h = 0; h < 20; h++)
-										{
-											if (h < arrRowValue.Length)
-											{
-												if (arrRowValue[h].Replace(" ", "").Trim().ToLower() == "htminstruction")
-												{
-													idxOfHTMInstruction = h;
-												}
-											}
+                                        //for (int h = (idxOfHTMInstruction == 5 ? 6 : 5); h < 20; h++)
+                                        //{
+                                        //    int iHIdex = (idxOfHTMInstruction == 5 ? (h - 5) : (h - 4));
 
+                                        //    if (h < arrRowValue.Length)
+                                        //    {
+                                        //        cm.Parameters.AddWithValue("@H" + iHIdex, arrRowValue[h].ToString().Trim());
 
-										}
+                                        //        if (arrRowValue[h].Replace(" ", "").Trim().ToLower() == "htminstruction")
+                                        //        {
+                                        //            idxOfHTMInstruction = h;
+                                        //        }
+                                        //    }
+                                        //    else
+                                        //        cm.Parameters.AddWithValue("@H" + iHIdex, "");
+                                        //}
+                                        bool flagSample = false;
+                                        bool flagHTM = false;
+                                        for (int h = 1; h <= 15; h++)
+                                        {
+                                            int iHIdex = (idxOfHTMInstruction == 5 ? (h + 5) : (h + 4));
+                                            string val = "";
+                                            if (iHIdex < arrRowValue.Length)
+                                            {
+                                                val = arrRowValue[iHIdex].ToString().Trim();
+                                            }
+                                            if (val == "New")
+                                            {
+                                                flagSample = true;
+                                                sample = listSampleStep[countHeader];
+                                                int leftIndex = sample.IndexOf("(");
+                                                int rightIndex = sample.IndexOf(")");
+                                                if (leftIndex > -1 && rightIndex > -1)
+                                                {
+                                                    sampleStep = sample.Substring(leftIndex + 1, rightIndex - leftIndex - 1).Trim();
+                                                    sample = sample.Substring(0, leftIndex).Trim();
+                                                }
+                                                else
+                                                    sampleStep = sample;
+                                                val = listSampleSize[countHeader];
+                                            }
+                                            cm.Parameters.AddWithValue("@H" + h, val);
 
-										//for (int h = (idxOfHTMInstruction == 5 ? 6 : 5); h < 20; h++)
-										//{
-										//    int iHIdex = (idxOfHTMInstruction == 5 ? (h - 5) : (h - 4));
+                                            if (val.Replace(" ", "").Trim().ToLower() == "htminstruction")
+                                            {
+                                                idxOfHTMInstruction = iHIdex;
+                                                flagHTM = true;
+                                            }
+                                        }
+                                        //如果沒有New表示為全段尺寸表，就清空
+                                        if (!flagSample) { sample = ""; sampleStep = ""; }
+                                        cm.Parameters.AddWithValue("@sample", sample);
+                                        cm.Parameters.AddWithValue("@sampleStep", sampleStep);
 
-										//    if (h < arrRowValue.Length)
-										//    {
-										//        cm.Parameters.AddWithValue("@H" + iHIdex, arrRowValue[h].ToString().Trim());
-
-										//        if (arrRowValue[h].Replace(" ", "").Trim().ToLower() == "htminstruction")
-										//        {
-										//            idxOfHTMInstruction = h;
-										//        }
-										//    }
-										//    else
-										//        cm.Parameters.AddWithValue("@H" + iHIdex, "");
-										//}
-
-
-										for (int h = 1; h <= 15; h++)
-										{
-											int iHIdex = (idxOfHTMInstruction == 5 ? (h + 5) : (h + 4));
-											string val = "";
-											if (iHIdex < arrRowValue.Length)
-											{
-												val = arrRowValue[iHIdex].ToString().Trim();
-											}
-
-											cm.Parameters.AddWithValue("@H" + h, val);
-
-											if (val.Replace(" ", "").Trim().ToLower() == "htminstruction")
-											{
-												idxOfHTMInstruction = iHIdex;
-											}
-
-										}
-
-										lusthid = Convert.ToInt64(cm.ExecuteScalar().ToString());
-
-
-										#endregion
-
-									}
-									else if (i >= 2)
-									{
-										string[] arrRowValue = sRowLine.Split(new string[] { "|" }, StringSplitOptions.None);
-
-										int iLength = arrRowValue.Length;
-
-										if (idxOfHTMInstruction == 5)
-										{
-											//HTMInstruction 在Tol(-)後
-											arrLu_SizeTableDtos.Add(new Lu_SizeTableDto()
-											{
-												rowid = iRowid,
-												codeid = arrRowValue[0].Trim(),
-												Name = arrRowValue[1].Trim(),
-												Criticality = arrRowValue[2].Trim(),
-												TolA = arrRowValue[3].Trim(),
-												TolB = arrRowValue[4].Trim(),
-												HTMInstruction = arrRowValue[5].Trim(),
-												A1 = iLength >= 7 ? ConvertToStrDouble(arrRowValue[6].Trim()).ToString() : "",
-												A2 = iLength >= 8 ? ConvertToStrDouble(arrRowValue[7].Trim()).ToString() : "",
-												A3 = iLength >= 9 ? ConvertToStrDouble(arrRowValue[8].Trim()).ToString() : "",
-												A4 = iLength >= 10 ? ConvertToStrDouble(arrRowValue[9].Trim()).ToString() : "",
-												A5 = iLength >= 11 ? ConvertToStrDouble(arrRowValue[10].Trim()).ToString() : "",
-												A6 = iLength >= 12 ? ConvertToStrDouble(arrRowValue[11].Trim()).ToString() : "",
-												A7 = iLength >= 13 ? ConvertToStrDouble(arrRowValue[12].Trim()).ToString() : "",
-												A8 = iLength >= 14 ? ConvertToStrDouble(arrRowValue[13].Trim()).ToString() : "",
-												A9 = iLength >= 15 ? ConvertToStrDouble(arrRowValue[14].Trim()).ToString() : "",
-												A10 = iLength >= 16 ? ConvertToStrDouble(arrRowValue[15].Trim()).ToString() : "",
-												A11 = iLength >= 17 ? ConvertToStrDouble(arrRowValue[16].Trim()).ToString() : "",
-												A12 = iLength >= 18 ? ConvertToStrDouble(arrRowValue[17].Trim()).ToString() : "",
-												A13 = iLength >= 19 ? ConvertToStrDouble(arrRowValue[18].Trim()).ToString() : "",
-												A14 = iLength >= 20 ? ConvertToStrDouble(arrRowValue[19].Trim()).ToString() : "",
-												A15 = iLength >= 21 ? ConvertToStrDouble(arrRowValue[20].Trim()).ToString() : "",
-											});
-										}
-										else
-										{
-											//HTMInstruction 不在Tol(-)後
-
-											arrLu_SizeTableDtos.Add(new Lu_SizeTableDto()
-											{
-												rowid = iRowid,
-												codeid = arrRowValue[0].Trim(),
-												Name = arrRowValue[1].Trim(),
-												Criticality = arrRowValue[2].Trim(),
-												TolA = arrRowValue[3].Trim(),
-												TolB = arrRowValue[4].Trim(),
-												HTMInstruction = (idxOfHTMInstruction > 0 ? arrRowValue[idxOfHTMInstruction].Trim() : ""),
-												A1 = iLength >= 6 ? ConvertToStrDouble(arrRowValue[5].Trim()).ToString() : "",
-												A2 = iLength >= 7 ? ConvertToStrDouble(arrRowValue[6].Trim()).ToString() : "",
-												A3 = iLength >= 8 ? ConvertToStrDouble(arrRowValue[7].Trim()).ToString() : "",
-												A4 = iLength >= 9 ? ConvertToStrDouble(arrRowValue[8].Trim()).ToString() : "",
-												A5 = iLength >= 10 ? ConvertToStrDouble(arrRowValue[9].Trim()).ToString() : "",
-												A6 = iLength >= 11 ? ConvertToStrDouble(arrRowValue[10].Trim()).ToString() : "",
-												A7 = iLength >= 12 ? ConvertToStrDouble(arrRowValue[11].Trim()).ToString() : "",
-												A8 = iLength >= 13 ? ConvertToStrDouble(arrRowValue[12].Trim()).ToString() : "",
-												A9 = iLength >= 14 ? ConvertToStrDouble(arrRowValue[13].Trim()).ToString() : "",
-												A10 = iLength >= 15 ? ConvertToStrDouble(arrRowValue[14].Trim()).ToString() : "",
-												A11 = iLength >= 16 ? ConvertToStrDouble(arrRowValue[15].Trim()).ToString() : "",
-												A12 = iLength >= 17 ? ConvertToStrDouble(arrRowValue[16].Trim()).ToString() : "",
-												A13 = iLength >= 18 ? ConvertToStrDouble(arrRowValue[17].Trim()).ToString() : "",
-												A14 = iLength >= 19 ? ConvertToStrDouble(arrRowValue[18].Trim()).ToString() : "",
-												A15 = iLength >= 20 ? ConvertToStrDouble(arrRowValue[19].Trim()).ToString() : "",
-											});
-										}
+                                        lusthid = Convert.ToInt64(cm.ExecuteScalar().ToString());
 
 
-										iRowid++;
-									}
-								}
+                                        #endregion
 
-								foreach (var item in arrLu_SizeTableDtos)
-								{
-									#region 比對詞彙
+                                    }
+                                    else if (i >= 2)
+                                    {
+                                        string[] arrRowValue = sRowLine.Split(new string[] { "|" }, StringSplitOptions.None);
 
-									var res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "Size" && x.ColName == "Name"
-									&& x.Termname_org == item.Name.Trim().Replace(" ", "").ToLower());
+                                        int iLength = arrRowValue.Length;
 
-									if (res != null)
-										item.Name = res.Termname;
+                                        if (idxOfHTMInstruction == 5)
+                                        {
+                                            //HTMInstruction 在Tol(-)後
+                                            arrLu_SizeTableDtos.Add(new Lu_SizeTableDto()
+                                            {
+                                                rowid = iRowid,
+                                                codeid = arrRowValue[0].Trim(),
+                                                Name = arrRowValue[1].Trim(),
+                                                Criticality = arrRowValue[2].Trim(),
+                                                TolA = arrRowValue[3].Trim(),
+                                                TolB = arrRowValue[4].Trim(),
+                                                HTMInstruction = arrRowValue[5].Trim(),
+                                                A1 = iLength >= 7 ? ConvertToStrDouble(arrRowValue[6].Trim()).ToString() : "",
+                                                A2 = iLength >= 8 ? ConvertToStrDouble(arrRowValue[7].Trim()).ToString() : "",
+                                                A3 = iLength >= 9 ? ConvertToStrDouble(arrRowValue[8].Trim()).ToString() : "",
+                                                A4 = iLength >= 10 ? ConvertToStrDouble(arrRowValue[9].Trim()).ToString() : "",
+                                                A5 = iLength >= 11 ? ConvertToStrDouble(arrRowValue[10].Trim()).ToString() : "",
+                                                A6 = iLength >= 12 ? ConvertToStrDouble(arrRowValue[11].Trim()).ToString() : "",
+                                                A7 = iLength >= 13 ? ConvertToStrDouble(arrRowValue[12].Trim()).ToString() : "",
+                                                A8 = iLength >= 14 ? ConvertToStrDouble(arrRowValue[13].Trim()).ToString() : "",
+                                                A9 = iLength >= 15 ? ConvertToStrDouble(arrRowValue[14].Trim()).ToString() : "",
+                                                A10 = iLength >= 16 ? ConvertToStrDouble(arrRowValue[15].Trim()).ToString() : "",
+                                                A11 = iLength >= 17 ? ConvertToStrDouble(arrRowValue[16].Trim()).ToString() : "",
+                                                A12 = iLength >= 18 ? ConvertToStrDouble(arrRowValue[17].Trim()).ToString() : "",
+                                                A13 = iLength >= 19 ? ConvertToStrDouble(arrRowValue[18].Trim()).ToString() : "",
+                                                A14 = iLength >= 20 ? ConvertToStrDouble(arrRowValue[19].Trim()).ToString() : "",
+                                                A15 = iLength >= 21 ? ConvertToStrDouble(arrRowValue[20].Trim()).ToString() : "",
+                                            });
+                                        }
+                                        else
+                                        {
+                                            //HTMInstruction 不在Tol(-)後
 
-									res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "Size" && x.ColName == "Criticality"
-									 && x.Termname_org == item.Criticality.Trim().Replace(" ", "").ToLower());
+                                            arrLu_SizeTableDtos.Add(new Lu_SizeTableDto()
+                                            {
+                                                rowid = iRowid,
+                                                codeid = arrRowValue[0].Trim(),
+                                                Name = arrRowValue[1].Trim(),
+                                                Criticality = arrRowValue[2].Trim(),
+                                                TolA = arrRowValue[3].Trim(),
+                                                TolB = arrRowValue[4].Trim(),
+                                                HTMInstruction = (idxOfHTMInstruction > 0 ? arrRowValue[idxOfHTMInstruction].Trim() : ""),
+                                                A1 = iLength >= 6 ? ConvertToStrDouble(arrRowValue[5].Trim()).ToString() : "",
+                                                A2 = iLength >= 7 ? ConvertToStrDouble(arrRowValue[6].Trim()).ToString() : "",
+                                                A3 = iLength >= 8 ? ConvertToStrDouble(arrRowValue[7].Trim()).ToString() : "",
+                                                A4 = iLength >= 9 ? ConvertToStrDouble(arrRowValue[8].Trim()).ToString() : "",
+                                                A5 = iLength >= 10 ? ConvertToStrDouble(arrRowValue[9].Trim()).ToString() : "",
+                                                A6 = iLength >= 11 ? ConvertToStrDouble(arrRowValue[10].Trim()).ToString() : "",
+                                                A7 = iLength >= 12 ? ConvertToStrDouble(arrRowValue[11].Trim()).ToString() : "",
+                                                A8 = iLength >= 13 ? ConvertToStrDouble(arrRowValue[12].Trim()).ToString() : "",
+                                                A9 = iLength >= 14 ? ConvertToStrDouble(arrRowValue[13].Trim()).ToString() : "",
+                                                A10 = iLength >= 15 ? ConvertToStrDouble(arrRowValue[14].Trim()).ToString() : "",
+                                                A11 = iLength >= 16 ? ConvertToStrDouble(arrRowValue[15].Trim()).ToString() : "",
+                                                A12 = iLength >= 17 ? ConvertToStrDouble(arrRowValue[16].Trim()).ToString() : "",
+                                                A13 = iLength >= 18 ? ConvertToStrDouble(arrRowValue[17].Trim()).ToString() : "",
+                                                A14 = iLength >= 19 ? ConvertToStrDouble(arrRowValue[18].Trim()).ToString() : "",
+                                                A15 = iLength >= 20 ? ConvertToStrDouble(arrRowValue[19].Trim()).ToString() : "",
+                                            });
+                                        }
 
-									if (res != null)
-										item.Criticality = res.Termname;
+
+                                        iRowid++;
+                                    }
+                                }
+
+                                foreach (var item in arrLu_SizeTableDtos)
+                                {
+                                    #region 比對詞彙
+
+                                    var res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "Size" && x.ColName == "Name"
+                                    && x.Termname_org == item.Name.Trim().Replace(" ", "").ToLower());
+
+                                    if (res != null)
+                                        item.Name = res.Termname;
+
+                                    res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "Size" && x.ColName == "Criticality"
+                                     && x.Termname_org == item.Criticality.Trim().Replace(" ", "").ToLower());
+
+                                    if (res != null)
+                                        item.Criticality = res.Termname;
 
 
 
-									#endregion
+                                    #endregion
 
 
 
 
-									sSql = @"insert into PDFTAG.dbo.Lu_SizeTable 
+                                    sSql = @"insert into PDFTAG.dbo.Lu_SizeTable 
 (luhid,rowid,codeid,Name,Criticality,TolA,TolB,HTMInstruction,lusthid,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15) 
 values 
 (@luhid,@rowid,@codeid,@Name,@Criticality,@TolA,@TolB,@HTMInstruction,@lusthid,@A1,@A2,@A3,@A4,@A5,@A6,@A7,@A8,@A9,@A10,@A11,@A12,@A13,@A14,@A15)  SELECT SCOPE_IDENTITY();";
@@ -1045,30 +1069,44 @@ values
 								if (dtLu_SizeTable_Header.Rows.Count > 0)
 								{
 									List<string> arrSizeHeaders = new List<string>(){
-										"0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL", "NEW" };
+                                        "0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"};
+                                    //"0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL", "NEW" };
 
-									List<Lu_SizeHeaderDto> arrSizeHeaderIdxs = new List<Lu_SizeHeaderDto>();
-									for (int h = 1; h <= 15; h++)
-									{
-										if (arrSizeHeaders.Contains(dtLu_SizeTable_Header.Rows[0]["H" + h].ToString().Trim().ToUpper()))
-										{
-											arrSizeHeaderIdxs.Add(new Lu_SizeHeaderDto { Idx = h, Name = dtLu_SizeTable_Header.Rows[0]["H" + h].ToString().Trim() });
+                                    List<Lu_SizeHeaderDto> arrSizeHeaderIdxs = new List<Lu_SizeHeaderDto>();
 
-										}
-									}
+                                    for (int h = 1; h <= 15; h++)
+                                    {
+                                        if (arrSizeHeaders.Contains(dtLu_SizeTable_Header.Rows[0]["H" + h].ToString().Trim().ToUpper()))
+                                        {
+                                            arrSizeHeaderIdxs.Add(new Lu_SizeHeaderDto { Idx = h, Name = dtLu_SizeTable_Header.Rows[0]["H" + h].ToString().Trim() });
+                                        }
+                                        if (dtLu_SizeTable_Header.Rows[0]["H" + h].ToString().IndexOf(",") > -1)
+                                        {
+                                            string[] splitSampleSize = dtLu_SizeTable_Header.Rows[0]["H" + h].ToString().Split(',');
+                                            for (int i = 0; i < splitSampleSize.Count(); i++)
+                                            {
+                                                arrSizeHeaderIdxs.Add(new Lu_SizeHeaderDto { Idx = i + 1, Name = splitSampleSize[i].Trim().ToUpper() });
+                                            }
+                                            break;
+                                        }                                        
+                                    }
 
-									sSql = @"insert into PDFTAG.dbo.Lu_SizeTable_Header_1 
-(pipid,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15) 
+
+
+                                    sSql = @"insert into PDFTAG.dbo.Lu_SizeTable_Header_1 
+(pipid,SAMPLE,SAMPLESTEP,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15) 
 values 
-(@pipid,@H1,@H2,@H3,@H4,@H5,@H6,@H7,@H8,@H9,@H10,@H11,@H12,@H13,@H14,@H15); SELECT SCOPE_IDENTITY();";
+(@pipid,@sample,@sampleStep,@H1,@H2,@H3,@H4,@H5,@H6,@H7,@H8,@H9,@H10,@H11,@H12,@H13,@H14,@H15); SELECT SCOPE_IDENTITY();";
 
 									Response.Write("<!--" + sSql + "-->");
 									cm.CommandText = sSql;
 									cm.Parameters.Clear();
 									cm.Parameters.AddWithValue("@pipid", pipid);
-									for (int h = 0; h <= 14; h++)
-									{
-										//var res = arrSizeHeaderIdxs.FirstOrDefault(x => x.Idx == h);
+                                    cm.Parameters.AddWithValue("@sample", sample);
+                                    cm.Parameters.AddWithValue("@sampleStep", sampleStep);
+                                    for (int h = 0; h <= 14; h++)
+                                    {
+                                        //var res = arrSizeHeaderIdxs.FirstOrDefault(x => x.Idx == h);
 
 										if (h < arrSizeHeaderIdxs.Count)
 										{
@@ -1832,9 +1870,9 @@ insert into PDFTAG.dbo.Lu_SizeTable
 					}
                     #endregion
 
-                    #endregion
+					#endregion
 
-                    if (isUpdate)
+					if (isUpdate)
 					{
 						bool isEdit = false;
 
@@ -4147,14 +4185,16 @@ insert into PDFTAG.dbo.UA_SizeTable
 					foreach (AbsorbedCell cell in row.CellList)
 					{
 						string cellText = "";
-						foreach (TextFragment fragment in cell.TextFragments)
+                        bool getSamplStep = false;
+                        bool getSamplSize = false;
+                        foreach (TextFragment fragment in cell.TextFragments)
 						{
 							if (fragment.BaselinePosition.YIndent <= 11)
 							{
 								//Remove "Modified Date:Aug 11, 2020.."
 								continue;
 							}
-
+                            
 							foreach (TextSegment seg in fragment.Segments)
 							{
 								//if(seg.Text== "Standard")
@@ -4163,7 +4203,11 @@ insert into PDFTAG.dbo.UA_SizeTable
 								//}
 
 								cellText += (isHeader ? (seg.Text.EndsWith(":") ? "&" : "") : "") + seg.Text + " ";
-							}
+                                if (getSamplStep) { listSampleStep.Add(seg.Text); getSamplStep = false; }
+                                else if (getSamplSize) { listSampleSize.Add(seg.Text); getSamplSize = false; }
+                                if (seg.Text == "Sample") { getSamplStep = true; }
+                                else if (seg.Text == "Sample Size") { getSamplSize = true; }
+                            }
 							//sb.Append(seg.Text + " | ");
 							//Console.Write($"{sb.ToString()}|");                              
 						}

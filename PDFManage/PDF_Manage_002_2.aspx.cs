@@ -1581,7 +1581,7 @@ order by a.pidate,a.pipid";
                         {
                             //找compare codeid符合的第一筆
                             var tmpSizetable = getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("codeid").ToString().Replace(" ", "") == drSizeTables[s]["codeid"].ToString().Replace(" ", "")
-                                && x.Field<string>("H2") == drSizeTables[s]["H2"].ToString());
+                                && x.Field<string>("H1") == drSizeTables[s]["H1"].ToString());
 
                             string lustid = "";
                             string org_lustid = "";
@@ -1804,7 +1804,7 @@ order by a.pidate,a.pipid";
                             //如果有找到就刪掉，剩下的就是目的文件多的
                             if (!string.IsNullOrEmpty(codeid_compare))
                                 getSizeTable.Rows.Remove(getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("codeid").ToString().Replace(" ", "") == drSizeTables[s]["codeid"].ToString().Replace(" ", "")
-                                        && x.Field<string>("H2") == drSizeTables[s]["H2"].ToString()));
+                                        && x.Field<string>("H1") == drSizeTables[s]["H1"].ToString()));
 
                         }
                         sb.Append("</table>");
@@ -1890,7 +1890,6 @@ order by a.pidate,a.pipid";
                             sbNotExitSizeTmpTable.Append(" <th scope='col'>Criticality</th>");
                             sbNotExitSizeTmpTable.Append(" <th scope='col'>Tol(-)</th>");
                             sbNotExitSizeTmpTable.Append(" <th scope='col'>Tol(+)</th>");
-                            sbNotExitSizeTmpTable.Append(" <th scope='col'>HTM Instruction</th>");
 
                             foreach (var size in tmpSize)
                             {
@@ -1933,10 +1932,6 @@ order by a.pidate,a.pipid";
                                 {
                                     string compareHeader = drCompareSizeTables[s]["H" + i].ToString();
                                     if (string.IsNullOrEmpty(compareHeader)) { break; }
-                                    else if (i == 1)
-                                    {
-                                        sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='A" + i + "' >" + drCompareSizeTables[s]["A" + i].ToString() + "</td>");
-                                    }
                                     else if (tmpSize.Contains(compareHeader))
                                     {
                                         sizeTableFlag = true;

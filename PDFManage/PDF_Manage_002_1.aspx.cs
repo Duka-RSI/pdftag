@@ -325,7 +325,27 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
                                 standardPlacement = Compare(drOrgBom["StandardPlacement"].ToString(), standardPlacement, FilterNote(arrNotes, lubid, "StandardPlacement"));
                                 placement = Compare(drOrgBom["Placement"].ToString(), placement, FilterNote(arrNotes, lubid, "placement"));
-                                supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"));
+
+                                if (drOrgBom["supplierArticle"].ToString() == supplierArticle)
+                                {
+                                    sSql = @"select distinct MAT_NO,MAT_NAME from [RD_SAMPLE].[dbo].[SAM_MAT_DEF] where UPPER(MAT_NO)='" + supplierArticle + "'";
+
+                                    cm.CommandText = sSql;
+                                    cm.Parameters.Clear();
+                                    DataTable dtSAM_MAT_DEF = new DataTable();
+                                    using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                                    {
+                                        da.Fill(dtSAM_MAT_DEF);
+                                    }
+                                    if (dtSAM_MAT_DEF.Rows.Count > 0) { }
+                                    //supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"));
+                                    else
+                                        supplierArticle = supplierArticle + "<br><font color='red'>修:無對應</font>";
+                                }
+                                else
+                                    supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"));
+
+                                //supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"));
                                 supplier = Compare(drOrgBom["supplier"].ToString(), supplier, FilterNote(arrNotes, lubid, "supplier"));
                             }
 
@@ -853,7 +873,7 @@ values
                     if (res != null)
                     {
                         StandardPlacement = res.Termname;
-                        isUpdate = true;
+                        //isUpdate = true;
                     }
 
                     res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "Placement"
@@ -862,7 +882,7 @@ values
                     if (res != null)
                     {
                         Placement = res.Termname;
-                        isUpdate = true;
+                        //isUpdate = true;
                     }
 
                     res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "SupplierArticle"
@@ -880,7 +900,7 @@ values
                     if (res != null)
                     {
                         Supplier = res.Termname;
-                        isUpdate = true;
+                        //isUpdate = true;
                     }
 
                     bool isUpdateColor = false;
@@ -1029,7 +1049,7 @@ values
                     {
                         bool isEdit = false;
 
-                        if (isUpdateColor)
+                        //if (isUpdateColor)
                             isEdit = true;
 
                         sSql = "update PDFTAG.dbo.Lu_BOM \n";
