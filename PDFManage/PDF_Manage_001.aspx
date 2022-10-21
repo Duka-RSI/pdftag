@@ -139,7 +139,7 @@
                                             runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>
                                             </span>
 
-                                        <span <%# LoginUser.role==LoginUser.ROLE_ADMIN || ((int)Eval("pver")==3 && string.IsNullOrEmpty(Eval("mdate").ToString()))?"":"style='display:none'"%>>
+                                        <span <%# ((int)Eval("pver")==3 && string.IsNullOrEmpty(Eval("mdate").ToString()))?"":"style='display:none'"%>>
                                          <%--<a href="#" onclick="showExecuteGAP('<%# Eval("pipid")%>');return false;"><input type="button" value="執行" class="btn btn-secondary"></a>--%>
                                             <asp:LinkButton ID="LinkButton3" CommandName="parsePDF_GAP" CommandArgument='<%# Eval("pipid")%>'
                                             runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>

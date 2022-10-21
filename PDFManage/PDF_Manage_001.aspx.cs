@@ -3198,10 +3198,15 @@ insert into PDFTAG.dbo.GAP_SizeTable
 			string titleType = dt.Rows[0]["titleType"].ToString();
 			string sPDFPath = Server.MapPath("~/PDFManage/" + dt.Rows[0]["piuploadfile"].ToString());
 			//string sSaveTxtPath = Server.MapPath("~/PdfToText/" + Path.GetFileNameWithoutExtension(dt.Rows[0]["piuploadfile"].ToString()) + ".txt");
-			string sSaveTxtPath = Server.MapPath("~/PDFManage/" + dt.Rows[0]["piuploadfile"].ToString().Replace(".pdf", ".txt")); ;
+			string sSaveTxtPath = Server.MapPath("~/PDFManage/" + dt.Rows[0]["piuploadfile"].ToString().Replace(".pdf", ".txt"));
+			string sSaveTxtPath2 = Server.MapPath("~/PDFManage/" + dt.Rows[0]["piuploadfile"].ToString().Replace(".pdf", "_v2.txt"));
 
 			if (parse == "1" || !System.IO.File.Exists(sSaveTxtPath))
 				ConvertPDFToText3(sPDFPath, sSaveTxtPath);
+
+			//為了找BOM Date
+			if (parse == "1" || !System.IO.File.Exists(sSaveTxtPath2))
+				ConvertPDFToText2(sPDFPath, sSaveTxtPath2);
 
 			if (!System.IO.File.Exists(sSaveTxtPath))
 			{
@@ -3209,7 +3214,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
 				return;
 			}
 
-			#region Parse Text GAP_Header
+			#region Parse Text UA_Header
 
 
 			UA_HeaderDto ua_HeaderDto = new UA_HeaderDto();
@@ -3224,6 +3229,23 @@ insert into PDFTAG.dbo.GAP_SizeTable
 			int iRow = 1;
 			int iLineRow = 0;
 
+			string sGenerateddate = "";
+			using (StreamReader data = new StreamReader(sSaveTxtPath2))
+			{
+				while (!data.EndOfStream)
+				{
+					sLine = data.ReadLine();
+
+					if (sLine.Contains("Copyright") && sLine.Contains("All Rights Reserved"))
+					{
+						sGenerateddate = sLastLine.Split(' ')[0];
+						break;
+					}
+					sLastLine = sLine;
+				}
+			}
+
+			sLastLine = "";
 			using (StreamReader data = new StreamReader(sSaveTxtPath))
 			{
 				while (!data.EndOfStream)
@@ -3326,7 +3348,7 @@ values
 						cm.Parameters.AddWithValue("@class", ua_HeaderDto.sclass);
 						cm.Parameters.AddWithValue("@pod", "");
 						cm.Parameters.AddWithValue("@stylestatus", ua_HeaderDto.stylestatus);
-						cm.Parameters.AddWithValue("@generateddate", "");
+						cm.Parameters.AddWithValue("@generateddate", sGenerateddate);
 						cm.Parameters.AddWithValue("@stylesketch", "");
 						cm.Parameters.AddWithValue("@creator", LoginUser.PK);
 						cm.Parameters.AddWithValue("@createordate", sNow);
@@ -3564,7 +3586,7 @@ values
 										B2 = iLength >= 6 ? arrParts[5].Trim() : "",
 										B3 = iLength >= 7 ? arrParts[6].Trim() : "",
 										B4 = iLength >= 8 ? arrParts[7].Trim() : "",
-										B5 = iLength >= 8 ? arrParts[8].Trim() : "",
+										B5 = iLength >= 9 ? arrParts[8].Trim() : "",
 										B6 = iLength >= 10 ? arrParts[9].Trim() : "",
 										B7 = iLength >= 11 ? arrParts[10].Trim() : "",
 										B8 = iLength >= 12 ? arrParts[11].Trim() : "",
