@@ -244,13 +244,14 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
                 foreach (var itemType in arrTypes)
                 {
-                    sb.Append("<h4>" + itemType.type + "</h4>");
+                    //sb.Append("<h4>" + itemType.type + "</h4>");
                     sb.Append("<table class='table table-hover'>");
                     sb.Append("<tr>");
-                    sb.Append(" <th scope='col'>Standard Placement</th>");
+                    //sb.Append(" <th scope='col'>Standard Placement</th>");
+                    sb.Append(" <th scope='col'>" + itemType.type + "</th>");
                     sb.Append(" <th scope='col'>Usage</th>");
-                    sb.Append(" <th scope='col'>Supplier Article</th>");
-                    sb.Append(" <th scope='col'>Supplier</th>");
+                    //sb.Append(" <th scope='col'>Supplier Article</th>");
+                    //sb.Append(" <th scope='col'>Supplier</th>");
 
                     sSql = "select * \n";
                     sSql += "from PDFTAG.dbo.UA_BOMGarmentcolor a              \n";
@@ -322,14 +323,34 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
                                 standardPlacement = Compare(drOrgBom["StandardPlacement"].ToString(), standardPlacement, FilterNote(arrNotes, lubid, "StandardPlacement"));
                                 usage = Compare(drOrgBom["usage"].ToString(), usage, FilterNote(arrNotes, lubid, "usage"));
-                                supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"), IsMappingSupplierArticle);
+
+                                if (drOrgBom["supplierArticle"].ToString() == supplierArticle)
+                                {
+                                    sSql = @"select distinct MAT_NO,MAT_NAME from [RD_SAMPLE].[dbo].[SAM_MAT_DEF] where UPPER(MAT_NO)='" + supplierArticle + "'";
+
+                                    cm.CommandText = sSql;
+                                    cm.Parameters.Clear();
+                                    DataTable dtSAM_MAT_DEF = new DataTable();
+                                    using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                                    {
+                                        da.Fill(dtSAM_MAT_DEF);
+                                    }
+                                    if (dtSAM_MAT_DEF.Rows.Count > 0) { }
+                                    //supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"));
+                                    else
+                                        supplierArticle = supplierArticle + "<br><font color='red'>修:無對應</font>";
+                                }
+                                else
+                                    supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle, IsMappingSupplierArticle"));
+
+                                //supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"), IsMappingSupplierArticle);
                                 supplier = Compare(drOrgBom["supplier"].ToString(), supplier, FilterNote(arrNotes, lubid, "supplier"));
                             }
 
                         }
 
 
-                        if (!IsMappingSupplierArticle)
+                        if (!isEdit && !IsMappingSupplierArticle)
                         {
                             Response.Write("<!--supplierArticle=" + supplierArticle + " IsMappingSupplierArticle=" + IsMappingSupplierArticle + "-->");
 
@@ -346,10 +367,10 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
                         iSeq++;
                         sb.Append("<tr data-rowid='" + drBom["rowid"].ToString() + "' id='row" + iSeq + "'>");
-                        sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='StandardPlacement' onclick='editBom(this)'>" + standardPlacement + "</td>");
-                        sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' " + parts + " data-col='usage' onclick='editBom(this)'>" + usage + "</td>");
+                        //sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='StandardPlacement' onclick='editBom(this)'>" + standardPlacement + "</td>");
                         sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' " + parts + " data-col='SupplierArticle' onclick='editBom(this)'>" + supplierArticle + "</td>");
-                        sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='Supplier' onclick='editBom(this)'>" + supplier + "</td>");
+                        sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' " + parts + " data-col='usage' onclick='editBom(this)'>" + usage + "</td>");                        
+                        //sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='Supplier' onclick='editBom(this)'>" + supplier + "</td>");
 
                         for (int i = 1; i <= iColorCnt; i++)
                         {
@@ -465,10 +486,10 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                     sb.Append("<tr>");
                     sb.Append(" <th scope='col'>#</th>");
                     sb.Append(" <th scope='col'>Description</th>");
-                    sb.Append(" <th scope='col'>Criticality</th>");
+                    //sb.Append(" <th scope='col'>Criticality</th>");
                     sb.Append(" <th scope='col'>Tol(-)</th>");
                     sb.Append(" <th scope='col'>Tol(+)</th>");
-                    sb.Append(" <th scope='col'>HTM Instruction</th>");
+                    //sb.Append(" <th scope='col'>HTM Instruction</th>");
 
                     int iOtherCnt = 0;
                     if (dtUA_SizeTable_Header.Rows.Count > 0)
@@ -501,10 +522,10 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
                         string Code = drSizeTable["Code"].ToString();
                         string Description = drSizeTable["Description"].ToString();
-                        string criticality = drSizeTable["Criticality"].ToString();
+                        //string criticality = drSizeTable["Criticality"].ToString();
                         string tolA = drSizeTable["TolA"].ToString();
                         string tolB = drSizeTable["TolB"].ToString();
-                        string hTMInstruction = drSizeTable["HTMInstruction"].ToString();
+                        //string hTMInstruction = drSizeTable["HTMInstruction"].ToString();
 
                         DataRow[] drOrgSizeTables = dtSizeTable_Org.Select("lustid='" + org_lustid + "'");
 
@@ -518,10 +539,10 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
                                 Code = Compare(drOrgSizeTable["Code"].ToString(), Code, FilterNote(arrNotes, lustid, "Code"));
                                 Description = Compare(drOrgSizeTable["Description"].ToString(), Description, FilterNote(arrNotes, lustid, "Description"));
-                                criticality = Compare(drOrgSizeTable["criticality"].ToString(), criticality, FilterNote(arrNotes, lustid, "criticality"));
+                                //criticality = Compare(drOrgSizeTable["criticality"].ToString(), criticality, FilterNote(arrNotes, lustid, "criticality"));
                                 tolA = Compare(drOrgSizeTable["tolA"].ToString(), tolA, FilterNote(arrNotes, lustid, "tolA"));
                                 tolB = Compare(drOrgSizeTable["tolB"].ToString(), tolB, FilterNote(arrNotes, lustid, "tolB"));
-                                hTMInstruction = Compare(drOrgSizeTable["hTMInstruction"].ToString(), hTMInstruction, FilterNote(arrNotes, lustid, "hTMInstruction"));
+                                //hTMInstruction = Compare(drOrgSizeTable["hTMInstruction"].ToString(), hTMInstruction, FilterNote(arrNotes, lustid, "hTMInstruction"));
                             }
 
                         }
@@ -530,10 +551,10 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                         sb.Append("<tr data-rowid='" + drSizeTable["rowid"].ToString() + "' id='row" + iSeq + "'>");
                         sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Code' onclick='editSizeTable(this)'>" + Code + "</td>");
                         sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Description' onclick='editSizeTable(this)'>" + Description + "</td>");
-                        sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Criticality' onclick='editSizeTable(this)'>" + criticality + "</td>");
+                        //sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Criticality' onclick='editSizeTable(this)'>" + criticality + "</td>");
                         sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolA' onclick='editSizeTable(this)'>" + tolA + "</td>");
                         sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolB' onclick='editSizeTable(this)'>" + tolB + "</td>");
-                        sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='HTMInstruction' onclick='editSizeTable(this)'>" + hTMInstruction + "</td>");
+                        //sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='HTMInstruction' onclick='editSizeTable(this)'>" + hTMInstruction + "</td>");
 
                         for (int i = 1; i <= iOtherCnt; i++)
                         {
@@ -814,7 +835,7 @@ values
                 {
                     string lubid = drBom["lubid"].ToString();
                     string StandardPlacement = drBom["StandardPlacement"].ToString();
-                    string Placement = drBom["Placement"].ToString();
+                    //string Placement = drBom["Placement"].ToString();
                     string SupplierArticle = drBom["SupplierArticle"].ToString();
                     string Supplier = drBom["Supplier"].ToString();
 
@@ -853,14 +874,14 @@ values
                         isUpdate = true;
                     }
 
-                    res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "Placement"
-                     && x.Termname_org == Placement.Trim().Replace(" ", "").ToLower());
+                    //res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "Placement"
+                    // && x.Termname_org == Placement.Trim().Replace(" ", "").ToLower());
 
-                    if (res != null)
-                    {
-                        Placement = res.Termname;
-                        isUpdate = true;
-                    }
+                    //if (res != null)
+                    //{
+                    //    Placement = res.Termname;
+                    //    isUpdate = true;
+                    //}
 
                     res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "SupplierArticle"
                     && x.Termname_org == SupplierArticle.Trim().Replace(" ", "").ToLower());
@@ -998,14 +1019,14 @@ values
                     if (isUpdate)
                     {
                         sSql = "update PDFTAG.dbo.UA_BOM \n";
-                        sSql += "set  StandardPlacement=@StandardPlacement,Placement=@Placement,SupplierArticle=@SupplierArticle,Supplier=@Supplier           \n";
+                        sSql += "set  StandardPlacement=@StandardPlacement,SupplierArticle=@SupplierArticle,Supplier=@Supplier           \n";
                         sSql += " ,B1=@B1,B2=@B2,B3=@B3,B4=@B4,B5=@B5,B6=@B6,B7=@B7,B8=@B8,B9=@B9,B10=@B10,isEdit=1           \n";
                         sSql += "where lubid=@lubid\n";
                         cm.CommandText = sSql;
                         cm.Parameters.Clear();
                         cm.Parameters.AddWithValue("@lubid", lubid);
                         cm.Parameters.AddWithValue("@StandardPlacement", StandardPlacement);
-                        cm.Parameters.AddWithValue("@Placement", Placement);
+                        //cm.Parameters.AddWithValue("@Placement", Placement);
                         cm.Parameters.AddWithValue("@SupplierArticle", SupplierArticle);
                         cm.Parameters.AddWithValue("@Supplier", Supplier);
                         cm.Parameters.AddWithValue("@B1", B1);

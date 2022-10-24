@@ -589,18 +589,19 @@ order by a.pidate,a.pipid";
 
                 foreach (var itemType in arrTypes)
                 {
-                    if (!arrExistTypes.Contains(itemType.type))
-                        sb.Append("<h4>" + itemType.type + "</h4>");
+                    //if (!arrExistTypes.Contains(itemType.type))
+                    //    sb.Append("<h4>" + itemType.type + "</h4>");
 
                     arrExistTypes.Add(itemType.type);
 
 
                     sb.Append("<table class='table table-hover'>");
                     sb.Append("<tr>");
-                    sb.Append(" <th scope='col'>Standard Placement</th>");
+                    //sb.Append(" <th scope='col'>Standard Placement</th>");
+                    sb.Append(" <th scope='col'>" + itemType.type + " </th>");
                     sb.Append(" <th scope='col'>Usage</th>");
-                    sb.Append(" <th scope='col'>Supplier Article</th>");
-                    sb.Append(" <th scope='col'>Supplier</th>");
+                    //sb.Append(" <th scope='col'>Supplier Article</th>");
+                    //sb.Append(" <th scope='col'>Supplier</th>");
 
 
                     List<bool> arrCompareHeaderResult = new List<bool>();
@@ -834,10 +835,10 @@ order by a.pidate,a.pipid";
                             }
 
                             sb.Append("<tr data-rowid='" + drBoms[b]["rowid"].ToString() + "'>");
-                            sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='StandardPlacement' onclick='editBom(this,1)'>" + standardPlacement_source + (string.IsNullOrEmpty(standardPlacement_note) ? "" : "<br>中:" + standardPlacement_note) + "</td>");
-                            sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='usage' onclick='editBom(this,1)'>" + usage_source + (string.IsNullOrEmpty(usage_note) ? "" : "<br>中:" + usage_note) + "</td>");
+                            //sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='StandardPlacement' onclick='editBom(this,1)'>" + standardPlacement_source + (string.IsNullOrEmpty(standardPlacement_note) ? "" : "<br>中:" + standardPlacement_note) + "</td>");
                             sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='SupplierArticle' onclick='editBom(this,1)'>" + supplierArticle_source + (string.IsNullOrEmpty(supplierArticle_note) ? "" : "<br>中:" + supplierArticle_note) + "</td>");
-							sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='Supplier' onclick='editBom(this)'>" + supplier_source + (string.IsNullOrEmpty(supplier_note) ? "" : "<br>中:" + supplier_note) + "</td>");
+                            sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='usage' onclick='editBom(this,1)'>" + usage_source + (string.IsNullOrEmpty(usage_note) ? "" : "<br>中:" + usage_note) + "</td>");                            
+							//sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='Supplier' onclick='editBom(this)'>" + supplier_source + (string.IsNullOrEmpty(supplier_note) ? "" : "<br>中:" + supplier_note) + "</td>");
 
 							List<string> arrColorNameSource = new List<string>();
                             List<string> arrColorValSource = new List<string>();
@@ -875,10 +876,10 @@ order by a.pidate,a.pipid";
                             isCompare = false;
 
                             sb.Append("<tr  class='rowCompare'>");
-                            sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' onclick='editBom(this,1)' data-col='StandardPlacement' >" + (isCompare ? Compare(sType, standardPlacement, standardPlacement_compare, standardPlacement_compare_note) : "") + "</td>");
-                            sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' onclick='editBom(this,1)' data-col='usage' >" + (isCompare ? Compare(sType, usage, usage_compare, usage_compare_note) : "") + "</td>");
+                            //sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' onclick='editBom(this,1)' data-col='StandardPlacement' >" + (isCompare ? Compare(sType, standardPlacement, standardPlacement_compare, standardPlacement_compare_note) : "") + "</td>");
                             sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' onclick='editBom(this,1)' data-col='SupplierArticle' >" + (isCompare ? Compare(sType, supplierArticle, supplierArticle_compare, supplierArticle_compare_note) : "") + "</td>");
-							sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' onclick='editBom(this,1)' data-col='Supplier' >" + (isCompare ? Compare(sType, supplier, supplier_compare, supplier_compare_note) : "") + "</td>");
+                            sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' onclick='editBom(this,1)' data-col='usage' >" + (isCompare ? Compare(sType, usage, usage_compare, usage_compare_note) : "") + "</td>");                            
+							//sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' onclick='editBom(this,1)' data-col='Supplier' >" + (isCompare ? Compare(sType, supplier, supplier_compare, supplier_compare_note) : "") + "</td>");
 
 							isCompare = true;
 
@@ -979,10 +980,11 @@ order by a.pidate,a.pipid";
                         sbNotExit.Append("<h4>" + itemType.type + "</h4>");
                         sbNotExit.Append("<table class='table table-hover'>");
                         sbNotExit.Append("<tr>");
-                        sbNotExit.Append(" <th scope='col'>Standard Placement</th>");
+                        //sbNotExit.Append(" <th scope='col'>Standard Placement</th>");
+                        sbNotExit.Append(" <th scope='col'>" + itemType.type + "</th>");
                         sbNotExit.Append(" <th scope='col'>Usage</th>");
-                        sbNotExit.Append(" <th scope='col'>Supplier Article</th>"); ;
-                        sbNotExit.Append(" <th scope='col'>Supplier</th>");
+                        //sbNotExit.Append(" <th scope='col'>Supplier Article</th>");
+                        //sbNotExit.Append(" <th scope='col'>Supplier</th>");
                         //foreach (var color in arrUA_BOMGarmentcolors)
                         //{
                         //    var isExistCompare = arrUA_BOMGarmentcolorsCompare.Any(x => x == color);
@@ -1017,10 +1019,10 @@ order by a.pidate,a.pipid";
                             var resItem = arrCompareData.FirstOrDefault(x => x.rowId == rowId);
 
                             sbNotExit.Append("<tr>");
-                            sbNotExit.Append(" <td scope='col'>" + resItem.StandardPlacement_org + "</td>");
-                            sbNotExit.Append(" <td scope='col'>" + resItem.Usage_org + "</td>");
+                            //sbNotExit.Append(" <td scope='col'>" + resItem.StandardPlacement_org + "</td>");
                             sbNotExit.Append(" <td scope='col'>" + resItem.SupplierArticle_org + "</td>");
-                            sbNotExit.Append(" <td scope='col'>" + resItem.Supplier_org + "</td>");
+                            sbNotExit.Append(" <td scope='col'>" + resItem.Usage_org + "</td>");                            
+                            //sbNotExit.Append(" <td scope='col'>" + resItem.Supplier_org + "</td>");
 
 
                             foreach (var color in arrUA_BOMGarmentcolorsCompare)
@@ -1183,10 +1185,10 @@ order by a.pidate,a.pipid";
                         sb.Append("<tr>");
                         sb.Append(" <th scope='col'>#</th>");
                         sb.Append(" <th scope='col'>Description</th>");
-                        sb.Append(" <th scope='col'>Criticality</th>");
+                        //sb.Append(" <th scope='col'>Criticality</th>");
                         sb.Append(" <th scope='col'>Tol(-)</th>");
                         sb.Append(" <th scope='col'>Tol(+)</th>");
-                        sb.Append(" <th scope='col'>HTM Instruction</th>");
+                        //sb.Append(" <th scope='col'>HTM Instruction</th>");
 
                         List<string> arrHearders = new List<string>();
 
@@ -1305,14 +1307,19 @@ order by a.pidate,a.pipid";
                                 hTMInstruction = drSizeTables[s]["hTMInstruction"].ToString();
 
 
-                                code_note = drSizeTables[s]["code"].ToString();
-                                description_note = drSizeTables[s]["Description"].ToString();
-                                criticality_note = drSizeTables[s]["Criticality"].ToString();
-                                tolA_note = drSizeTables[s]["TolA"].ToString();
-                                tolB_note = drSizeTables[s]["TolB"].ToString();
-                                hTMInstruction_note = drSizeTables[s]["hTMInstruction"].ToString();
+                                //code_note = drSizeTables[s]["code"].ToString();
+                                //description_note = drSizeTables[s]["Description"].ToString();
+                                //criticality_note = drSizeTables[s]["Criticality"].ToString();
+                                //tolA_note = drSizeTables[s]["TolA"].ToString();
+                                //tolB_note = drSizeTables[s]["TolB"].ToString();
+                                //hTMInstruction_note = drSizeTables[s]["hTMInstruction"].ToString();
+                                code_note = FilterNote(arrNotes, lustid, "codeid");
+                                description_note = FilterNote(arrNotes, lustid, "name");
+                                criticality_note = FilterNote(arrNotes, lustid, "criticality");
+                                tolA_note = FilterNote(arrNotes, lustid, "tolA");
+                                tolB_note = FilterNote(arrNotes, lustid, "tolB");
+                                hTMInstruction_note = FilterNote(arrNotes, lustid, "hTMInstruction");
 
-                           
                             }
                             catch (Exception ex) { }
 
@@ -1371,10 +1378,10 @@ order by a.pidate,a.pipid";
                                 sb.Append("<tr data-rowid='" + drSizeTables[s]["rowid"].ToString() + "'>");
                                 sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='code' onclick='editSizeTable(this)'>" + code_source + (string.IsNullOrEmpty(code_note) ? "" : "<br>中:" + code_note) + "</td>");
                                 sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='description' onclick='editSizeTable(this)'>" + description_source + (string.IsNullOrEmpty(description_note) ? "" : "<br>中:" + description_note) + "</td>");
-                                sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='criticality' onclick='editSizeTable(this)'>" + criticality_source + (string.IsNullOrEmpty(criticality_note) ? "" : "<br>中:" + criticality_note) + "</td>");
+                                //sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='criticality' onclick='editSizeTable(this)'>" + criticality_source + (string.IsNullOrEmpty(criticality_note) ? "" : "<br>中:" + criticality_note) + "</td>");
                                 sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolA' onclick='editSizeTable(this)'>" + tolA_source + (string.IsNullOrEmpty(tolA_note) ? "" : "<br>中:" + tolA_note) + "</td>");
                                 sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolB' onclick='editSizeTable(this)'>" + tolB_source + (string.IsNullOrEmpty(tolB_note) ? "" : "<br>中:" + tolB_note) + "</td>");
-                                sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='hTMInstruction' onclick='editSizeTable(this)'>" + hTMInstruction_source + (string.IsNullOrEmpty(hTMInstruction_note) ? "" : "<br>中:" + hTMInstruction_note) + "</td>");
+                                //sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='hTMInstruction' onclick='editSizeTable(this)'>" + hTMInstruction_source + (string.IsNullOrEmpty(hTMInstruction_note) ? "" : "<br>中:" + hTMInstruction_note) + "</td>");
 
                                 //for (int i = 1; i <= iOtherCnt; i++)
                                 //{
@@ -1409,10 +1416,10 @@ order by a.pidate,a.pipid";
                                 sb.Append("<tr  class='rowCompare'>");
                                 sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' onclick='editSizeTable(this,1)' data-col='code' >" + Compare(sType, code, code_compare, code_compare_note) + "</td>");
                                 sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' onclick='editSizeTable(this,1)' data-col='Description' >" + Compare(sType, description, description_compare, description_compare_note) + "</td>");
-                                sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' onclick='editSizeTable(this,1)' data-col='criticality' >" + Compare(sType, criticality, criticality_compare, criticality_compare_note) + "</td>");
+                                //sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' onclick='editSizeTable(this,1)' data-col='criticality' >" + Compare(sType, criticality, criticality_compare, criticality_compare_note) + "</td>");
                                 sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' onclick='editSizeTable(this,1)' data-col='TolA' >" + Compare(sType, tolA, tolA_compare, tolA_compare_note) + "</td>");
                                 sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' onclick='editSizeTable(this,1)' data-col='TolB' >" + Compare(sType, tolB, tolB_compare, tolB_compare_note) + "</td>");
-                                sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' onclick='editSizeTable(this,1)' data-col='hTMInstruction' >" + Compare(sType, hTMInstruction, hTMInstruction_compare, hTMInstruction_compare_note) + "</td>");
+                                //sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' onclick='editSizeTable(this,1)' data-col='hTMInstruction' >" + Compare(sType, hTMInstruction, hTMInstruction_compare, hTMInstruction_compare_note) + "</td>");
 
                                 //for (int i = 1; i <= iOtherCnt; i++)
                                 //{
