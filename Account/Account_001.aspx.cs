@@ -62,8 +62,8 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                     List<string> arrStrCUST_NO = new List<string>();
 
                     if (arrCUST_NO.Contains("1")) arrStrCUST_NO.Add("LuLu");
-                    else if (arrCUST_NO.Contains("2")) arrStrCUST_NO.Add("UA");
-                    else if(arrCUST_NO.Contains("3")) arrStrCUST_NO.Add("GAP");
+                    if (arrCUST_NO.Contains("2")) arrStrCUST_NO.Add("UA");
+                    if(arrCUST_NO.Contains("3")) arrStrCUST_NO.Add("GAP");
 
                     dr["strCUST_NO"] = string.Join(",", arrStrCUST_NO);
                 }
