@@ -94,6 +94,7 @@
                                 <asp:HiddenField ID="hidMAT_ID" runat="server" />
 
                                  關鍵字:<input type="text" id="txtSearchMAT_NO"><input type="button" value="查詢" onclick="onSearchMAT_NO()" /> 
+                                只撈ERP料號:<input type='checkbox' name='rbERP_MAT' id="SearchOnlyERPMat" value="Y"/>
                                 <div style="height:200px;width:650px; overflow:scroll">
                                     <table class="table">
                                         <tr>
@@ -105,6 +106,9 @@
                                             </th>
                                              <th>
                                                 MAT_NAME
+                                            </th>
+                                            <th>
+                                                ERP_EXIST
                                             </th>
                                         </tr>
                                         <tbody id="tblMAT_NO"></tbody>
@@ -829,9 +833,12 @@
         function onSearchMAT_NO() {
 
             let MAT_NO = $('#txtSearchMAT_NO').val();
+            let searchonlyerp = "N";
+            if ($("input[name=rbERP_MAT]:checked").length > 0) searchonlyerp = "Y";
 
             let data = {
                 MAT_NO: MAT_NO,
+                searchonlyerp: searchonlyerp,
             };
 
 
@@ -850,6 +857,7 @@
                         html += "<td><input type='radio' name='rbMAT_NO' data-MAT_NO='" + res[i].MAT_NO + "' onchange='onRbMAT_NO_change(this)' /></td>";
                         html += "<td>" + res[i].MAT_NO + "</td>";
                         html += "<td>" + res[i].MAT_NAME + "</td>";
+                        html += "<td>" + res[i].ERP_EXIST + "</td>";
                         html += "</tr>";
                     }
                     $('#tblMAT_NO').html(html);
