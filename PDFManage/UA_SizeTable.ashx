@@ -175,29 +175,29 @@ public class Passport : IHttpHandler, IRequiresSessionState
 				sizeColumnName = resLu_SizeTable_Header.TextOrg;
 
 
-				sSql = "select lusthid  from  PDFTAG.dbo.UA_SizeTable_1 where lustid_relation=@lustid";
-				var resLu_SizeTable_1_Org = cn.Query<Text>(sSql, new { lustid = lustid_org }).FirstOrDefault();
+				//sSql = "select lusthid  from  PDFTAG.dbo.UA_SizeTable_1 where lustid_relation=@lustid";
+				//var resLu_SizeTable_1_Org = cn.Query<Text>(sSql, new { lustid = lustid_org }).FirstOrDefault();
 
-				sSql = "select *  from  PDFTAG.dbo.UA_SizeTable_Header_1  where lusthid=@lusthid";
+				//sSql = "select *  from  PDFTAG.dbo.UA_SizeTable_Header_1  where lusthid=@lusthid";
 
-				var Lu_SizeTable_Header_1 = cn.Query(sSql, new { lusthid = resLu_SizeTable_1_Org.lusthid }).FirstOrDefault();
+				//var Lu_SizeTable_Header_1 = cn.Query(sSql, new { lusthid = resLu_SizeTable_1_Org.lusthid }).FirstOrDefault();
 
-				co1_1 = "A";
-				if (Lu_SizeTable_Header_1.H1 == sizeColumnName) co1_1 = "A1";
-				else if (Lu_SizeTable_Header_1.H2 == sizeColumnName) co1_1 = "A2";
-				else if (Lu_SizeTable_Header_1.H3 == sizeColumnName) co1_1 = "A3";
-				else if (Lu_SizeTable_Header_1.H4 == sizeColumnName) co1_1 = "A4";
-				else if (Lu_SizeTable_Header_1.H5 == sizeColumnName) co1_1 = "A5";
-				else if (Lu_SizeTable_Header_1.H6 == sizeColumnName) co1_1 = "A6";
-				else if (Lu_SizeTable_Header_1.H7 == sizeColumnName) co1_1 = "A7";
-				else if (Lu_SizeTable_Header_1.H8 == sizeColumnName) co1_1 = "A8";
-				else if (Lu_SizeTable_Header_1.H9 == sizeColumnName) co1_1 = "A9";
-				else if (Lu_SizeTable_Header_1.H10 == sizeColumnName) co1_1 = "A10";
-				else if (Lu_SizeTable_Header_1.H11 == sizeColumnName) co1_1 = "A11";
-				else if (Lu_SizeTable_Header_1.H12 == sizeColumnName) co1_1 = "A12";
-				else if (Lu_SizeTable_Header_1.H13 == sizeColumnName) co1_1 = "A13";
-				else if (Lu_SizeTable_Header_1.H14 == sizeColumnName) co1_1 = "A14";
-				else if (Lu_SizeTable_Header_1.H15 == sizeColumnName) co1_1 = "A15";
+				//co1_1 = "A";
+				//if (Lu_SizeTable_Header_1.H1 == sizeColumnName) co1_1 = "A1";
+				//else if (Lu_SizeTable_Header_1.H2 == sizeColumnName) co1_1 = "A2";
+				//else if (Lu_SizeTable_Header_1.H3 == sizeColumnName) co1_1 = "A3";
+				//else if (Lu_SizeTable_Header_1.H4 == sizeColumnName) co1_1 = "A4";
+				//else if (Lu_SizeTable_Header_1.H5 == sizeColumnName) co1_1 = "A5";
+				//else if (Lu_SizeTable_Header_1.H6 == sizeColumnName) co1_1 = "A6";
+				//else if (Lu_SizeTable_Header_1.H7 == sizeColumnName) co1_1 = "A7";
+				//else if (Lu_SizeTable_Header_1.H8 == sizeColumnName) co1_1 = "A8";
+				//else if (Lu_SizeTable_Header_1.H9 == sizeColumnName) co1_1 = "A9";
+				//else if (Lu_SizeTable_Header_1.H10 == sizeColumnName) co1_1 = "A10";
+				//else if (Lu_SizeTable_Header_1.H11 == sizeColumnName) co1_1 = "A11";
+				//else if (Lu_SizeTable_Header_1.H12 == sizeColumnName) co1_1 = "A12";
+				//else if (Lu_SizeTable_Header_1.H13 == sizeColumnName) co1_1 = "A13";
+				//else if (Lu_SizeTable_Header_1.H14 == sizeColumnName) co1_1 = "A14";
+				//else if (Lu_SizeTable_Header_1.H15 == sizeColumnName) co1_1 = "A15";
 
 
 
@@ -208,10 +208,10 @@ public class Passport : IHttpHandler, IRequiresSessionState
 			}
 
 
-			sSql = "update PDFTAG.dbo.UA_SizeTable_1 \n";
-			sSql += "set " + co1_1 + "=@text,isEdit=1              \n";
-			sSql += "where lustid_relation =@lustid\n";
-			var resLu_SizeTable_1 = cn.Execute(sSql, new { lustid = lustid_org, text = text });
+			//sSql = "update PDFTAG.dbo.UA_SizeTable_1 \n";
+			//sSql += "set " + co1_1 + "=@text,isEdit=1              \n";
+			//sSql += "where lustid_relation =@lustid\n";
+			//var resLu_SizeTable_1 = cn.Execute(sSql, new { lustid = lustid_org, text = text });
 
 
 			if (!string.IsNullOrEmpty(chNote))
