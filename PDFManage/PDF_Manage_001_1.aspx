@@ -42,7 +42,10 @@
                         </div>
                         <div class="col">
                             <asp:Button ID="btnQuery" runat="server" Text="查詢" CssClass="btn btn-secondary" OnClick="btnQuery_Click" />
+
+                            <% if (LoginUser.role == LoginUser.ROLE_ADMIN) {%>
                             <button type="button" class="btn btn-secondary" onclick="showAdd();">新增</button>
+                            <%} %>
                         </div>
                     </div>
 
@@ -133,10 +136,8 @@
                             <th>群組類別:
                             </th>
                             <td align="left">
-                                <asp:DropDownList ID="dlgmcate" runat="server">                                    
-                                    <%--<asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
-                                    <asp:ListItem Value="2" Text="UA"></asp:ListItem>
-                                    <asp:ListItem Value="3" Text="GAP"></asp:ListItem>--%>
+                                <asp:DropDownList ID="dlgmcate" runat="server">
+                                   
                                 </asp:DropDownList>
                             </td>
                         </tr>

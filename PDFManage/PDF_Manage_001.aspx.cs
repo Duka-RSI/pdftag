@@ -3202,7 +3202,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
 			string sSaveTxtPath2 = Server.MapPath("~/PDFManage/" + dt.Rows[0]["piuploadfile"].ToString().Replace(".pdf", "_v2.txt"));
 
 			if (parse == "1" || !System.IO.File.Exists(sSaveTxtPath))
-				ConvertPDFToText3(sPDFPath, sSaveTxtPath);
+				ConvertPDFToText3_UA(sPDFPath, sSaveTxtPath);
 
 			//為了找BOM Date
 			if (parse == "1" || !System.IO.File.Exists(sSaveTxtPath2))
@@ -4299,6 +4299,96 @@ insert into PDFTAG.dbo.UA_SizeTable
 		StringBuilder sb = new StringBuilder();
 		foreach (var page in pdfDocument.Pages)
 		{
+			Aspose.Pdf.Text.TableAbsorber absorber = new Aspose.Pdf.Text.TableAbsorber();
+			absorber.Visit(page);
+			foreach (AbsorbedTable table in absorber.TableList)
+			{
+				Console.WriteLine("Table");
+				foreach (AbsorbedRow row in table.RowList)
+				{
+					sb = new StringBuilder();
+					sb.Append("@Row: ");
+
+					bool isHeader = false;
+
+					foreach (AbsorbedCell cell in row.CellList)
+					{
+						string cellText = "";
+						foreach (TextFragment fragment in cell.TextFragments)
+						{
+							//if (fragment.BaselinePosition.YIndent <= 11)
+							//{
+							//    //Remove "Modified Date:Aug 11, 2020.."
+							//    continue;
+							//}
+
+							foreach (TextSegment seg in fragment.Segments)
+							{
+								//if(seg.Text== "Standard")
+								//{
+
+								//}
+
+								cellText += seg.Text;
+							}
+							//sb.Append(seg.Text + " | ");
+							//Console.Write($"{sb.ToString()}|");                              
+						}
+
+						sb.Append(cellText + " %% ");
+					}
+
+					sbFinal.AppendLine(sb.ToString());
+				}
+
+				sb.AppendLine("----");
+			}
+		}
+
+		System.IO.File.WriteAllText(sTxtPath, sbFinal.ToString());
+	}
+	
+	public void ConvertPDFToText3_UA(string sPdfPath, string sTxtPath)
+	{
+		// Initialize license object
+		Aspose.Pdf.License license = new Aspose.Pdf.License();
+		try
+		{
+			// Set license
+			license.SetLicense(Server.MapPath("~/PDFManage/Aspose.Pdf.lic"));
+		}
+		catch (Exception)
+		{
+			// something went wrong
+			throw;
+		}
+
+		Document pdfDocument = new Document(sPdfPath);
+
+		StringBuilder sbFinal = new StringBuilder();
+		StringBuilder sb = new StringBuilder();
+		foreach (var page in pdfDocument.Pages)
+		{
+			bool isParsePage=true;
+			
+			//UA- Size table部分，只需要擷取 文件底部有MEASUREMENT CHART文字的size table
+			var textAbsorber = new TextAbsorber
+			{
+				ExtractionOptions = {FormattingMode = TextExtractionOptions.TextFormattingMode.Pure}
+			};
+			page.Accept(textAbsorber);
+			var ext = textAbsorber.Text;
+
+            if (ext.Contains("Tol(+)")){
+				
+			  if (!ext.Contains("MEASUREMENT CHART"))
+			        isParsePage=false;
+
+			}
+			
+			if(!isParsePage)
+				continue;			
+			
 			Aspose.Pdf.Text.TableAbsorber absorber = new Aspose.Pdf.Text.TableAbsorber();
 			absorber.Visit(page);
 			foreach (AbsorbedTable table in absorber.TableList)
