@@ -366,7 +366,7 @@
             let MAT_ID = $('#dlMAT_ID').val();
             let isRecord = 0;
 
-            if (saveCol == 'StandardPlacement' || saveCol == 'Placement' || saveCol == 'SupplierArticle' || saveCol == 'Supplier' || saveCol == 'Name' || saveCol == 'Criticality') {
+            if (saveCol == 'Usage' || saveCol == 'SupplierArticle' || saveCol == 'B1' || saveCol == 'B2' || saveCol == 'B3' || saveCol == 'B4' || saveCol == 'B5' || saveCol == 'B6' || saveCol == 'B7' || saveCol == 'B8' || saveCol == 'B9' || saveCol == 'B10') {
             //if (isSaveRecord) {
 
                 if (confirm('改的內容是否紀錄至詞庫')) {

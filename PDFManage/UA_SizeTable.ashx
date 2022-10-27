@@ -409,7 +409,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
 				sb.Append("<tr>");
 				sb.Append(" <th scope='col'>#</th>");
 				sb.Append(" <th scope='col'>Description</th>");
-				sb.Append(" <th scope='col'>Criticality</th>");
+				//sb.Append(" <th scope='col'>Criticality</th>");
 				sb.Append(" <th scope='col'>Tol(-)</th>");
 				sb.Append(" <th scope='col'>Tol(+)</th>");
 				//sb.Append(" <th scope='col'>HTM Instruction</th>");
@@ -447,7 +447,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
 					string code = drSizeTable["Code"].ToString();
 					string description = drSizeTable["Description"].ToString();
-					string criticality = drSizeTable["Criticality"].ToString();
+					//string criticality = drSizeTable["Criticality"].ToString();
 					string tolA = drSizeTable["TolA"].ToString();
 					string tolB = drSizeTable["TolB"].ToString();
 					string hTMInstruction = drSizeTable["HTMInstruction"].ToString();
@@ -464,7 +464,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
 							code = Compare(drOrgSizeTable["code"].ToString(), code, FilterNote(arrNotes, lustid, "code"));
 							description = Compare(drOrgSizeTable["description"].ToString(), description, FilterNote(arrNotes, lustid, "description"));
-							criticality = Compare(drOrgSizeTable["criticality"].ToString(), criticality, FilterNote(arrNotes, lustid, "criticality"));
+							//criticality = Compare(drOrgSizeTable["criticality"].ToString(), criticality, FilterNote(arrNotes, lustid, "criticality"));
 							tolA = Compare(drOrgSizeTable["tolA"].ToString(), tolA, FilterNote(arrNotes, lustid, "tolA"));
 							tolB = Compare(drOrgSizeTable["tolB"].ToString(), tolB, FilterNote(arrNotes, lustid, "tolB"));
 							//hTMInstruction = Compare(drOrgSizeTable["hTMInstruction"].ToString(), hTMInstruction, FilterNote(arrNotes, lustid, "hTMInstruction"));
@@ -476,7 +476,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
 					sb.Append("<tr data-rowid='" + drSizeTable["rowid"].ToString() + "' id='row" + iSeq + "'>");
 					sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='code' onclick='editSizeTable(this)'>" + code + "</td>");
 					sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Description' onclick='editSizeTable(this)'>" + description + "</td>");
-					sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Criticality' onclick='editSizeTable(this)'>" + criticality + "</td>");
+					//sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Criticality' onclick='editSizeTable(this)'>" + criticality + "</td>");
 					sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolA' onclick='editSizeTable(this)'>" + tolA + "</td>");
 					sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolB' onclick='editSizeTable(this)'>" + tolB + "</td>");
 					//sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='HTMInstruction' onclick='editSizeTable(this)'>" + hTMInstruction + "</td>");

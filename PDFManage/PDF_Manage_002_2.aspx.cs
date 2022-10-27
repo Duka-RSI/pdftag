@@ -936,6 +936,7 @@ order by a.pidate,a.pipid";
                 List<string> arrExistTypes_notCompare = new List<string>();
                 List<Lu_Bom> arrNotCompareData = new List<Lu_Bom>();
                 StringBuilder sbNotExit_header = new StringBuilder();
+                StringBuilder sbNotExit_tmptable = new StringBuilder();                
                 StringBuilder sbNotExit_itemtype = new StringBuilder();
                 StringBuilder sbNotExit_table = new StringBuilder();
                 StringBuilder sbNotExit_tablebody = new StringBuilder();
@@ -1064,7 +1065,7 @@ order by a.pidate,a.pipid";
 
                 #region  資料列
                 sbNotExit_header.Append("<h4>資料列</h4>");
-                bool headerFlag = true;
+                //bool headerFlag = true;
                 arrExistTypes_notCompare = new List<string>();
                 foreach (var itemType in arrTypes_notCompare)
                 {
@@ -1332,20 +1333,27 @@ order by a.pidate,a.pipid";
                     {
                         sbNotExit_itemtype.Clear();
                     }
-                    if (sbNotExit_itemtype.Length == 0)
-                    {
-                        sbNotExit_header.Clear();
-                    }
-                    if (headerFlag && sbNotExit_header.Length > 0) { sbNotExit.Append(sbNotExit_header.ToString()); headerFlag = false; }
-                    sbNotExit.Append(sbNotExit_itemtype.ToString());
-                    sbNotExit.Append(sbNotExit_table.ToString());
+                    //if (sbNotExit_itemtype.Length == 0)
+                    //{
+                    //    sbNotExit_header.Clear();
+                    //}
+                    //if (headerFlag && sbNotExit_header.Length > 0) { sbNotExit.Append(sbNotExit_header.ToString()); headerFlag = false; }
+                    sbNotExit_tmptable.Append(sbNotExit_itemtype.ToString());
+                    sbNotExit_tmptable.Append(sbNotExit_table.ToString());
+                    //sbNotExit.Append(sbNotExit_itemtype.ToString());
+                    //sbNotExit.Append(sbNotExit_table.ToString());
                     sbNotExit_itemtype.Clear();
                     sbNotExit_table.Clear();
                     sbNotExit_tablebody.Clear();
                 }//end foreach itemtype
+                if (sbNotExit_tmptable.Length != 0)
+                {
+                    sbNotExit.Append(sbNotExit_header.ToString());
+                    sbNotExit.Append(sbNotExit_tmptable.ToString());
+                }
                 #endregion
                 #endregion
-                
+
 
                 #endregion
 
@@ -1361,7 +1369,7 @@ order by a.pidate,a.pipid";
                     where 1=1
                     and a.luhid =@luhid
                     --and a.lusthid in ('" + hid_Source_lusthid.Value.Replace(",", "','") + @"')--直接全抓
-                    and trim(H1) <> 'Requested'     --排除樣品尺寸表
+                    and b.SAMPLE = ''     --排除樣品尺寸表
                     order by lusthid,rowid asc ";
                 Response.Write("<!--" + sSql + "-->");
                 cm.CommandText = sSql;
@@ -1409,7 +1417,7 @@ order by a.pidate,a.pipid";
                     where 1=1
                     and a.luhid =@luhid
                     --and a.lusthid in ('" + hid_Compare_lusthid.Value.Replace(",", "','") + @"')
-                    and trim(H1) <> 'Requested'     --排除樣品尺寸表
+                    and b.SAMPLE = ''     --排除樣品尺寸表
                     order by lusthid,rowid asc ";
 
                 cm.CommandText = sSql;

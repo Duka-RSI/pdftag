@@ -3452,8 +3452,8 @@ values
 			List<int> arrBomGarmentColorStartIdx = new List<int>();
 			bool isSizeTable = false;
 
-
-			int iRow = 1;
+            string sample = "";
+            int iRow = 1;
 			int iLineRow = 0;
 			long lubcid = 0;
 			string type = "";
@@ -3478,6 +3478,13 @@ values
 						isSizeTable = true;
 					}
 
+					//抓樣衣尺寸表                        
+					if (sLine.StartsWith("@Row:  %%"))
+					{
+						if (sLine.Trim().Split(new string[] { "%%" }, StringSplitOptions.None).Where(w => !string.IsNullOrWhiteSpace(w) && !w.Contains("CW#COLORWAY")).ToArray().Count() > 1)
+							sample = sLine.Trim().Split(new string[] { "%%" }, StringSplitOptions.None).Where(w => !string.IsNullOrWhiteSpace(w) && !w.Contains("CW#COLORWAY")).ToArray()[1].ToString().Trim();
+					}
+
 					if (false)
 					{
 
@@ -3486,6 +3493,8 @@ values
 					if (isBom)
 					{
 						#region isBom
+
+						sample = "";//清掉
 
 						if (sLine.Contains("@Row:  %% (SET A:"))
 						{
@@ -3729,7 +3738,7 @@ values
 								}
 
 
-								if (header.Contains("Tol(+)"))
+								if (header.Contains("Tol(+)") || (sample != "" && header == arrHeaders[3]))
 								{
 									iTolAddIdx = sLine.IndexOf(header);
 									isStartSizeColumn = true;
@@ -3740,6 +3749,7 @@ values
 							resUA_SizeTableHeaderDto = new UA_SizeTableHeaderDto()
 							{
 								HeaderCount = iSizeHeaderLength,
+								SAMPLE = sample,
 								H1 = iSizeHeaderLength >= 1 ? arrSizeHeaders[0].Trim() : "",
 								H2 = iSizeHeaderLength >= 2 ? arrSizeHeaders[1].Trim() : "",
 								H3 = iSizeHeaderLength >= 3 ? arrSizeHeaders[2].Trim() : "",
@@ -3757,7 +3767,7 @@ values
 								H15 = iSizeHeaderLength >= 15 ? arrSizeHeaders[14].Trim() : "",
 
 							};
-
+							sample = "";//清掉
 
 							sLine = data.ReadLine();//Header 有2行
 							iLineRow++;
@@ -3814,14 +3824,15 @@ values
 
 
 							sSql = @"insert into PDFTAG.dbo.UA_SizeTable_Header 
-(pipid,HeaderCount,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15) 
+(pipid,HeaderCount,SAMPLE,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15) 
 values 
-(@pipid,@HeaderCount,@H1,@H2,@H3,@H4,@H5,@H6,@H7,@H8,@H9,@H10,@H11,@H12,@H13,@H14,@H15); SELECT SCOPE_IDENTITY();";
+(@pipid,@HeaderCount,@SAMPLE,@H1,@H2,@H3,@H4,@H5,@H6,@H7,@H8,@H9,@H10,@H11,@H12,@H13,@H14,@H15); SELECT SCOPE_IDENTITY();";
 
 							cm.CommandText = sSql;
 							cm.Parameters.Clear();
 							cm.Parameters.AddWithValue("@pipid", pipid);
 							cm.Parameters.AddWithValue("@HeaderCount", resUA_SizeTableHeaderDto.HeaderCount);
+							cm.Parameters.AddWithValue("@SAMPLE", resUA_SizeTableHeaderDto.SAMPLE);
 							cm.Parameters.AddWithValue("@H1", resUA_SizeTableHeaderDto.H1);
 							cm.Parameters.AddWithValue("@H2", resUA_SizeTableHeaderDto.H2);
 							cm.Parameters.AddWithValue("@H3", resUA_SizeTableHeaderDto.H3);

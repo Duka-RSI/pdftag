@@ -369,7 +369,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                         sb.Append("<tr data-rowid='" + drBom["rowid"].ToString() + "' id='row" + iSeq + "'>");
                         //sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='StandardPlacement' onclick='editBom(this)'>" + standardPlacement + "</td>");
                         sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' " + parts + " data-col='SupplierArticle' onclick='editBom(this)'>" + supplierArticle + "</td>");
-                        sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' " + parts + " data-col='usage' onclick='editBom(this)'>" + usage + "</td>");                        
+                        sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' " + parts + " data-col='Usage' onclick='editBom(this)'>" + usage + "</td>");                        
                         //sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='Supplier' onclick='editBom(this)'>" + supplier + "</td>");
 
                         for (int i = 1; i <= iColorCnt; i++)
@@ -484,7 +484,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                     sb.Append("<h4>Size Table</h4>");
                     sb.Append("<table class='table table-hover'>");
                     sb.Append("<tr>");
-                    sb.Append(" <th scope='col'>#</th>");
+                    sb.Append(" <th scope='col'>Code</th>");
                     sb.Append(" <th scope='col'>Description</th>");
                     //sb.Append(" <th scope='col'>Criticality</th>");
                     sb.Append(" <th scope='col'>Tol(-)</th>");
@@ -907,7 +907,7 @@ values
                         switch (a)
                         {
                             case 1:
-                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A1
+                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
               && x.Termname_org == B1.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -918,7 +918,7 @@ values
                                 break;
 
                             case 2:
-                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A2
+                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
               && x.Termname_org == B2.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -929,7 +929,7 @@ values
                                 break;
 
                             case 3:
-                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A3
+                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
               && x.Termname_org == B3.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -940,7 +940,7 @@ values
                                 break;
 
                             case 4:
-                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A4
+                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
               && x.Termname_org == B4.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -950,7 +950,7 @@ values
                                 }
                                 break;
                             case 5:
-                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A5
+                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
               && x.Termname_org == B5.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -960,7 +960,7 @@ values
                                 }
                                 break;
                             case 6:
-                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A6
+                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
               && x.Termname_org == B6.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -970,7 +970,7 @@ values
                                 }
                                 break;
                             case 7:
-                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A7
+                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
               && x.Termname_org == B7.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -980,7 +980,7 @@ values
                                 }
                                 break;
                             case 8:
-                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A8
+                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
               && x.Termname_org == B8.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -990,7 +990,7 @@ values
                                 }
                                 break;
                             case 9:
-                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A9
+                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
               && x.Termname_org == B9.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -1000,7 +1000,7 @@ values
                                 }
                                 break;
                             case 10:
-                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A10
+                                res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
               && x.Termname_org == B10.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)

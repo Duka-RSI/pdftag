@@ -76,7 +76,8 @@
                         </div>--%>
                         <div class="col">
                             <%-- <asp:Button ID="Button1" runat="server" Text="執行" CssClass="btn btn-warning" OnClick="btnQuery_Click" OnClientClick="return onQuery()" />--%>
-                            <input type="button" value="執行" class="btn btn-warning" onclick="onQuery()" />
+                            <%--<input type="button" value="執行" class="btn btn-warning" onclick="onQuery()" />--%>
+                            <asp:Button ID="Button1" runat="server" Text="執行" CssClass="btn btn-warning" OnClick="btnQuery_Click" OnClientClick="return onQuery2()" />
                         </div>
                     </div>
                 </th>

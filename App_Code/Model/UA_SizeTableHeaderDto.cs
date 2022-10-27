@@ -11,6 +11,7 @@ public class UA_SizeTableHeaderDto
     public long lusthid { get; set; }
     public long pipid { get; set; }
     public int HeaderCount { get; set; }
+    public string SAMPLE { get; set; }
     public string H1 { get; set; }
     public string H2 { get; set; }
     public string H3 { get; set; }
