@@ -21,7 +21,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
 		if (!IsPostBack)
 		{
-			//setDl();
+			setDl();
 			DataBind();
 		}
 	}
@@ -65,10 +65,10 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 				da.Fill(dt);
 			}
 
-			dlTitle.DataTextField = "ptitle";
-			dlTitle.DataValueField = "ptitle";
-			dlTitle.DataSource = dt;
-			dlTitle.DataBind();
+			//dlTitle.DataTextField = "ptitle";
+			//dlTitle.DataValueField = "ptitle";
+			//dlTitle.DataSource = dt;
+			//dlTitle.DataBind();
 			dlTitle.Items.Insert(0, new System.Web.UI.WebControls.ListItem("全部", ""));
 
 
@@ -96,14 +96,17 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 			ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
 			//dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
 		}
+
+		if (dlVersion.Items.Count > 0)
+		{
+			dlVersion_SelectedIndexChanged(null, null);
+		}
 	}
 
 
 
 	private void DataBind()
 	{
-		setDl();
-
 		bool _AllowPaging = true;
 		SQLHelper sql = new SQLHelper();
 		DataTable dt = new DataTable();
@@ -460,5 +463,45 @@ insert into PDFTAG.dbo.Lu_SizeTable
 		DataBind();
 	}
 
+	protected void dlVersion_SelectedIndexChanged(object sender, EventArgs e)
+	{
+		var sql = new SQLHelper();
+		var dt = new DataTable();
 
+		string sSql = "";
+
+		string version = dlVersion.SelectedItem.Value;
+
+		sSql = "select  distinct b.ptitle \n";
+		sSql += "from PDFTAG.dbo.HistoryData a              \n";
+		sSql += " join PDFTAG.dbo.P_inProcess b on a.pipid=b.pipid and b.isshow=0            \n";
+		sSql += " where 1=1 and a.isshow=0  \n";
+		sSql += " and b.pver in ('" + version + "') \n";
+
+		if (LoginUser.role == LoginUser.ROLE_User)
+			sSql += " and b.creator ='" + LoginUser.PK + "' \n";
+
+		sSql += "order by b.ptitle \n";
+
+
+		using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
+		{
+			using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+			{
+				da.Fill(dt);
+			}
+
+			dlTitle.DataTextField = "ptitle";
+			dlTitle.DataValueField = "ptitle";
+			dlTitle.DataSource = dt;
+			dlTitle.DataBind();
+			dlTitle.Items.Insert(0, new System.Web.UI.WebControls.ListItem("全部", ""));
+
+
+
+
+
+		}
+
+	}
 }

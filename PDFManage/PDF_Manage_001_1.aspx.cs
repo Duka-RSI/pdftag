@@ -77,7 +77,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                 sSql += " and (a.gmname like '%" + txt + "%'  ) \n";
 
 
-            sSql += "order by a.gmname \n";
+            sSql += "order by a.gmcate,a.gmname \n";
             Response.Write("<!--" + sSql + "-->");
 
             using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))

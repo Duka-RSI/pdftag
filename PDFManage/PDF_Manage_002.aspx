@@ -35,7 +35,7 @@
                             </label>
                         </div>
                         <div class="col-4 col-md-3">
-                            <asp:DropDownList ID="dlVersion" runat="server" CssClass="form-control">
+                            <asp:DropDownList ID="dlVersion" runat="server" CssClass="form-control" OnSelectedIndexChanged="dlVersion_SelectedIndexChanged" AutoPostBack="true">
                                 <asp:ListItem Value="" Text="全部"></asp:ListItem>
                                <%-- <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
                                 <asp:ListItem Value="2" Text="UA"></asp:ListItem>
