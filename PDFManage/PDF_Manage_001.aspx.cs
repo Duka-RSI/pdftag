@@ -381,8 +381,13 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
             string sample = "";
             string sampleStep = "";
             int countHeader = -1;
+            int colStandardPlacement = -1;
+            int colPlacement = -1;
+            int colSupplierArticle = -1;
+            int colSupplier = -1;
+            int colTatol = -1;
 
-			using (StreamReader data = new StreamReader(sSaveTxtPath))
+            using (StreamReader data = new StreamReader(sSaveTxtPath))
 			{
 				while (!data.EndOfStream)
 				{
@@ -528,10 +533,27 @@ values
 									//Header
 									string[] arrHeader = sRowLine.Split(new string[] { "|" }, StringSplitOptions.None);
 									List<string> arrBOMGarmentcolor = new List<string>();
-									for (int h = 12; h < arrHeader.Length; h++)
+                                    bool isColor = false;
+									for (int h = 0; h < arrHeader.Length; h++)
 									{
-										if (!string.IsNullOrWhiteSpace(arrHeader[h]))
-											arrBOMGarmentcolor.Add(arrHeader[h]);
+                                        if (isColor)
+                                        {
+                                            if (!string.IsNullOrWhiteSpace(arrHeader[h]))
+                                                arrBOMGarmentcolor.Add(arrHeader[h]);
+                                        }
+                                        else
+                                        {
+                                            //用字串抓欄位的位置
+                                            if (arrHeader[h].Replace(" ", "") == "StandardPlacement") colStandardPlacement = h;
+                                            if (arrHeader[h].Replace(" ", "") == "Placement") colPlacement = h;
+                                            if (arrHeader[h].Replace(" ", "") == "SupplierArticle#") colSupplierArticle = h;
+                                            if (arrHeader[h].Replace(" ", "") == "Supplier") colSupplier = h;
+                                            else if (arrHeader[h].Replace(" ", "") == "Total")
+                                            {
+                                                colTatol = h;
+                                                isColor = true;
+                                            }
+                                        }                          
 									}
 									//Lu_BOMGarmentcolor
 
@@ -584,13 +606,13 @@ values
 									}
 
 
-									#region Lu_BOM
-
-									string StandardPlacement = arrRowValue[0].Trim();
-									string Placement = arrRowValue[1].Trim();
-									string SupplierArticle = arrRowValue[2].Trim().Replace(" ", string.Empty);
-									string Supplier = arrRowValue[5].Trim();
-									int iDataLength = arrRowValue.Length;
+                                    #region Lu_BOM
+                                    
+                                    string StandardPlacement = arrRowValue[colStandardPlacement].Trim();
+                                    string Placement = arrRowValue[colPlacement].Trim();
+                                    string SupplierArticle = arrRowValue[colSupplierArticle].Trim().Replace(" ", string.Empty);
+                                    string Supplier = arrRowValue[colSupplier].Trim();
+                                    int iDataLength = arrRowValue.Length;
 
 									if (string.IsNullOrWhiteSpace(StandardPlacement)
 										&& string.IsNullOrWhiteSpace(Placement)
@@ -598,16 +620,19 @@ values
 										&& string.IsNullOrWhiteSpace(Supplier))
 										continue;
 
-									string B1 = (iDataLength >= 13 ? arrRowValue[12].Trim() : "");
-									string B2 = (iDataLength >= 14 ? arrRowValue[13].Trim() : "");
-									string B3 = (iDataLength >= 15 ? arrRowValue[14].Trim() : "");
-									string B4 = (iDataLength >= 16 ? arrRowValue[15].Trim() : "");
-									string B5 = (iDataLength >= 17 ? arrRowValue[16].Trim() : "");
-									string B6 = (iDataLength >= 18 ? arrRowValue[17].Trim() : "");
-									string B7 = (iDataLength >= 19 ? arrRowValue[18].Trim() : "");
-									string B8 = (iDataLength >= 20 ? arrRowValue[19].Trim() : "");
-									string B9 = (iDataLength >= 21 ? arrRowValue[20].Trim() : "");
-									string B10 = (iDataLength >= 22 ? arrRowValue[21].Trim() : "");
+                                    Dictionary<string, string> dictBOM = new Dictionary<string, string>();
+                                    for(int countB = 1; countB <= 10; countB++)
+                                    {
+                                        if (colTatol + countB < iDataLength)
+                                        {
+                                            dictBOM.Add(string.Format("B{0}", countB.ToString()), arrRowValue[colTatol + countB].Trim());
+                                        }
+                                        else
+                                        {
+                                            dictBOM.Add(string.Format("B{0}", countB.ToString()), "");
+                                        }
+                                    }
+                                    
 
                                     #region 比對詞彙
 
@@ -640,124 +665,124 @@ values
 									if (false)
 									{
                                         #region color
-                                        bool isUpdateColor = false;
-										for (int a = 1; a <= 10; a++)
-										{
-											if (a > arrBOMGarmentcolorHeaders.Count)
-												break;
+          //                              bool isUpdateColor = false;
+										//for (int a = 1; a <= 10; a++)
+										//{
+										//	if (a > arrBOMGarmentcolorHeaders.Count)
+										//		break;
 
-											//20220803 不會針對0002-WHT做判斷，只會針對White的內容做取代，並顯示 修: PreWhite。trm 也有一個 0002-WHT。點[學習]後，不會把 DTM 變成 PreWhite
-											//string sColName = arrBOMGarmentcolorHeaders[a - 1];
-											string sColName = "GarmentColor";
+										//	//20220803 不會針對0002-WHT做判斷，只會針對White的內容做取代，並顯示 修: PreWhite。trm 也有一個 0002-WHT。點[學習]後，不會把 DTM 變成 PreWhite
+										//	//string sColName = arrBOMGarmentcolorHeaders[a - 1];
+										//	string sColName = "GarmentColor";
 
-											switch (a)
-											{
-												case 1:
-													res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
-								  && x.Termname_org == B1.Trim().Replace(" ", "").ToLower());
+										//	switch (a)
+										//	{
+										//		case 1:
+										//			res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
+								  //&& x.Termname_org == B1.Trim().Replace(" ", "").ToLower());
 
-													if (res != null)
-													{
-														B1 = res.Termname;
-														isUpdateColor = true;
-													}
-													break;
+										//			if (res != null)
+										//			{
+										//				B1 = res.Termname;
+										//				isUpdateColor = true;
+										//			}
+										//			break;
 
-												case 2:
-													res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
-								  && x.Termname_org == B2.Trim().Replace(" ", "").ToLower());
+										//		case 2:
+										//			res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
+								  //&& x.Termname_org == B2.Trim().Replace(" ", "").ToLower());
 
-													if (res != null)
-													{
-														B2 = res.Termname;
-														isUpdateColor = true;
-													}
-													break;
+										//			if (res != null)
+										//			{
+										//				B2 = res.Termname;
+										//				isUpdateColor = true;
+										//			}
+										//			break;
 
-												case 3:
-													res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
-								  && x.Termname_org == B3.Trim().Replace(" ", "").ToLower());
+										//		case 3:
+										//			res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
+								  //&& x.Termname_org == B3.Trim().Replace(" ", "").ToLower());
 
-													if (res != null)
-													{
-														B3 = res.Termname;
-														isUpdateColor = true;
-													}
-													break;
+										//			if (res != null)
+										//			{
+										//				B3 = res.Termname;
+										//				isUpdateColor = true;
+										//			}
+										//			break;
 
-												case 4:
-													res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
-								  && x.Termname_org == B4.Trim().Replace(" ", "").ToLower());
+										//		case 4:
+										//			res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
+								  //&& x.Termname_org == B4.Trim().Replace(" ", "").ToLower());
 
-													if (res != null)
-													{
-														B4 = res.Termname;
-														isUpdateColor = true;
-													}
-													break;
-												case 5:
-													res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
-								  && x.Termname_org == B5.Trim().Replace(" ", "").ToLower());
+										//			if (res != null)
+										//			{
+										//				B4 = res.Termname;
+										//				isUpdateColor = true;
+										//			}
+										//			break;
+										//		case 5:
+										//			res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
+								  //&& x.Termname_org == B5.Trim().Replace(" ", "").ToLower());
 
-													if (res != null)
-													{
-														B5 = res.Termname;
-														isUpdateColor = true;
-													}
-													break;
-												case 6:
-													res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
-								  && x.Termname_org == B6.Trim().Replace(" ", "").ToLower());
+										//			if (res != null)
+										//			{
+										//				B5 = res.Termname;
+										//				isUpdateColor = true;
+										//			}
+										//			break;
+										//		case 6:
+										//			res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
+								  //&& x.Termname_org == B6.Trim().Replace(" ", "").ToLower());
 
-													if (res != null)
-													{
-														B6 = res.Termname;
-														isUpdateColor = true;
-													}
-													break;
-												case 7:
-													res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
-								  && x.Termname_org == B7.Trim().Replace(" ", "").ToLower());
+										//			if (res != null)
+										//			{
+										//				B6 = res.Termname;
+										//				isUpdateColor = true;
+										//			}
+										//			break;
+										//		case 7:
+										//			res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
+								  //&& x.Termname_org == B7.Trim().Replace(" ", "").ToLower());
 
-													if (res != null)
-													{
-														B7 = res.Termname;
-														isUpdateColor = true;
-													}
+										//			if (res != null)
+										//			{
+										//				B7 = res.Termname;
+										//				isUpdateColor = true;
+										//			}
 
-													break;
-												case 8:
-													res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
-								  && x.Termname_org == B8.Trim().Replace(" ", "").ToLower());
+										//			break;
+										//		case 8:
+										//			res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
+								  //&& x.Termname_org == B8.Trim().Replace(" ", "").ToLower());
 
-													if (res != null)
-													{
-														B8 = res.Termname;
-														isUpdateColor = true;
-													}
-													break;
-												case 9:
-													res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
-								  && x.Termname_org == B9.Trim().Replace(" ", "").ToLower());
+										//			if (res != null)
+										//			{
+										//				B8 = res.Termname;
+										//				isUpdateColor = true;
+										//			}
+										//			break;
+										//		case 9:
+										//			res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
+								  //&& x.Termname_org == B9.Trim().Replace(" ", "").ToLower());
 
-													if (res != null)
-													{
-														B9 = res.Termname;
-														isUpdateColor = true;
-													}
-													break;
-												case 10:
-													res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
-								  && x.Termname_org == B10.Trim().Replace(" ", "").ToLower());
+										//			if (res != null)
+										//			{
+										//				B9 = res.Termname;
+										//				isUpdateColor = true;
+										//			}
+										//			break;
+										//		case 10:
+										//			res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == sColName
+								  //&& x.Termname_org == B10.Trim().Replace(" ", "").ToLower());
 
-													if (res != null)
-													{
-														B10 = res.Termname;
-														isUpdateColor = true;
-													}
-													break;
-											}
-										}
+										//			if (res != null)
+										//			{
+										//				B10 = res.Termname;
+										//				isUpdateColor = true;
+										//			}
+										//			break;
+										//	}
+										//}
                                         #endregion
                                     }
 
@@ -784,27 +809,12 @@ values
 									cm.Parameters.AddWithValue("@Placement", Placement);
 									cm.Parameters.AddWithValue("@SupplierArticle", SupplierArticle);
 									cm.Parameters.AddWithValue("@Supplier", Supplier);
-									//cm.Parameters.AddWithValue("@B1", iDataLength >= 13 ? arrRowValue[12].Trim() : "");
-									//cm.Parameters.AddWithValue("@B2", iDataLength >= 14 ? arrRowValue[13].Trim() : "");
-									//cm.Parameters.AddWithValue("@B3", iDataLength >= 15 ? arrRowValue[14].Trim() : "");
-									//cm.Parameters.AddWithValue("@B4", iDataLength >= 16 ? arrRowValue[15].Trim() : "");
-									//cm.Parameters.AddWithValue("@B5", iDataLength >= 17 ? arrRowValue[16].Trim() : "");
-									//cm.Parameters.AddWithValue("@B6", iDataLength >= 18 ? arrRowValue[17].Trim() : "");
-									//cm.Parameters.AddWithValue("@B7", iDataLength >= 19 ? arrRowValue[18].Trim() : "");
-									//cm.Parameters.AddWithValue("@B8", iDataLength >= 20 ? arrRowValue[19].Trim() : "");
-									//cm.Parameters.AddWithValue("@B9", iDataLength >= 21 ? arrRowValue[20].Trim() : "");
-									//cm.Parameters.AddWithValue("@B10", iDataLength >= 22 ? arrRowValue[21].Trim() : "");
+                                    
+                                    for (int colBom = 1; colBom <= 10; colBom++)
+                                    {
+                                        cm.Parameters.AddWithValue(string.Format("@B{0}", colBom.ToString()), dictBOM[string.Format("B{0}", colBom.ToString())].Trim());
+                                    }
 
-									cm.Parameters.AddWithValue("@B1", B1);
-									cm.Parameters.AddWithValue("@B2", B2);
-									cm.Parameters.AddWithValue("@B3", B3);
-									cm.Parameters.AddWithValue("@B4", B4);
-									cm.Parameters.AddWithValue("@B5", B5);
-									cm.Parameters.AddWithValue("@B6", B6);
-									cm.Parameters.AddWithValue("@B7", B7);
-									cm.Parameters.AddWithValue("@B8", B8);
-									cm.Parameters.AddWithValue("@B9", B9);
-									cm.Parameters.AddWithValue("@B10", B10);
 									cm.Parameters.AddWithValue("@isEdit", isEdit ? 1 : 0);
 
 									lubid = Convert.ToInt64(cm.ExecuteScalar().ToString());
