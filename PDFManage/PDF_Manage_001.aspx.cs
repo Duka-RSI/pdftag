@@ -12,6 +12,7 @@ using Aspose.Pdf;
 using Aspose.Pdf.Text;
 using System.Data.SqlClient;
 using Dapper;
+using System.Text.RegularExpressions;
 public partial class Passport_Passport_A000 : System.Web.UI.Page
 {
 	protected string script;
@@ -385,8 +386,8 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
             int colPlacement = -1;
             int colSupplierArticle = -1;
             int colSupplier = -1;
-            int colTatol = -1;
-
+            //int colTatol = -1;
+            Dictionary<int, string> dicColor = new Dictionary<int, string>();
             using (StreamReader data = new StreamReader(sSaveTxtPath))
 			{
 				while (!data.EndOfStream)
@@ -532,29 +533,26 @@ values
 
 									//Header
 									string[] arrHeader = sRowLine.Split(new string[] { "|" }, StringSplitOptions.None);
-									List<string> arrBOMGarmentcolor = new List<string>();
+									//List<string> arrBOMGarmentcolor = new List<string>();
                                     bool isColor = false;
-									for (int h = 0; h < arrHeader.Length; h++)
+                                    dicColor = new Dictionary<int, string>();//清掉
+                                    for (int h = 0; h < arrHeader.Length; h++)
 									{
-                                        if (isColor)
+                                        if (arrHeader[h].Replace(" ", "") == "StandardPlacement") colStandardPlacement = h;
+                                        else if (arrHeader[h].Replace(" ", "") == "Placement") colPlacement = h;
+                                        else if (arrHeader[h].Replace(" ", "") == "SupplierArticle#") colSupplierArticle = h;
+                                        else if (arrHeader[h].Replace(" ", "") == "Supplier") colSupplier = h;
+                                        else if (Regex.IsMatch(arrHeader[h].Replace(" ", ""), @"^[0-9]{4,}") && Regex.IsMatch(arrHeader[h].Replace(" ", ""), @"[a-zA-Z]{3,}$"))
                                         {
-                                            if (!string.IsNullOrWhiteSpace(arrHeader[h]))
-                                                arrBOMGarmentcolor.Add(arrHeader[h]);
-                                        }
-                                        else
-                                        {
-                                            //用字串抓欄位的位置
-                                            if (arrHeader[h].Replace(" ", "") == "StandardPlacement") colStandardPlacement = h;
-                                            if (arrHeader[h].Replace(" ", "") == "Placement") colPlacement = h;
-                                            if (arrHeader[h].Replace(" ", "") == "SupplierArticle#") colSupplierArticle = h;
-                                            if (arrHeader[h].Replace(" ", "") == "Supplier") colSupplier = h;
-                                            else if (arrHeader[h].Replace(" ", "") == "Total")
+                                            string colorName = arrHeader[h].Replace(" ", "");
+                                            //如果色組只有四碼，前面補0到6碼，只有0001-BLK及0002-WHT維持4碼
+                                            if (Regex.IsMatch(colorName, @"^[0-9]{4}[^0-9]") && (colorName != "0001-BLK" && colorName != "0002-WHT"))
                                             {
-                                                colTatol = h;
-                                                isColor = true;
+                                                colorName = "00" + colorName;
                                             }
-                                        }                          
-									}
+                                            dicColor.Add(h, colorName);
+                                        }
+                                    }
 									//Lu_BOMGarmentcolor
 
 									#region Lu_BOMGarmentcolor
@@ -571,13 +569,13 @@ values
 
 									for (int a = 1; a <= 10; a++)
 									{
-										if (a > arrBOMGarmentcolor.Count)
+										if (a > dicColor.Count)
 											cm.Parameters.AddWithValue("@A" + a, "");
 										else
 										{
-											cm.Parameters.AddWithValue("@A" + a, arrBOMGarmentcolor[a - 1]);
+											cm.Parameters.AddWithValue("@A" + a, dicColor.Values.ElementAt(a - 1));
 
-											arrBOMGarmentcolorHeaders.Add(arrBOMGarmentcolor[a - 1]);
+											arrBOMGarmentcolorHeaders.Add(dicColor.Values.ElementAt(a - 1));
 										}
 									}
 
@@ -599,7 +597,7 @@ values
 										type = sRowLine.Replace("|", "").Trim();
 										continue;
 									}
-									if (sRowLine.Contains("Total = $"))
+									if (sRowLine.Contains("Total ="))
 									{
 										isMaterialColorReport = false;
 										continue;
@@ -623,16 +621,15 @@ values
                                     Dictionary<string, string> dictBOM = new Dictionary<string, string>();
                                     for(int countB = 1; countB <= 10; countB++)
                                     {
-                                        if (colTatol + countB < iDataLength)
+                                        if (countB <= dicColor.Count())
                                         {
-                                            dictBOM.Add(string.Format("B{0}", countB.ToString()), arrRowValue[colTatol + countB].Trim());
+                                            dictBOM.Add(string.Format("B{0}", countB.ToString()), arrRowValue[dicColor.Keys.ElementAt(countB - 1)].Trim());
                                         }
                                         else
                                         {
                                             dictBOM.Add(string.Format("B{0}", countB.ToString()), "");
                                         }
-                                    }
-                                    
+                                    }                                    
 
                                     #region 比對詞彙
 
