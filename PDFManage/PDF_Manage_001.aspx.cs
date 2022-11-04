@@ -542,7 +542,7 @@ values
                                         else if (arrHeader[h].Replace(" ", "") == "Placement") colPlacement = h;
                                         else if (arrHeader[h].Replace(" ", "") == "SupplierArticle#") colSupplierArticle = h;
                                         else if (arrHeader[h].Replace(" ", "") == "Supplier") colSupplier = h;
-                                        else if (Regex.IsMatch(arrHeader[h].Replace(" ", ""), @"^[0-9]{4,}") && Regex.IsMatch(arrHeader[h].Replace(" ", ""), @"[a-zA-Z]{3,}$"))
+                                        else if (Regex.IsMatch(arrHeader[h].Replace(" ", ""), @"^[0-9]{4,}") && Regex.IsMatch(arrHeader[h].Replace(" ", ""), @"[a-zA-Z]{1,}$"))
                                         {
                                             string colorName = arrHeader[h].Replace(" ", "");
                                             //如果色組只有四碼，前面補0到6碼，只有0001-BLK及0002-WHT維持4碼

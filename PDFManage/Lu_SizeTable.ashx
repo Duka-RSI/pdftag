@@ -231,11 +231,31 @@ public class Passport : IHttpHandler, IRequiresSessionState
                              end ";
 
                 var res2 = cn.Execute(sSql, new { IdName = "lustid", id = lustid, ColName = col, note = chNote, creator = LoginUser.PK, createordate = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") });
+
+                //先不用，mark起來
+                ////將備註加入學習
+                //sSql = @"IF NOT Exists (select * from PDFTAG.dbo.Lu_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and FirstCharTermname_org=@FirstCharTermname_org and termname_org=@termname_org )
+                //             begin
+                //                  insert into PDFTAG.dbo.Lu_LearnmgrItem
+                //                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,creator,creatordate)
+                //                    values 
+                //              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@creator,@creatordate)
+                //              end ";
+                //cn.Execute(sSql, new
+                //{
+                //    ColSource = "Size",
+                //    ColName = "chNote",
+                //    FirstCharTermname_org = resLu_SizeTable_Org.TextOrg.Substring(0, 1),
+                //    termname_org = resLu_SizeTable_Org.TextOrg.Trim().Replace(" ", "").ToLower(),
+                //    termname = chNote,
+                //    creator = LoginUser.PK,
+                //    creatordate = dtNow.ToString("yyyy/MM/dd HH:mm:ss")
+                //});
             }
 
             int iCntLearnmgrItem = 0;
 
-            if (isRecord == "1")
+            if (isRecord == "1" && resLu_SizeTable_Org.TextOrg != text)
             {
                 string sFirstCharTermname_org = resLu_SizeTable_Org.TextOrg.Substring(0, 1);
                 string sTermname_org = resLu_SizeTable_Org.TextOrg.Trim().Replace(" ", "").ToLower();

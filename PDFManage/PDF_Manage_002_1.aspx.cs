@@ -623,7 +623,10 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
     public string Compare(string org, string newText, string note, bool IsMapping = true)
     {
         if (org == newText)
-            return org;
+            if(string.IsNullOrEmpty(note))
+                return org;
+            else
+                return "<font>原:" + org + "</font><br><font color='blue'>中:" + note + "</font>";
         else
         {
             if (IsMapping)
@@ -1075,9 +1078,26 @@ values
                         cm.Parameters.AddWithValue("@B10", B10);
                         cm.Parameters.AddWithValue("@isEdit", isEdit ? 1 : 0);
                         cm.ExecuteNonQuery();
-
-
+                        
                     }
+
+                    //先不用，mark起來
+                    ////學習按鈕自動新增中文備註
+                    //btnlearnNote(arrLu_LearnmgrItemDto, "BOM", StandardPlacement.Trim().Replace(" ", "").ToLower(), lubid, "StandardPlacement", dtNow);
+                    //btnlearnNote(arrLu_LearnmgrItemDto, "BOM", Placement.Trim().Replace(" ", "").ToLower(), lubid, "Placement", dtNow);
+                    //btnlearnNote(arrLu_LearnmgrItemDto, "BOM", SupplierArticle.Trim().Replace(" ", "").ToLower(), lubid, "SupplierArticle", dtNow);
+                    //btnlearnNote(arrLu_LearnmgrItemDto, "BOM", Supplier.Trim().Replace(" ", "").ToLower(), lubid, "Supplier", dtNow);
+
+                    //Dictionary<string, string> dictBOM = new Dictionary<string, string>();
+                    //for (int countB = 1; countB <= 10; countB++)
+                    //{
+                    //    dictBOM.Add(string.Format("B{0}", countB.ToString()), drBom["B" + countB].ToString());                        
+                    //}
+                    //for (int i = 1; i <= 10; i++)
+                    //{
+                    //    btnlearnNote(arrLu_LearnmgrItemDto, "BOM", dictBOM[string.Format("B{0}", i.ToString())].Trim().Replace(" ", "").ToLower(), lubid, string.Format("B{0}", i.ToString()), dtNow);
+                    //}
+
                 }
 
                 #endregion
@@ -1172,6 +1192,19 @@ values
                         cm.Parameters.AddWithValue("@Criticality", Criticality);
                         cm.ExecuteNonQuery();
                     }
+                    //先不用，mark起來
+                    ////學習按鈕自動新增中文備註
+                    //btnlearnNote(arrLu_LearnmgrItemDto, "Size", Name.Trim().Replace(" ", "").ToLower(), lustid, "Name", dtNow);
+                    //btnlearnNote(arrLu_LearnmgrItemDto, "Size", Criticality.Trim().Replace(" ", "").ToLower(), lustid, "Criticality", dtNow);
+                    //Dictionary<string, string> dictSize = new Dictionary<string, string>();
+                    //for (int countB = 1; countB <= 15; countB++)
+                    //{
+                    //    dictSize.Add(string.Format("A{0}", countB.ToString()), drLu_SizeTable["A" + countB].ToString());
+                    //}
+                    //for (int i = 1; i <= 15; i++)
+                    //{
+                    //    btnlearnNote(arrLu_LearnmgrItemDto, "Size", dictSize[string.Format("A{0}", i.ToString())].Trim().Replace(" ", "").ToLower(), lustid, string.Format("A{0}", i.ToString()), dtNow);
+                    //}
                 }
 
                 #endregion
@@ -1188,5 +1221,59 @@ values
         DataBind();
     }
 
+    /// <summary>
+    /// 找出資料庫是否有備註，若有再確認該PDF是否已有備註，若無則依學習新增一筆備註
+    /// </summary>
+    /// <param name="_learnList"></param>
+    /// <param name="_colSoruce"></param>
+    /// <param name="_termname"></param>
+    /// <param name="_id"></param>
+    /// <param name="_colName"></param>
+    /// <param name="_dtNow"></param>
+    private void btnlearnNote(List<Lu_LearnmgrItemDto> _learnList, string _colSoruce, string _termname, string _id, string _colName, DateTime _dtNow)
+    {
+        SQLHelper sql = new SQLHelper();
+        string sSql = "";
+        using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
+        {
+            //找學習
+            var resNote = _learnList.FirstOrDefault(x => x.ColSource == _colSoruce && x.ColName == "chNote" && x.Termname_org == _termname);
+            if (resNote != null)
+            {
+                //確認是否已有備註
+                string sqlNote = "";
+                if (_colSoruce == "BOM")
+                    sqlNote = "select * from Lu_Ch_Note a where a.IdName='lubid' and a.ColName = '"+ _colName + "' and a.Id = " + _id;
+                else if (_colSoruce == "Size")
+                    sqlNote = "select * from Lu_Ch_Note a where a.IdName='lustid' and a.ColName = '"+ _colName + "' and a.Id = " + _id;
+                cm.CommandText = sqlNote;
+                cm.Parameters.Clear();
+                DataTable dtNote = new DataTable();
+                using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                {
+                    da.Fill(dtNote);
+                }
+                if (dtNote != null)
+                {
+                    string newNoteSql = @" insert into PDFTAG.dbo.Lu_Ch_Note
+                                (IdName,id,ColName,note,creator,createordate)
+                                values 
+                                (@IdName,@id,@ColName,@note,@creator,@createordate) ";
+                    cm.CommandText = newNoteSql;
+                    cm.Parameters.Clear();
+                    if(_colSoruce == "BOM")
+                        cm.Parameters.AddWithValue("@IdName", "lubid");
+                    else if(_colSoruce == "Size")
+                        cm.Parameters.AddWithValue("@IdName", "lustid");
+                    cm.Parameters.AddWithValue("@id", _id);
+                    cm.Parameters.AddWithValue("@ColName", _colName);
+                    cm.Parameters.AddWithValue("@note", resNote.Termname);
+                    cm.Parameters.AddWithValue("@creator", LoginUser.PK);
+                    cm.Parameters.AddWithValue("@createordate", _dtNow.ToString("yyyy/MM/dd HH:mm:ss"));
+                    cm.ExecuteNonQuery();
+                }
+            }
+        }
+    }
 
 }
