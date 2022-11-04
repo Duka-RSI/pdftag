@@ -658,8 +658,8 @@ values
 
 									if (res != null)
 										Supplier = res.Termname;
-
-									if (false)
+                                                                        
+                                    if (false)
 									{
                                         #region color
           //                              bool isUpdateColor = false;
@@ -819,11 +819,20 @@ values
 
 									Response.Write("<!--insert lubcid=" + lubcid + "-->");
 
+                                    //先不用，mark起來
+                                    //btnlearnNote(arrLu_LearnmgrItemDto, "BOM", StandardPlacement.Trim().Replace(" ", "").ToLower(), lubid.ToString(), "StandardPlacement", sNow);
+                                    //btnlearnNote(arrLu_LearnmgrItemDto, "BOM", Placement.Trim().Replace(" ", "").ToLower(), lubid.ToString(), "Placement", sNow);
+                                    //btnlearnNote(arrLu_LearnmgrItemDto, "BOM", SupplierArticle.Trim().Replace(" ", "").ToLower(), lubid.ToString(), "SupplierArticle", sNow);
+                                    //btnlearnNote(arrLu_LearnmgrItemDto, "BOM", Supplier.Trim().Replace(" ", "").ToLower(), lubid.ToString(), "Supplier", sNow);                                    
+                                    //for (int BNum = 1; BNum <= 10; BNum++)
+                                    //{
+                                    //    btnlearnNote(arrLu_LearnmgrItemDto, "BOM", dictBOM[string.Format("B{0}", BNum.ToString())].Trim().Replace(" ", "").ToLower(), lubid.ToString(), string.Format("B{0}", BNum.ToString()), sNow);
+                                    //}
 
-									#endregion
-								}
+                                    #endregion
+                                }
 
-							}
+                            }
 
 							#endregion
 						}
@@ -1014,14 +1023,9 @@ values
 
                                     if (res != null)
                                         item.Criticality = res.Termname;
-
-
-
+                                    
                                     #endregion
-
-
-
-
+                                    
                                     sSql = @"insert into PDFTAG.dbo.Lu_SizeTable 
 (luhid,rowid,codeid,Name,Criticality,TolA,TolB,HTMInstruction,lusthid,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15) 
 values 
@@ -1057,11 +1061,23 @@ values
 
 									long lustid = Convert.ToInt64(cm.ExecuteScalar().ToString());
 
-								}
+                                    //先不用，mark起來
+                                    //btnlearnNote(arrLu_LearnmgrItemDto, "Size", item.Name.Trim().Replace(" ", "").ToLower(), lustid.ToString(), "Name", sNow);
+                                    //btnlearnNote(arrLu_LearnmgrItemDto, "Size", item.Criticality.Trim().Replace(" ", "").ToLower(), lustid.ToString(), "Criticality", sNow);
+                                    //Dictionary<string, string> dictBOM = new Dictionary<string, string>();
+                                    //for (int countB = 1; countB <= 15; countB++)
+                                    //{
+                                    //    dictBOM.Add(string.Format("A{0}", countB.ToString()), item."A" + countB.ToString());
+                                    //}
+                                    //for (int i = 1; i <= 15; i++)
+                                    //{
+                                    //    btnlearnNote(arrLu_LearnmgrItemDto, "Size", dictBOM[string.Format("A{0}", i.ToString())].Trim().Replace(" ", "").ToLower(), lustid.ToString(), string.Format("A{0}", i.ToString()), sNow);
+                                    //}
+                                }
 
-								#region Lu_SizeTable_1
+                                #region Lu_SizeTable_1
 
-								sSql = @"select * from PDFTAG.dbo.Lu_SizeTable_Header where lusthid=@lusthid";
+                                sSql = @"select * from PDFTAG.dbo.Lu_SizeTable_Header where lusthid=@lusthid";
 
 								Response.Write("<!--" + sSql.Replace("@lusthid", lusthid.ToString()) + "-->");
 								cm.CommandText = sSql;
@@ -3281,7 +3297,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
 						{
 							//@Row: Status: Prototype1363621 - BaseSeason: FW22Lifecycle: CarryoverUA Tech 6in Novelty 2 PackRegional Fit: US %% 
 							//@Row: Status: Pre-Production1361426 - MCSSeason: SS22Lifecycle: CarryoverUA Training Vent 2.0 SSRegional Fit: US %% 
-							string sTempLine = sLine.Replace("@Row:", "").Replace("Status: Prototype", "@Row").Replace("Status: Pre-Production", "@Row").Replace("Season:", "@Row");
+							string sTempLine = sLine.Replace("@Row:", "").Replace("Status: Prototype", "@Row").Replace("Status: Pre-Production", "@Row").Replace("Status: Production", "@Row").Replace("Season:", "@Row");
 							string style = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Split('-')[0].Trim();
 
 							sTempLine = sLine.Replace("@Row:", "").Replace("Lifecycle:", "@Row").Replace("Regional Fit:", "@Row");
@@ -3526,8 +3542,8 @@ values
 							#endregion
 
 
-							if (sLine.StartsWith("@Row: Fabric")
-								|| sLine.StartsWith("@Row: Trim") || sLine.StartsWith("@Row: Thread") || sLine.StartsWith("@Row: Label") || sLine.StartsWith("@Row: Hangtag/Packaging"))
+							if (sLine.StartsWith("@Row: Fabric") || sLine.StartsWith("@Row: Trim") || sLine.StartsWith("@Row: Embellishment") 
+                                || sLine.StartsWith("@Row: Thread") || sLine.StartsWith("@Row: Label") || sLine.StartsWith("@Row: Hangtag/Packaging"))
 							{
 
 								isBomTypeData = true;
@@ -4611,9 +4627,7 @@ values
 			}
 		}
 	}
-
-
-
+    
 	protected void dlVersion_SelectedIndexChanged(object sender, EventArgs e)
 	{
 		var sql = new SQLHelper();
@@ -4648,4 +4662,60 @@ values
 		}
 
 	}
+
+    /// <summary>
+    /// 找出資料庫是否有備註，若有再確認該PDF是否已有備註，若無則依學習新增一筆備註
+    /// </summary>
+    /// <param name="_learnList"></param>
+    /// <param name="_colSoruce"></param>
+    /// <param name="_termname"></param>
+    /// <param name="_id"></param>
+    /// <param name="_colName"></param>
+    /// <param name="_dtNow"></param>
+    private void btnlearnNote(List<Lu_LearnmgrItemDto> _learnList, string _colSoruce, string _termname, string _id, string _colName, string _dtNow)
+    {
+        SQLHelper sql = new SQLHelper();
+        string sSql = "";
+        using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
+        {
+            //找學習
+            var resNote = _learnList.FirstOrDefault(x => x.ColSource == _colSoruce && x.ColName == "chNote" && x.Termname_org == _termname);
+            if (resNote != null)
+            {
+                //確認是否已有備註
+                string sqlNote = "";
+                if (_colSoruce == "BOM")
+                    sqlNote = "select * from Lu_Ch_Note a where a.IdName='lubid' and a.ColName = '" + _colName + "' and a.Id = " + _id;
+                else if (_colSoruce == "Size")
+                    sqlNote = "select * from Lu_Ch_Note a where a.IdName='lustid' and a.ColName = '" + _colName + "' and a.Id = " + _id;
+                cm.CommandText = sqlNote;
+                cm.Parameters.Clear();
+                DataTable dtNote = new DataTable();
+                using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                {
+                    da.Fill(dtNote);
+                }
+                if (dtNote != null)
+                {
+                    string newNoteSql = @" insert into PDFTAG.dbo.Lu_Ch_Note
+                                (IdName,id,ColName,note,creator,createordate)
+                                values 
+                                (@IdName,@id,@ColName,@note,@creator,@createordate) ";
+                    cm.CommandText = newNoteSql;
+                    cm.Parameters.Clear();
+                    if (_colSoruce == "BOM")
+                        cm.Parameters.AddWithValue("@IdName", "lubid");
+                    else if (_colSoruce == "Size")
+                        cm.Parameters.AddWithValue("@IdName", "lustid");
+                    cm.Parameters.AddWithValue("@id", _id);
+                    cm.Parameters.AddWithValue("@ColName", _colName);
+                    cm.Parameters.AddWithValue("@note", resNote.Termname);
+                    cm.Parameters.AddWithValue("@creator", LoginUser.PK);
+                    cm.Parameters.AddWithValue("@createordate", _dtNow);
+                    cm.ExecuteNonQuery();
+                }
+            }
+        }
+    }
+
 }
