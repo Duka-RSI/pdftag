@@ -224,37 +224,45 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
         try
         {
             DateTime dtNow = DateTime.Now;
-           
 
-            sSql = @"insert into PDFTAG.dbo.GroupManage 
+            DataTable dtCheck = new DataTable();
+            sSql = "select * from PDFTAG.dbo.GroupManage where isshow = 0 and gmname = '" + gmname.Text + "' and gmcate = '"+ dlgmcate.SelectedItem.Value + "' ";
+            using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
+            {
+                using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                {
+                    da.Fill(dtCheck);
+                }
+            }
+
+            if (dtCheck.Rows.Count == 0)
+            {
+                sSql = @"insert into PDFTAG.dbo.GroupManage 
 (gmname,gmcate,creator,createordate,isShow) 
 values 
 (@gmname,@gmcate,@creator,@createordate,@isShow);SELECT SCOPE_IDENTITY();";
 
-            using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
-            {
+                using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
+                {
+                    cm.Parameters.AddWithValue("@gmname", gmname.Text);
+                    cm.Parameters.AddWithValue("@gmcate", dlgmcate.SelectedItem.Value);
+                    cm.Parameters.AddWithValue("@creator", LoginUser.PK);
+                    cm.Parameters.AddWithValue("@createordate", dtNow.ToString("yyyy/MM/dd HH:mm:ss"));
+                    cm.Parameters.AddWithValue("@isShow", "0");
 
-
-                cm.Parameters.AddWithValue("@gmname", gmname.Text);
-                cm.Parameters.AddWithValue("@gmcate", dlgmcate.SelectedItem.Value);
-                cm.Parameters.AddWithValue("@creator", LoginUser.PK);
-                cm.Parameters.AddWithValue("@createordate", dtNow.ToString("yyyy/MM/dd HH:mm:ss"));
-                cm.Parameters.AddWithValue("@isShow", "0");
-
-
-
-                long result = Convert.ToInt64(cm.ExecuteScalar().ToString());
-
-
+                    long result = Convert.ToInt64(cm.ExecuteScalar().ToString());
+                }
             }
-
-
+            else
+            {
+                throw new Exception("群組名稱已重複");
+            }
+            
         }
         catch (Exception err)
         {
             Response.Write("btnAdd_Click:" + err.ToString());
         }
-
 
         DataBind();
     }
