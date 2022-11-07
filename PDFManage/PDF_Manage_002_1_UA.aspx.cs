@@ -161,9 +161,9 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                 sb.Append(" <th scope='col'>Season</th>");
                 sb.Append(" <th scope='col'>Style</th>");
                 sb.Append(" <th scope='col'>Style Desc</th>");
-                sb.Append(" <th scope='col'>Product Size</th>");
+                sb.Append(" <th scope='col'>Size Scale</th>");
                 sb.Append(" <th scope='col'>Product Family</th>");
-                sb.Append(" <th scope='col'>Style Status</th>");
+                sb.Append(" <th scope='col'>Sample Status</th>");
                 sb.Append(" <th scope='col'></th>");
                 sb.Append("</tr>");
                 sb.Append("<tr id='row" + iSeq + "'>");
