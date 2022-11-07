@@ -147,10 +147,10 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 				sSql += " and (a.gmid = '" + gmid + "'  ) \n";
 
             //讓USER看得到同部門的
-			//if (LoginUser.role != LoginUser.ROLE_ADMIN)
-				//sSql += " and (a.creator = '" + LoginUser.PK + "'  ) \n";
+            if (LoginUser.role != LoginUser.ROLE_ADMIN)
+                sSql += " and (a.pver in ('" + string.Join("','", LoginUser.CUST_NO.ToArray()) + "')  ) \n";
 
-			sSql += "order by a.pipid desc \n";
+            sSql += "order by a.pipid desc \n";
 			Response.Write("<!--" + sSql + "-->");
 
 			using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))

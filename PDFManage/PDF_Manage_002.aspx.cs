@@ -131,10 +131,10 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 			if (!string.IsNullOrEmpty(txt))
 				sSql += " and (b.ptitle like '%" + txt + "%'  ) \n";
 
-			//if (LoginUser.role != LoginUser.ROLE_ADMIN)
-			//	sSql += " and (b.creator = '" + LoginUser.PK + "'  ) \n";
+            if (LoginUser.role != LoginUser.ROLE_ADMIN)
+                sSql += " and (b.pver in ('" + string.Join("','", LoginUser.CUST_NO.ToArray()) + "')  ) \n";
 
-			sSql += "order by b.pipid desc \n";
+            sSql += "order by b.pipid desc \n";
 			Response.Write("<!--" + sSql + "-->");
 
 			using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
