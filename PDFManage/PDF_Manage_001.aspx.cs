@@ -146,8 +146,9 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 			if (!string.IsNullOrEmpty(gmid))
 				sSql += " and (a.gmid = '" + gmid + "'  ) \n";
 
-			if (LoginUser.role != LoginUser.ROLE_ADMIN)
-				sSql += " and (a.creator = '" + LoginUser.PK + "'  ) \n";
+            //讓USER看得到同部門的
+			//if (LoginUser.role != LoginUser.ROLE_ADMIN)
+				//sSql += " and (a.creator = '" + LoginUser.PK + "'  ) \n";
 
 			sSql += "order by a.pipid desc \n";
 			Response.Write("<!--" + sSql + "-->");
