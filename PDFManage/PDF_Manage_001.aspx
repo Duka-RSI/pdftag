@@ -300,7 +300,6 @@
             dlTitleType_change();
             $('#<%=ptitle.ClientID %>').val('');
             $('#<%=FileUpload1.ClientID %>').val('');
-            $('#<%=ddlpver.ClientID %>').val("1");
             $("#divFile").html('');
 
             $('#<%=hidgmid.ClientID %>').val('');

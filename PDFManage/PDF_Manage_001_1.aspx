@@ -180,7 +180,6 @@
 
             $('#<%=hidgmid.ClientID %>').val('');
             $('#<%=gmname.ClientID %>').val('');
-            $('#<%=dlgmcate.ClientID %>').val('');
             $("#span_creator").text('');
             $("#span_createordate").text('');
 
