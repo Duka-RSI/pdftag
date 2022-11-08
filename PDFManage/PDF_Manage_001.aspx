@@ -110,7 +110,7 @@
                                         <%# Eval("generateddate")%>
                                     </td>
                                     <td style="word-break: break-all">
-                                        <a href="#" onclick="Open('<%# Eval("piuploadfile")%>')"><%# RemoveDateOnFileName(System.IO.Path.GetFileName((string)Eval("piuploadfile")))%></a>
+                                        <a href="#" onclick="Open('<%# Eval("piuploadfile")%>')"><%# System.IO.Path.GetFileName((string)Eval("piuploadfile"))%></a>
                                     </td>
                                     <td>
                                         <%# (int)Eval("pver")==1?"Lulu": (int)Eval("pver")==2?"UA": (int)Eval("pver")==3?"GAP":""%>

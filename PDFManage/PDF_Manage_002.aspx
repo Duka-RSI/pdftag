@@ -102,7 +102,7 @@
                                         <%# Eval("pidate")%>
                                     </td>
                                     <td style="font-size: 14px; word-break: break-all">
-                                        <font size='2'><a href="#" onclick="Open('<%# Eval("piuploadfile")%>')"><%# RemoveDateOnFileName(System.IO.Path.GetFileName((string)Eval("piuploadfile")))%></a></font>
+                                        <font size='2'><a href="#" onclick="Open('<%# Eval("piuploadfile")%>')"><%# System.IO.Path.GetFileName((string)Eval("piuploadfile"))%></a></font>
                                     </td>
                                     <td>
                                         <%# (int)Eval("pver")==1?"Lulu": (int)Eval("pver")==2?"UA": (int)Eval("pver")==3?"GAP":""%>
