@@ -1401,7 +1401,7 @@ values
 
 						w9 = w9.Replace("UOM:", "");
 					}
-					else if (type == "Hangtag/Packaging ")
+					else if (type == "Hangtag/Packaging")
 					{
 						string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
 
@@ -1415,7 +1415,7 @@ values
 
 						w9 = w9.Replace("UOM:", "");
 					}
-					else if (type == "Embellishment ")
+					else if (type == "Embellishment")
 					{
 						string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
 
@@ -3598,7 +3598,8 @@ values
 									}
 
 
-									if (sLine.StartsWith("@Row: Fabric") || sLine.StartsWith("@Row: Trim") || sLine.StartsWith("@Row: Thread") || sLine.StartsWith("@Row: Label") || sLine.StartsWith("@Row: Hangtag/Packaging"))
+									if (sLine.StartsWith("@Row: Fabric") || sLine.StartsWith("@Row: Trim") || sLine.StartsWith("@Row: Embellishment")
+                                        || sLine.StartsWith("@Row: Thread") || sLine.StartsWith("@Row: Label") || sLine.StartsWith("@Row: Hangtag/Packaging"))
 									{
 										//新Type, 相同欄位
 										sBomType = sLine.Trim().Split(new string[] { "%%" }, StringSplitOptions.None).Where(w => !string.IsNullOrWhiteSpace(w)).ToArray()[0].Replace("@Row:", "").Trim();
