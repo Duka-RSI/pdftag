@@ -1339,9 +1339,10 @@ values
 				string w10 = "";
 				try
 				{
-					if (type == "Fabric")
+					if (type.Contains("Fabric"))
 					{
-						string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
+                        //  Fabric描述 / 物料描述 / 廠商 / 廠商料號 / 物料狀態 / 成份
+                        string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
 
 						w1 = arrData[0];
 						w2 = arrData[1];
@@ -1353,82 +1354,77 @@ values
 
 						w6 = w6.Trim().TrimEnd('/');
 					}
-					else if (type == "Trim")
+					else if (type.Contains("Trim"))
 					{
-						string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
+                        //  戶料號 / (描述) / 物料描述 / 廠商 / (描述) / 物料狀態 / 規格 / 單位
+                        string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
+                        
+						w1 = arrData[0];
+                        w2 = arrData[1];
+                        w3 = arrData[2];
+                        w4 = arrData[3];
+                        w5 = arrData[4];
+                        w6 = arrData[5];
+                        if (arrData.Count() == 6)
+                        {
+                            w6 = w6.Replace("UOM:", "");
+                        }
+                        else if (arrData.Count() == 7)
+                        {
+                            w7 = arrData[6];
+                            w7 = w7.Replace("UOM:", "");
+                        }
+                        else if (arrData.Count() == 8)
+                        {
+                            w7 = arrData[6];
+                            w8 = arrData[7];
+                            w8 = w7.Replace("UOM:", "");
+                        }
+                    }
+					else if (type.Contains("Thread"))
+					{
+                        //  客戶料號 / 物料描述 / 補充描述 / (描述) / 廠商 / / 物料狀態 / 規格 / 單位
+                        string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
 
 						w1 = arrData[0];
 						w2 = arrData[1];
 						w3 = arrData[2];
-
-						w5 = arrData[3];
-						w7 = arrData[4];
-						w8 = arrData[5];
-						w9 = arrData[6];
-
-
-
-						w9 = w9.Replace("UOM:", "");
+						w4 = arrData[3];
+                        if (arrData.Count() == 8)
+                        {
+                            w5 = arrData[5];
+                            w6 = arrData[6];
+                            w7 = arrData[7];
+                            w7 = w7.Replace("UOM:", "");
+                        }
+                        else if (arrData.Count() == 9)
+                        {
+                            w5 = arrData[4];
+                            w6 = arrData[6];
+                            w7 = arrData[7];
+                            w8 = arrData[8];
+                            w8 = w8.Replace("UOM:", "");
+                        }
 					}
-					else if (type == "Thread")
+					else if (type.Contains("Label") || type.Contains("Hangtag/Packaging") || type.Contains("Embellishment"))
 					{
-						string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
+                        //  客戶料號 / 物料描述 / 廠商 / (描述) / 物料狀態 / 單位
+                        string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
 
 						w1 = arrData[0];
 						w2 = arrData[1];
 						w3 = arrData[2];
-
-						w5 = arrData[3];
-						w7 = arrData[4];
-						w8 = arrData[5];
-						w9 = arrData[6];
-						//w10 = arrData[7];
-
-
-						w9 = w9.Replace("UOM:", "");
-					}
-					else if (type == "Label")
-					{
-						string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
-
-						w1 = arrData[0];
-						w2 = arrData[1];
-						w3 = arrData[2];
-
-						w5 = arrData[3];
-						w7 = arrData[4];
-						w9 = arrData[5];
-
-						w9 = w9.Replace("UOM:", "");
-					}
-					else if (type == "Hangtag/Packaging")
-					{
-						string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
-
-						w1 = arrData[0];
-						w2 = arrData[1];
-						w3 = arrData[2];
-
-						w5 = arrData[3];
-						w7 = arrData[4];
-						w9 = arrData[5];
-
-						w9 = w9.Replace("UOM:", "");
-					}
-					else if (type == "Embellishment")
-					{
-						string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
-
-						w1 = arrData[0];
-						w2 = arrData[1];
-						w3 = arrData[2];
-
-						w5 = arrData[3];
-						w7 = arrData[4];
-						w8 = arrData[5];
-						w9 = arrData[6];
-
-						w9 = w9.Replace("UOM:", "");
+						w4 = arrData[3];
+						w5 = arrData[4];						
+                        if (arrData.Count() == 5)
+                        {
+                            w5 = w5.Replace("UOM:", "");
+                        }
+                        else if (arrData.Count() == 6)
+                        {
+                            w6 = arrData[5];
+                            w6 = w6.Replace("UOM:", "");
+                        }
 					}
 
 					if (!string.IsNullOrEmpty(w1))
@@ -1458,26 +1454,13 @@ values
 						cm.Parameters.AddWithValue("@creatordate", dtNow.ToString("yyyy/MM/dd HH:mm:ss"));
 						cm.ExecuteNonQuery();
 					}
-
-
-
-
-
 				}
-
 				catch (Exception err)
 				{
 					Response.Write("<!--[parsePDF_UA_BOM_TagData] lubid=" + lubid + "  " + err.ToString() + "-->");
 				}
-
-
-
 			}
-
-
 		}
-
-
 		return new_pipid;
 	}
 	/// <summary>
