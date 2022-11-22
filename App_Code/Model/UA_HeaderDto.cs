@@ -19,6 +19,8 @@ public class UA_HeaderDto
     public string brand { get; set; }
     public string dividion { get; set; }
     public string sclass { get; set; }
+    public string FitType { get; set; }
+    public string GearLine { get; set; }
     public string pod { get; set; }
     public string generateddate { get; set; }
     public string stylesketch { get; set; }

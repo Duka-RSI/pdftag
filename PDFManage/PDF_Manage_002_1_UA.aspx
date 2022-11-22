@@ -1,36 +1,36 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/master/MasterPage_Login.master"
-    AutoEventWireup="true" CodeFile="PDF_Manage_002_1_UA.aspx.cs" Inherits="Passport_Passport_A000" %>
+	AutoEventWireup="true" CodeFile="PDF_Manage_002_1_UA.aspx.cs" Inherits="Passport_Passport_A000" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
-    <style type="text/css">
-        .NotShow {
-            display: none;
-        }
+	<style type="text/css">
+		.NotShow {
+			display: none;
+		}
 
-        .btnNotActive {
-            background-color: #e7e7e7;
-            color: black;
-        }
-        /* Gray */
-        .btnActive {
-            background-color: #555555;
-        }
-        /* Black */
-    </style>
-    <div class="">
-        <table class="table table-sm">
-            <thead>
-                <tr>
-                    <th scope="col" colspan="5">
-                        <a href="PDF_Manage_002.aspx">歷程管理</a> >>
+		.btnNotActive {
+			background-color: #e7e7e7;
+			color: black;
+		}
+		/* Gray */
+		.btnActive {
+			background-color: #555555;
+		}
+		/* Black */
+	</style>
+	<div class="">
+		<table class="table table-sm">
+			<thead>
+				<tr>
+					<th scope="col" colspan="5">
+						<a href="PDF_Manage_002.aspx">歷程管理</a> >>
                         <asp:Label ID="lblInfo" runat="server"></asp:Label>:進入編輯
                         <asp:HiddenField ID="hidpipid" runat="server" />
-                    </th>
-                </tr>
-            </thead>
-            <%-- <tr>
+					</th>
+				</tr>
+			</thead>
+			<%-- <tr>
                 <th scope="col" colspan="5">
                     <div class="row m-0">
                         <div class="col-0">
@@ -53,887 +53,1176 @@
 
                 </th>
             </tr>--%>
-            <tr>
-                <td style="height: 450px; vertical-align: top;">
-                    <font color="red">點擊儲存格進行編輯修改</font>  <asp:Button ID="btnQuery" runat="server" Text="學習" CssClass="btn btn-secondary" OnClick="btnLearn_Click" OnClientClick="return confirm('是否要學習 ?');" />
-                    <div id="divHeader" runat="server"></div>
-                   
-                </td>
-            </tr>
-        </table>
-    </div>
-    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addModalTitle"></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <table class="table">
-                        <tr>
-                            <td align="left">原文件
-                            </td>
-                            <td align="left">
-                                <textarea id="orgText" class="form-control" disabled></textarea>
-                            </td>
-                        </tr>
-                        <tr id="rowCompareSupplierArticle">
-                            <td align="left">比對
-                            </td>
-                            <td align="left">
-                              <%--  <select id="dlPARTS_TYPE" onchange="dlPARTS_TYPE_change()"></select>
+			<tr>
+				<td style="height: 450px; vertical-align: top;">
+					<font color="red">點擊儲存格進行編輯修改</font>
+					<asp:Button ID="btnQuery" runat="server" Text="學習" CssClass="btn btn-secondary" OnClick="btnLearn_Click" OnClientClick="return confirm('是否要學習 ?');" />
+					<div id="divHeader" runat="server"></div>
+
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="addModalTitle"></h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<table class="table">
+						<tr>
+							<td align="left">原文件
+							</td>
+							<td align="left">
+								<textarea id="orgText" class="form-control" disabled></textarea>
+							</td>
+						</tr>
+						<tr class="rowCompareSupplierArticleHide" style="display: none">
+							<td align="left">比對
+							</td>
+							<td align="left">
+								<%--  <select id="dlPARTS_TYPE" onchange="dlPARTS_TYPE_change()"></select>
                                 <select id="dlPARTS_CODE" onchange="dlPARTS_CODE_change()"></select>
                                 <select id="dlPARTS_DESC" onchange="dlPARTS_DESC_change()"></select>
                                 <select id="dlMAT_ID"></select>--%>
-                                <asp:HiddenField ID="hidPARTS_TYPE" runat="server" />
-                                <asp:HiddenField ID="hidPARTS_CODE" runat="server" />
-                                <asp:HiddenField ID="hidPARTS_DESC" runat="server" />
-                                <asp:HiddenField ID="hidMAT_ID" runat="server" />
+								<%--<asp:HiddenField ID="hidPARTS_TYPE" runat="server" />
+								<asp:HiddenField ID="hidPARTS_CODE" runat="server" />
+								<asp:HiddenField ID="hidPARTS_DESC" runat="server" />
+								<asp:HiddenField ID="hidMAT_ID" runat="server" />
 
-                                 關鍵字:<input type="text" id="txtSearchMAT_NO"><input type="button" value="查詢" onclick="onSearchMAT_NO()" /> 
-                                只撈ERP料號:<input type='checkbox' name='rbERP_MAT' id="SearchOnlyERPMat" value="Y"/>
-                                <div style="height:200px;width:650px; overflow:scroll">
-                                    <table class="table">
-                                        <tr>
-                                             <th>
-                                                	
-                                            </th>
-                                            <th>
-                                                MAT_NO	
-                                            </th>
-                                             <th>
-                                                MAT_NAME
-                                            </th>
-                                            <th>
-                                                ERP_EXIST
-                                            </th>
-                                        </tr>
-                                        <tbody id="tblMAT_NO"></tbody>
-                                    </table>
-                                </div>
-                            </td>
-                        </tr>
-                         <tr id="rowCompareColor">
-                            <td align="left">比對
-                            </td>
-                            <td align="left">
-                                 關鍵字:<input type="text" id="txtSearchCOLOR_DESC"><input type="button" value="查詢" onclick="onSearchCOLOR_DESC()" /> 
-                                <div style="height:200px;width:650px; overflow:scroll">
-                                    <table class="table">
-                                        <tr>
-                                             <th>
-                                                	
-                                            </th>
-                                            <th>
-                                                COLOR_DESC	
-                                            </th>
-                                             <th>
-                                                COLOR_DESC_CHN
-                                            </th>
-                                        </tr>
-                                        <tbody id="tblCOLOR_DESC"></tbody>
-                                    </table>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="left">更改
-                            </td>
-                            <td align="left">
-                                <textarea id="editText" class="form-control"></textarea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="left">中文備註
-                            </td>
-                            <td align="left">
-                                <textarea id="noteText" class="form-control"></textarea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="center" colspan="2">
-                                <input type="button" value="取消" class="btn btn-danger" data-dismiss="modal" />
-                                <input type="button" value="儲存" class="btn btn-success" onclick="onSave()" />
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                </div>
-            </div>
-        </div>
-    </div>
-    <script type="text/javascript">
-        $(document).ready(function () {
+								關鍵字:<input type="text" id="txtSearchMAT_NO"><input type="button" value="查詢" onclick="onSearchMAT_NO()" />
+								只撈ERP料號:<input type='checkbox' name='rbERP_MAT' id="SearchOnlyERPMat" value="Y" />
+								<div style="height: 200px; width: 650px; overflow: scroll">
+									<table class="table">
+										<tr>
+											<th></th>
+											<th>MAT_NO	
+											</th>
+											<th>MAT_NAME
+											</th>
+											<th>ERP_EXIST
+											</th>
+										</tr>
+										<tbody id="tblMAT_NO"></tbody>
+									</table>
+								</div>--%>
+							</td>
+						</tr>
+						<tr id="rowCompareColor">
+							<td align="left">比對
+							</td>
+							<td align="left">關鍵字:<input type="text" id="txtSearchCOLOR_DESC"><input type="button" value="查詢" onclick="onSearchCOLOR_DESC()" />
+								<div style="height: 200px; width: 650px; overflow: scroll">
+									<table class="table">
+										<tr>
+											<th></th>
+											<th>COLOR_DESC	
+											</th>
+											<th>COLOR_DESC_CHN
+											</th>
+										</tr>
+										<tbody id="tblCOLOR_DESC"></tbody>
+									</table>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td align="left">更改
+							</td>
+							<td align="left">
+								<textarea id="editText" class="form-control"></textarea>
+							</td>
+						</tr>
+						<tr>
+							<td align="left">中文備註
+							</td>
+							<td align="left">
+								<textarea id="noteText" class="form-control"></textarea>
+							</td>
+						</tr>
+						<tr class="rowCompareSupplierArticle">
+							<td align="left" colspan="2">
+								<table class="table">
+									<tr>
+										<th></th>
+										<th>原文件</th>
+										<th>更改</th>
+									</tr>
+									<tbody id="tblUATagData">
+										<%--<tr>
+											<td>描述</td>
+											<td><span id="span_W1"></span></td>
+											<td>
+												<input type="text" id="EW1" value="" style="width: 300px"></td>
+										</tr>
+										<tr>
+											<td>物料描述</td>
+											<td><span id="span_W2"></span></td>
+											<td>
+												<input type="text" id="EW2" value="" style="width: 300px"></td>
+										</tr>
+										<tr>
+											<td>廠商</td>
+											<td><span id="span_W3"></span></td>
+											<td>
+												<input type="text" id="EW3" value="" style="width: 300px"></td>
+										</tr>
+										<tr>
+											<td>廠商料號</td>
+											<td><span id="span_W4"></span></td>
+											<td>
+												<input type="text" id="EW4" value="" style="width: 300px">
+												<input type="button" value="挑選" onclick="showSelectMatNo();return false;" />
+											</td>
+										</tr>
+										<tr>
+											<td>物料狀態</td>
+											<td><span id="span_W5"></span></td>
+											<td>
+												<input type="text" id="EW5" value="" style="width: 300px"></td>
+										</tr>
+										<tr>
+											<td>成份</td>
+											<td><span id="span_W6"></span></td>
+											<td>
+												<input type="text" id="EW6" value="" style="width: 300px"></td>
+										</tr>
+										<tr class="rowNotFabric">
+											<td>規格</td>
+											<td><span id="span_W7"></span></td>
+											<td>
+												<input type="text" id="EW7" value="" style="width: 300px"></td>
+										</tr>
+										<tr class="rowNotFabric">
+											<td>單位</td>
+											<td><span id="span_W8"></span></td>
+											<td>
+												<input type="text" id="EW8" value="" style="width: 300px"></td>
+										</tr>--%>
+									</tbody>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td align="center" colspan="2">
+								<input type="button" value="取消" class="btn btn-danger" data-dismiss="modal" />
+								<input type="button" value="儲存" class="btn btn-success" onclick="onSave()" />
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="modal-footer">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="selectMatNoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="addModalTitle"></h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<table class="table">
+						<tr>
+							<td align="left">比對
+							</td>
+							<td align="left">
+								<%--  <select id="dlPARTS_TYPE" onchange="dlPARTS_TYPE_change()"></select>
+                                <select id="dlPARTS_CODE" onchange="dlPARTS_CODE_change()"></select>
+                                <select id="dlPARTS_DESC" onchange="dlPARTS_DESC_change()"></select>
+                                <select id="dlMAT_ID"></select>--%>
+								<asp:HiddenField ID="HiddenField1" runat="server" />
+								<asp:HiddenField ID="HiddenField2" runat="server" />
+								<asp:HiddenField ID="HiddenField3" runat="server" />
+								<asp:HiddenField ID="HiddenField4" runat="server" />
+
+								關鍵字:<input type="text" id="txtSearchMAT_NO"><input type="button" value="查詢" onclick="onSearchMAT_NO()" />
+								只撈ERP料號:<input type='checkbox' name='rbERP_MAT' id="SearchOnlyERPMat" value="Y" />
+								<div style="height: 200px; width: 650px; overflow: scroll">
+									<table class="table">
+										<tr>
+											<th></th>
+											<th>MAT_NO	
+											</th>
+											<th>MAT_NAME
+											</th>
+											<th>ERP_EXIST
+											</th>
+										</tr>
+										<tbody id="tblMAT_NO"></tbody>
+									</table>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td align="center" colspan="2">
+								<input type="hidden" id="hidUaTagDataItem" />
+								<input type="button" value="取消" class="btn btn-danger" data-dismiss="modal" />
+								<input type="button" value="確定" class="btn btn-success" onclick="onSelectMatNo();return false;" />
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="modal-footer">
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		$(document).ready(function () {
                 <%=script %>
 
 
-        });
-        var objTd;
-        var saveUrl = "";
-        var orgUrl = "";
-        var saveId = "";
-        var saveCol = "";
-        var saveColorCol = "";
-        var isSaveRecord = false;
-
-        var PARTS_TYPE = "";
-        var PARTS_CODE = "";
-        var PARTS_DESC = "";
-        var MAT_ID = "";
-
-
-        function editHeader(td) {
-            let text = $(td).find('span:first').text();
-            //$('#editText').val(text);
-
-            $('#rowCompareSupplierArticle').hide();
-            $('#rowCompareColor').hide();
-
-            objTd = $(td);
-            saveUrl = "UA_Header.ashx?fun=saveByCol"
-            saveId = $(td).attr('data-luhid');
-            saveCol = $(td).attr('data-col');
-            isSaveRecord = false;
-
-
-            orgUrl = "UA_Header.ashx?fun=get_org"
-            orgId = $(td).attr('data-org_luhid');
-
-            getOrgTest();
-            getChNote("luhid");
-            $('#addModalTitle').text('編輯');
-            $('#addModal').modal('show')
-        }
-
-        function editBom(td) {
-            let text = $(td).find('span:first').text();
-            //$('#editText').val(text);
-
-            objTd = $(td);
-            saveUrl = "UA_BOM.ashx?fun=saveByCol"
-            saveId = $(td).attr('data-lubid');
-            saveCol = $(td).attr('data-col');
-            saveColorCol = "";
-            isSaveRecord = true;
-
-            $('#rowCompareColor').hide();
-
-            if (saveCol == "SupplierArticle") {
+		});
+		var objTd;
+		var saveUrl = "";
+		var orgUrl = "";
+		var saveId = "";
+		var saveCol = "";
+		var saveColorCol = "";
+		var isSaveRecord = false;
+		var isSaveUATagData = false;
+		var bomType = "";
 
-                PARTS_TYPE = $(td).attr('data-PARTS_TYPE');
-                PARTS_CODE = $(td).attr('data-PARTS_CODE');
-                PARTS_DESC = $(td).attr('data-PARTS_DESC');
-                MAT_ID = $(td).attr('data-MAT_ID');
-                isSaveRecord = false;
-                $('#rowCompareSupplierArticle').show();
-            } else {
+		var PARTS_TYPE = "";
+		var PARTS_CODE = "";
+		var PARTS_DESC = "";
+		var MAT_ID = "";
 
-                PARTS_TYPE = "";
-                PARTS_CODE = "";
-                PARTS_DESC = "";
-                MAT_ID = "";
-
-                $('#rowCompareSupplierArticle').hide();
-                
-            }
-
-            orgUrl = "UA_BOM.ashx?fun=get_org"
-            orgId = $(td).attr('data-org_lubid');
-            getOrgTest();
-            getChNote("lubid");
 
-            if (saveCol == 'B1' || saveCol == 'B2' || saveCol == 'B3' || saveCol == 'B4' || saveCol == 'B5' || saveCol == 'B6' || saveCol == 'B7' || saveCol == 'B8' || saveCol == 'B9' || saveCol == 'B10') {
-                saveColorCol = $(td).attr('data-colheader');
-                $('#rowCompareColor').show();
-            }
-
-
-            $('#addModalTitle').text('編輯');
-            $('#addModal').modal('show')
-        }
+		function editHeader(td) {
+			let text = $(td).find('span:first').text();
+			//$('#editText').val(text);
 
-        function editSizeTable(td) {
-            let text = $(td).find('span:first').text();
-            //$('#editText').val(text);
+			$('.rowCompareSupplierArticle').hide();
+			$('#rowCompareColor').hide();
 
-            $('#rowCompareSupplierArticle').hide();
-            $('#rowCompareColor').hide();
+			objTd = $(td);
+			saveUrl = "UA_Header.ashx?fun=saveByCol"
+			saveId = $(td).attr('data-luhid');
+			saveCol = $(td).attr('data-col');
+			isSaveRecord = false;
+			isSaveUATagData = false;
+
+			orgUrl = "UA_Header.ashx?fun=get_org"
+			orgId = $(td).attr('data-org_luhid');
+
+			getOrgTest();
+			getChNote("luhid");
+			$('#addModalTitle').text('編輯');
+			$('#addModal').modal('show')
+		}
+
+		function editBom(td) {
+			let text = $(td).find('span:first').text();
+			//$('#editText').val(text);
+
+			bomType = $(td).attr('data-type');
+
+			objTd = $(td);
+			saveUrl = "UA_BOM.ashx?fun=saveByCol"
+			saveId = $(td).attr('data-lubid');
+			saveCol = $(td).attr('data-col');
+			saveColorCol = "";
+			isSaveRecord = true;
+			isSaveUATagData = false;
+			isFabric = false;
+
+			$('#rowCompareColor').hide();
+
+			if (saveCol == "SupplierArticle") {
+
+				PARTS_TYPE = $(td).attr('data-PARTS_TYPE');
+				PARTS_CODE = $(td).attr('data-PARTS_CODE');
+				PARTS_DESC = $(td).attr('data-PARTS_DESC');
+				MAT_ID = $(td).attr('data-MAT_ID');
+				isSaveRecord = false;
+				$('.rowCompareSupplierArticle').show();
+
+
+				isSaveUATagData = true;
+				getUADataTagTable(saveId);
+
+
+
+			} else {
+
+				PARTS_TYPE = "";
+				PARTS_CODE = "";
+				PARTS_DESC = "";
+				MAT_ID = "";
+
+				$('.rowCompareSupplierArticle').hide();
+
+			}
+
+			orgUrl = "UA_BOM.ashx?fun=get_org"
+			orgId = $(td).attr('data-org_lubid');
+			getOrgTest();
+			getChNote("lubid");
+
+			if (saveCol == 'B1' || saveCol == 'B2' || saveCol == 'B3' || saveCol == 'B4' || saveCol == 'B5' || saveCol == 'B6' || saveCol == 'B7' || saveCol == 'B8' || saveCol == 'B9' || saveCol == 'B10') {
+				saveColorCol = $(td).attr('data-colheader');
+				$('#rowCompareColor').show();
+			}
+
+
+			$('#addModalTitle').text('編輯');
+			$('#addModal').modal('show')
+		}
+
+		function showSelectMatNo(item) {
+
+			$('#hidUaTagDataItem').val(item);
+			$('#selectMatNoModal').modal('show')
+		}
+		function onSelectMatNo() {
+			let MAT_NO = "";
+			$('.rbMAT_NO').each(function () {
+
+				if ($(this).prop("checked")) {
+					MAT_NO = $(this).attr('data-MAT_NO');
+
+				}
+			});
+			if (MAT_NO) {
+				let item = $('#hidUaTagDataItem').val();
+				$('#EW' + item).val(MAT_NO);
+			}
+
+			$('#selectMatNoModal').modal('hide');
+			return false;
+		}
+
+		function getUADataTagTable(lubid) {
+			$("#tblUATagData").html('');
+			//$('#span_W1').text('');
+			//$('#span_W2').text('');
+			//$('#span_W3').text('');
+			//$('#span_W4').text('');
+			//$('#span_W5').text('');
+			//$('#span_W6').text('');
+			//$('#span_W7').text('');
+			//$('#span_W8').text('');
+
+			//$('#EW1').val('');
+			//$('#EW2').val('');
+			//$('#EW3').val('');
+			//$('#EW4').val('');
+			//$('#EW5').val('');
+			//$('#EW6').val('');
+			//$('#EW7').val('');
+			//$('#EW8').val('');
+
+			$.ajax({
+				type: "POST",
+				url: "UA_TagData.ashx?fun=get_by_lubid&lubid=" + lubid,
+				dataType: 'json',
+				success: function (res) {
+
+					let html = "";
+
+					if (res) {
+
+						let arrFabric = ["描述", "物料描述", "廠商", "廠商料號", "物料狀態", "成份"];
+						let arrTrim = ["客戶料號", "物料描述", "補充描述", "(描述)", "廠商", "物料狀態", "規格", "單位"];
+						let arrThread = ["客戶料號", "物料描述", "補充描述", "(描述)", "廠商", "物料狀態", "規格", "單位"];
+						let arrHangtag = ["客戶料號", "物料描述", "廠商", "(描述)", "物料狀態", "單位"];
+						let arrEmbellishment = ["描述", "物料描述", "廠商", "(描述)", "物料狀態", "規格", "單位"];
+
+						let arrName = [];
+						let isFabric = false;
+						if (bomType == "Fabric") {
+							arrName = arrFabric;
+							isFabric = true;
+						}
+						else if (bomType == "Trim") arrName = arrTrim;
+						else if (bomType == "Thread") arrName = arrThread;
+						else if (bomType.indexOf('Hangtag') > -1) arrName = arrHangtag;
+						else if (bomType == "Embellishment") arrName = arrEmbellishment;
+
+
+						for (let i = 1; i <= arrName.length; i++) {
+
+
+							html += "<tr>";
+							html += "<td>" + arrName[i-1] + "</td>";
+							html += "<td>" + res["W" + i] + "</td>";
+							html += "<td><input type='text' id='EW" + i + "' value='' style='width:300px'>";
+
+							if ((!isFabric && i == 1) || (isFabric && i == 4)) {
+								html += "<input type='button' value='挑選' onclick='showSelectMatNo("+i+"); return false;' />";
+							}
+							html += "</td>";
+							html += "</tr>";
+						}
+
+						$("#tblUATagData").html(html);
+
+						for (let i = 1; i <= arrName.length; i++) {
+
+							$('#EW' + i).val((res["EW" + i] ?? res["W" + i]));
+						}
+
+						//$('#EW1').val((res.EW1 ?? res.W1));
+						//$('#EW2').val((res.EW2 ?? res.W2));
+						//$('#EW3').val((res.EW3 ?? res.W3));
+						//$('#EW4').val((res.EW4 ?? res.W4));
+						//$('#EW5').val((res.EW5 ?? res.W5));
+						//$('#EW6').val((res.EW6 ?? res.W6));
+						//$('#EW7').val((res.EW7 ?? res.W7));
+						//$('#EW8').val((res.EW8 ?? res.W8));
+
+
+
+					}
+
+
+
+				},
+				complete: function () {
+
+				},
+				error: function (error) {
+					alert("getUADataTagTable 失敗");
+				}
+			});
+		}
+
+		function onSaveUATagData(lubid) {
+			let EW1 = $('#EW1').val();
+			let EW2 = $('#EW2').val();
+			let EW3 = $('#EW3').val();
+			let EW4 = $('#EW4').val();
+			let EW5 = $('#EW5').val();
+			let EW6 = $('#EW6').val();
+			let EW7 = $('#EW7').val();
+			let EW8 = $('#EW8').val();
+
+			let data = {
+				lubid: lubid,
+				bomType: bomType,
+				EW1: EW1,
+				EW2: EW2,
+				EW3: EW3,
+				EW4: EW4,
+				EW5: EW5,
+				EW6: EW6,
+				EW7: EW7,
+				EW8: EW8
+			};
+			$.ajax({
+				type: "POST",
+				url: "UA_TagData.ashx?fun=edit",
+				data: data,
+				dataType: 'json',
+				success: function (res) {
+
+					console.log("[onSaveUATagData]");
+				},
+				complete: function () {
+
+				},
+				error: function (error) {
+					alert("儲存失敗-UATagData");
+				}
+			});
+
+		}
+
+		function editSizeTable(td) {
+			let text = $(td).find('span:first').text();
+			//$('#editText').val(text);
+
+			$('.rowCompareSupplierArticle').hide();
+			$('#rowCompareColor').hide();
+
+			objTd = $(td);
+			saveUrl = "UA_SizeTable.ashx?fun=saveByCol"
+			saveId = $(td).attr('data-lustid');
+			saveCol = $(td).attr('data-col');
+			isSaveRecord = false;
+			isSaveUATagData = false;
+
+			orgUrl = "UA_SizeTable.ashx?fun=get_org"
+			orgId = $(td).attr('data-org_lustid');
+
+			getOrgTest();
+			getChNote("lustid");
+			$('#addModalTitle').text('編輯');
+			$('#addModal').modal('show')
+		}
+
+		function getOrgTest() {
+
+			$('#orgText').val('');
+
+			let data = {
+				id: orgId,
+				newid: saveId,
+				col: saveCol,
+			};
+
+			console.log(data);
+
+			$.ajax({
+				type: "POST",
+				url: orgUrl,
+				data: data,
+				dataType: 'json',
+				success: function (res) {
+
+					if (res) {
+
+						$('#orgText').val(res.orgText);
+						$('#editText').val(res.newText);
+
+						if (saveCol == "SupplierArticle") {
+
+							getPARTS_TYPE(res.orgText);
+						}
+					}
+
+				},
+				complete: function () {
+
+				},
+				error: function (error) {
+					alert("失敗");
+				}
+			});
+		}
+
+		function getChNote(idName) {
+
+			$('#noteText').val('');
+
+			let data = {
+				idName: idName,
+				id: saveId,
+				ColName: saveCol,
+			};
+
+			console.log(data);
+
+			$.ajax({
+				type: "POST",
+				url: "UA_Ch_Note.ashx?fun=get",
+				data: data,
+				dataType: 'json',
+				success: function (res) {
+
+					if (res) {
+
+						$('#noteText').val(res.Note);
+					}
+
+				},
+				complete: function () {
+
+				},
+				error: function (error) {
+					alert("失敗");
+				}
+			});
+		}
+
+
+
+		function onSave() {
+			let orgtext = $('#orgText').val();
+			let text = $('#editText').val();
+			let note = $('#noteText').val();
+
+			//UA_BOM
+			let PARTS_TYPE = $('#dlPARTS_TYPE').val();
+			let PARTS_CODE = $('#dlPARTS_CODE').val();
+			let PARTS_DESC = $('#dlPARTS_DESC').val();
+			let MAT_ID = $('#dlMAT_ID').val();
+
+			let isRecord = 0;
+
+			if (saveCol == 'Usage' || saveCol == 'SupplierArticle' || saveCol == 'B1' || saveCol == 'B2' || saveCol == 'B3' || saveCol == 'B4' || saveCol == 'B5' || saveCol == 'B6' || saveCol == 'B7' || saveCol == 'B8' || saveCol == 'B9' || saveCol == 'B10') {
+				//if (isSaveRecord) {
+
+				if (confirm('改的內容是否紀錄至詞庫')) {
+					isRecord = 1;
+				}
+			}
+
+			if (isSaveUATagData) {
+				onSaveUATagData(saveId);
+			}
+
+			let data = {
+				orgId: orgId,
+				id: saveId,
+				col: saveCol,
+				colorCol: saveColorCol,
+				text: text,
+				chNote: note,
+
+				PARTS_TYPE: PARTS_TYPE,
+				PARTS_CODE: PARTS_CODE,
+				PARTS_DESC: PARTS_DESC,
+				MAT_ID: MAT_ID,
+				isRecord: isRecord
+			};
+
+			console.log(data);
+
+			$.ajax({
+				type: "POST",
+				url: saveUrl,
+				data: data,
+				dataType: 'json',
+				success: function (res) {
+
+					if (isRecord == 1 && res.learnmgrItem != 1) {
+						alert('內容已存在於詞庫');
+					}
+
+					if (res.data == 1) {
+
+						if (saveCol == "SupplierArticle") {
+
+							window.location.reload();
+						}
+
+						//objTd.text(text);
+
+						let html = "<font>原:" + orgtext + "</font><br><font color='red'>修:" + text + "</font><br><font color='blue'>中:" + note + "</font>"
+
+						objTd.html(html);
+						$('#addModal').modal('hide');
+					}
+
+				},
+				complete: function () {
+
+				},
+				error: function (error) {
+					alert("儲存失敗");
+				}
+			});
+		}
+
+		function deleteHeader(luhid, iSeq) {
+
+			if (confirm('確定刪除?')) {
+				let data = {
+					luhid: luhid,
 
-            objTd = $(td);
-            saveUrl = "UA_SizeTable.ashx?fun=saveByCol"
-            saveId = $(td).attr('data-lustid');
-            saveCol = $(td).attr('data-col');
-            isSaveRecord = false;
-
-            orgUrl = "UA_SizeTable.ashx?fun=get_org"
-            orgId = $(td).attr('data-org_lustid');
+				};
 
-            getOrgTest();
-            getChNote("lustid");
-            $('#addModalTitle').text('編輯');
-            $('#addModal').modal('show')
-        }
+				console.log(data);
 
-        function getOrgTest() {
+				$.ajax({
+					type: "POST",
+					url: "UA_Header.ashx?fun=delete",
+					data: data,
+					dataType: 'json',
+					success: function (res) {
 
-            $('#orgText').val('');
+						if (res == 1) {
 
-            let data = {
-                id: orgId,
-                newid: saveId,
-                col: saveCol,
-            };
+							$('#row' + iSeq).hide();
+						}
 
-            console.log(data);
+					},
+					complete: function () {
 
-            $.ajax({
-                type: "POST",
-                url: orgUrl,
-                data: data,
-                dataType: 'json',
-                success: function (res) {
-
-                    if (res) {
+					},
+					error: function (error) {
+						alert("刪除失敗");
+					}
+				});
+			}
 
-                        $('#orgText').val(res.orgText);
-                        $('#editText').val(res.newText);
-
-                        if (saveCol == "SupplierArticle") {
+		}
 
-                            getPARTS_TYPE(res.orgText);
-                        }
-                    }
+		function deleteBom(lubid, iSeq) {
 
-                },
-                complete: function () {
+			if (confirm('確定刪除?')) {
+				let data = {
+					lubid: lubid,
 
-                },
-                error: function (error) {
-                    alert("失敗");
-                }
-            });
-        }
+				};
 
-        function getChNote(idName) {
+				console.log(data);
 
-            $('#noteText').val('');
+				$.ajax({
+					type: "POST",
+					url: "UA_BOM.ashx?fun=delete",
+					data: data,
+					dataType: 'json',
+					success: function (res) {
 
-            let data = {
-                idName: idName,
-                id: saveId,
-                ColName: saveCol,
-            };
+						if (res == 1) {
 
-            console.log(data);
+							//$('#row' + iSeq).hide();
+							window.location.reload();
+						}
 
-            $.ajax({
-                type: "POST",
-                url: "UA_Ch_Note.ashx?fun=get",
-                data: data,
-                dataType: 'json',
-                success: function (res) {
+					},
+					complete: function () {
 
-                    if (res) {
+					},
+					error: function (error) {
+						alert("刪除失敗");
+					}
+				});
+			}
 
-                        $('#noteText').val(res.Note);
-                    }
+		}
 
-                },
-                complete: function () {
+		function deleteSizeTable(lustid, iSeq) {
 
-                },
-                error: function (error) {
-                    alert("失敗");
-                }
-            });
-        }
+			if (confirm('確定刪除?')) {
+				let data = {
+					lustid: lustid,
 
+				};
 
+				console.log(data);
 
-        function onSave() {
-            let orgtext = $('#orgText').val();
-            let text = $('#editText').val();
-            let note = $('#noteText').val();
+				$.ajax({
+					type: "POST",
+					url: "UA_SizeTable.ashx?fun=delete",
+					data: data,
+					dataType: 'json',
+					success: function (res) {
 
-            //UA_BOM
-            let PARTS_TYPE = $('#dlPARTS_TYPE').val();
-            let PARTS_CODE = $('#dlPARTS_CODE').val();
-            let PARTS_DESC = $('#dlPARTS_DESC').val();
-            let MAT_ID = $('#dlMAT_ID').val();
-            let isRecord = 0;
+						if (res == 1) {
 
-            if (saveCol == 'Usage' || saveCol == 'SupplierArticle' || saveCol == 'B1' || saveCol == 'B2' || saveCol == 'B3' || saveCol == 'B4' || saveCol == 'B5' || saveCol == 'B6' || saveCol == 'B7' || saveCol == 'B8' || saveCol == 'B9' || saveCol == 'B10') {
-            //if (isSaveRecord) {
+							$('#row' + iSeq).hide();
+						}
 
-                if (confirm('改的內容是否紀錄至詞庫')) {
-                    isRecord = 1;
-                }
-            }
+					},
+					complete: function () {
 
-            let data = {
-                orgId: orgId,
-                id: saveId,
-                col: saveCol,
-                colorCol:saveColorCol,
-                text: text,
-                chNote: note,
+					},
+					error: function (error) {
+						alert("刪除失敗");
+					}
+				});
+			}
 
-                PARTS_TYPE: PARTS_TYPE,
-                PARTS_CODE: PARTS_CODE,
-                PARTS_DESC: PARTS_DESC,
-                MAT_ID: MAT_ID,
-                isRecord: isRecord
-            };
 
-            console.log(data);
 
-            $.ajax({
-                type: "POST",
-                url: saveUrl,
-                data: data,
-                dataType: 'json',
-                success: function (res) {
+		}
 
-                    if (isRecord==1 && res.learnmgrItem != 1) {
-                        alert('內容已存在於詞庫');
-                    }
+		function copyHeader(luhid) {
 
-                    if (res.data == 1) {
+			let data = {
+				luhid: luhid,
 
-                        if (saveCol == "SupplierArticle") {
+			};
 
-                            window.location.reload();
-                        }
+			console.log(data);
 
-                        //objTd.text(text);
+			$.ajax({
+				type: "POST",
+				url: "UA_Header.ashx?fun=copy",
+				data: data,
+				dataType: 'json',
+				success: function (res) {
 
-                        let html = "<font>原:" + orgtext + "</font><br><font color='red'>修:" + text + "</font><br><font color='blue'>中:" + note + "</font>"
+					if (res == 1) {
 
-                        objTd.html(html);
-                        $('#addModal').modal('hide');
-                    }
+						//$('#row' + iSeq).hide();
+						window.location.reload();
+					}
 
-                },
-                complete: function () {
+				},
+				complete: function () {
 
-                },
-                error: function (error) {
-                    alert("儲存失敗");
-                }
-            });
-        }
+				},
+				error: function (error) {
+					alert("新增失敗");
+				}
+			});
+		}
 
-        function deleteHeader(luhid, iSeq) {
+		function copyBom(lubid) {
 
-            if (confirm('確定刪除?')) {
-                let data = {
-                    luhid: luhid,
+			let data = {
+				lubid: lubid,
 
-                };
+			};
 
-                console.log(data);
+			console.log(data);
 
-                $.ajax({
-                    type: "POST",
-                    url: "UA_Header.ashx?fun=delete",
-                    data: data,
-                    dataType: 'json',
-                    success: function (res) {
+			$.ajax({
+				type: "POST",
+				url: "UA_BOM.ashx?fun=copy",
+				data: data,
+				dataType: 'json',
+				success: function (res) {
 
-                        if (res == 1) {
+					if (res == 1) {
 
-                            $('#row' + iSeq).hide();
-                        }
+						//$('#row' + iSeq).hide();
+						window.location.reload();
+					}
 
-                    },
-                    complete: function () {
+				},
+				complete: function () {
 
-                    },
-                    error: function (error) {
-                        alert("刪除失敗");
-                    }
-                });
-            }
+				},
+				error: function (error) {
+					alert("新增失敗");
+				}
+			});
+		}
 
-        }
+		function copySizeTable(lustid) {
 
-        function deleteBom(lubid, iSeq) {
+			let data = {
+				lustid: lustid,
 
-            if (confirm('確定刪除?')) {
-                let data = {
-                    lubid: lubid,
+			};
 
-                };
+			console.log(data);
 
-                console.log(data);
+			$.ajax({
+				type: "POST",
+				url: "UA_SizeTable.ashx?fun=copy",
+				data: data,
+				dataType: 'json',
+				success: function (res) {
 
-                $.ajax({
-                    type: "POST",
-                    url: "UA_BOM.ashx?fun=delete",
-                    data: data,
-                    dataType: 'json',
-                    success: function (res) {
+					if (res == 1) {
 
-                        if (res == 1) {
+						//$('#row' + iSeq).hide();
+						window.location.reload();
+					}
 
-                            //$('#row' + iSeq).hide();
-                            window.location.reload();
-                        }
+				},
+				complete: function () {
 
-                    },
-                    complete: function () {
+				},
+				error: function (error) {
+					alert("新增失敗");
+				}
+			});
+		}
 
-                    },
-                    error: function (error) {
-                        alert("刪除失敗");
-                    }
-                });
-            }
+		function dlPARTS_TYPE_change() {
 
-        }
+			$("#dlPARTS_CODE").html('');
+			$("#dlPARTS_DESC").html('');
+			$("#dlMAT_ID").html('');
 
-        function deleteSizeTable(lustid, iSeq) {
 
-            if (confirm('確定刪除?')) {
-                let data = {
-                    lustid: lustid,
+			let PARTS_TYPE = $('#dlPARTS_TYPE').val();
 
-                };
+			getPARTS_CODE(PARTS_TYPE);
+		}
 
-                console.log(data);
+		function dlPARTS_CODE_change() {
 
-                $.ajax({
-                    type: "POST",
-                    url: "UA_SizeTable.ashx?fun=delete",
-                    data: data,
-                    dataType: 'json',
-                    success: function (res) {
+			$("#dlPARTS_DESC").html('');
+			$("#dlMAT_ID").html('');
 
-                        if (res == 1) {
 
-                            $('#row' + iSeq).hide();
-                        }
+			let PARTS_TYPE = $('#dlPARTS_TYPE').val();
+			let PARTS_CODE = $('#dlPARTS_CODE').val();
 
-                    },
-                    complete: function () {
+			getPARTS_DESC(PARTS_TYPE, PARTS_CODE);
+		}
 
-                    },
-                    error: function (error) {
-                        alert("刪除失敗");
-                    }
-                });
-            }
+		function dlPARTS_DESC_change() {
 
-           
 
-        }
 
-        function copyHeader(luhid) {
+			let PARTS_TYPE = $('#dlPARTS_TYPE').val();
+			let PARTS_CODE = $('#dlPARTS_CODE').val();
+			let PARTS_DESC = $('#dlPARTS_DESC').val();
 
-            let data = {
-                luhid: luhid,
+			getMAT_ID(MAT_NO, PARTS_TYPE, PARTS_CODE, PARTS_DESC);
+		}
 
-            };
+		function getPARTS_TYPE(MAT_NO) {
 
-            console.log(data);
 
-            $.ajax({
-                type: "POST",
-                url: "UA_Header.ashx?fun=copy",
-                data: data,
-                dataType: 'json',
-                success: function (res) {
 
-                    if (res == 1) {
+			let data = {
+				MAT_NO: MAT_NO,
+			};
 
-                        //$('#row' + iSeq).hide();
-                        window.location.reload();
-                    }
+			console.log(data);
 
-                },
-                complete: function () {
+			$("#dlPARTS_TYPE").html('');
 
-                },
-                error: function (error) {
-                    alert("新增失敗");
-                }
-            });
-        }
+			$.ajax({
+				type: "POST",
+				url: "SAM_MO_D.ashx?fun=getPARTS_TYPE",
+				data: data,
+				dataType: 'json',
+				success: function (res) {
 
-        function copyBom(lubid) {
+					let html = "<option value=''>請選擇</option>";
+					for (let i in res) {
+						html += "<option value='" + res[i].PARTS_TYPE + "'>" + res[i].PARTS_TYPE + "</option>";
+					}
 
-            let data = {
-                lubid: lubid,
+					$("#dlPARTS_TYPE").html(html);
 
-            };
+					if (PARTS_TYPE) {
+						$("#dlPARTS_TYPE").val(PARTS_TYPE);
+						getPARTS_CODE(PARTS_TYPE);
+					}
+				},
+				complete: function () {
 
-            console.log(data);
+				},
+				error: function (error) {
+					alert("失敗");
+				}
+			});
+		}
 
-            $.ajax({
-                type: "POST",
-                url: "UA_BOM.ashx?fun=copy",
-                data: data,
-                dataType: 'json',
-                success: function (res) {
+		function getPARTS_CODE(PARTS_TYPE) {
 
-                    if (res == 1) {
 
-                        //$('#row' + iSeq).hide();
-                        window.location.reload();
-                    }
+			let MAT_NO = $('#orgText').val();
 
-                },
-                complete: function () {
+			let data = {
+				MAT_NO: MAT_NO,
+				PARTS_TYPE: PARTS_TYPE,
+			};
 
-                },
-                error: function (error) {
-                    alert("新增失敗");
-                }
-            });
-        }
+			console.log(data);
 
-        function copySizeTable(lustid) {
+			$("#dlPARTS_CODE").html('');
 
-            let data = {
-                lustid: lustid,
+			$.ajax({
+				type: "POST",
+				url: "SAM_MO_D.ashx?fun=getPARTS_CODE",
+				data: data,
+				dataType: 'json',
+				success: function (res) {
 
-            };
+					let html = "<option value=''>請選擇</option>";
+					for (let i in res) {
+						html += "<option value='" + res[i].PARTS_CODE + "'>" + res[i].PARTS_CODE + "</option>";
+					}
 
-            console.log(data);
+					$("#dlPARTS_CODE").html(html);
 
-            $.ajax({
-                type: "POST",
-                url: "UA_SizeTable.ashx?fun=copy",
-                data: data,
-                dataType: 'json',
-                success: function (res) {
+					if (PARTS_CODE) {
+						$("#dlPARTS_CODE").val(PARTS_CODE);
+						getPARTS_DESC(PARTS_TYPE, PARTS_CODE);
+					}
 
-                    if (res == 1) {
+				},
+				complete: function () {
 
-                        //$('#row' + iSeq).hide();
-                        window.location.reload();
-                    }
+				},
+				error: function (error) {
+					alert("失敗");
+				}
+			});
+		}
 
-                },
-                complete: function () {
+		function getPARTS_DESC(PARTS_TYPE, PARTS_CODE) {
 
-                },
-                error: function (error) {
-                    alert("新增失敗");
-                }
-            });
-        }
+			let MAT_NO = $('#orgText').val();
 
-        function dlPARTS_TYPE_change() {
+			let data = {
+				MAT_NO: MAT_NO,
+				PARTS_TYPE: PARTS_TYPE,
+				PARTS_CODE: PARTS_CODE
+			};
 
-            $("#dlPARTS_CODE").html('');
-            $("#dlPARTS_DESC").html('');
-            $("#dlMAT_ID").html('');
+			console.log(data);
 
-           
-            let PARTS_TYPE = $('#dlPARTS_TYPE').val();
+			$("#dlPARTS_DESC").html('');
 
-            getPARTS_CODE(PARTS_TYPE);
-        }
+			$.ajax({
+				type: "POST",
+				url: "SAM_MO_D.ashx?fun=getPARTS_DESC",
+				data: data,
+				dataType: 'json',
+				success: function (res) {
 
-        function dlPARTS_CODE_change() {
+					let html = "<option value=''>請選擇</option>";
+					for (let i in res) {
+						html += "<option value='" + res[i].PARTS_DESC + "'>" + res[i].PARTS_DESC + "</option>";
+					}
 
-            $("#dlPARTS_DESC").html('');
-            $("#dlMAT_ID").html('');
+					$("#dlPARTS_DESC").html(html);
 
-            
-            let PARTS_TYPE = $('#dlPARTS_TYPE').val();
-            let PARTS_CODE = $('#dlPARTS_CODE').val();
+					if (PARTS_DESC) {
+						$("#dlPARTS_DESC").val(PARTS_DESC);
+						getMAT_ID(PARTS_TYPE, PARTS_CODE, PARTS_DESC);
+					}
+				},
+				complete: function () {
 
-            getPARTS_DESC(PARTS_TYPE, PARTS_CODE);
-        }
+				},
+				error: function (error) {
+					alert("失敗");
+				}
+			});
+		}
 
-        function dlPARTS_DESC_change() {
+		function getMAT_ID(PARTS_TYPE, PARTS_CODE, PARTS_DESC) {
+			let MAT_NO = $('#orgText').val();
 
+			let data = {
+				MAT_NO: MAT_NO,
+				PARTS_TYPE: PARTS_TYPE,
+				PARTS_CODE: PARTS_CODE,
+				PARTS_DESC: PARTS_DESC
+			};
 
+			console.log(data);
 
-            let PARTS_TYPE = $('#dlPARTS_TYPE').val();
-            let PARTS_CODE = $('#dlPARTS_CODE').val();
-            let PARTS_DESC = $('#dlPARTS_DESC').val();
+			$("#dlMAT_ID").html('');
 
-            getMAT_ID(MAT_NO, PARTS_TYPE, PARTS_CODE, PARTS_DESC);
-        }
+			$.ajax({
+				type: "POST",
+				url: "SAM_MO_D.ashx?fun=getMAT_ID",
+				data: data,
+				dataType: 'json',
+				success: function (res) {
 
-        function getPARTS_TYPE(MAT_NO) {
+					let html = "<option value=''>請選擇</option>";
+					for (let i in res) {
+						html += "<option value='" + res[i].MAT_ID + "'>" + res[i].MAT_ID + "</option>";
+					}
 
+					$("#dlMAT_ID").html(html);
 
+					if (MAT_ID) {
+						$("#dlMAT_ID").val(MAT_ID);
+					}
+				},
+				complete: function () {
 
-            let data = {
-                MAT_NO: MAT_NO,
-            };
+				},
+				error: function (error) {
+					alert("失敗");
+				}
+			});
+		}
 
-            console.log(data);
 
-            $("#dlPARTS_TYPE").html('');
+		function onSearchMAT_NO() {
 
-            $.ajax({
-                type: "POST",
-                url: "SAM_MO_D.ashx?fun=getPARTS_TYPE",
-                data: data,
-                dataType: 'json',
-                success: function (res) {
+			let MAT_NO = $('#txtSearchMAT_NO').val();
+			let searchonlyerp = "N";
+			if ($("input[name=rbERP_MAT]:checked").length > 0) searchonlyerp = "Y";
 
-                    let html = "<option value=''>請選擇</option>";
-                    for (let i in res) {
-                        html += "<option value='" + res[i].PARTS_TYPE + "'>" + res[i].PARTS_TYPE + "</option>";
-                    }
+			let data = {
+				MAT_NO: MAT_NO,
+				searchonlyerp: searchonlyerp,
+			};
 
-                    $("#dlPARTS_TYPE").html(html);
 
-                    if (PARTS_TYPE) {
-                        $("#dlPARTS_TYPE").val(PARTS_TYPE);
-                        getPARTS_CODE(PARTS_TYPE);
-                    }
-                },
-                complete: function () {
+			$("#tblMAT_NO").html('');
 
-                },
-                error: function (error) {
-                    alert("失敗");
-                }
-            });
-        }
+			$.ajax({
+				type: "POST",
+				url: "SAM_MAT_DEF.ashx?fun=SearchMAT_NO",
+				data: data,
+				dataType: 'json',
+				success: function (res) {
 
-        function getPARTS_CODE(PARTS_TYPE) {
+					let html = "";
+					for (let i in res) {
+						html += "<tr>";
+						//html += "<td><input type='radio' class='rbMAT_NO' name='rbMAT_NO' data-MAT_NO='" + res[i].MAT_NO + "' onchange='onRbMAT_NO_change(this)' /></td>";
+						html += "<td><input type='radio' class='rbMAT_NO' name='rbMAT_NO' data-MAT_NO='" + res[i].MAT_NO + "'  /></td>";
+						html += "<td>" + res[i].MAT_NO + "</td>";
+						html += "<td>" + res[i].MAT_NAME + "</td>";
+						html += "<td>" + res[i].ERP_EXIST + "</td>";
+						html += "</tr>";
+					}
+					$('#tblMAT_NO').html(html);
 
+					if (res.length == 0) {
+						alert('無對應資料。');
+						$('#editText').val('');
+					}
+				},
+				complete: function () {
 
-            let MAT_NO = $('#orgText').val();
+				},
+				error: function (error) {
+					alert("失敗");
+				}
+			});
+		}
 
-            let data = {
-                MAT_NO: MAT_NO,
-                PARTS_TYPE: PARTS_TYPE,
-            };
+		function onRbMAT_NO_change(obj) {
+			let MAT_NO = $(obj).attr('data-MAT_NO');
 
-            console.log(data);
+			$('#editText').val(MAT_NO);
+		}
 
-            $("#dlPARTS_CODE").html('');
 
-            $.ajax({
-                type: "POST",
-                url: "SAM_MO_D.ashx?fun=getPARTS_CODE",
-                data: data,
-                dataType: 'json',
-                success: function (res) {
+		function onSearchCOLOR_DESC() {
 
-                    let html = "<option value=''>請選擇</option>";
-                    for (let i in res) {
-                        html += "<option value='" + res[i].PARTS_CODE + "'>" + res[i].PARTS_CODE + "</option>";
-                    }
+			let COLOR_DESC = $('#txtSearchCOLOR_DESC').val();
 
-                    $("#dlPARTS_CODE").html(html);
+			let data = {
+				COLOR_DESC: COLOR_DESC,
+			};
 
-                    if (PARTS_CODE) {
-                        $("#dlPARTS_CODE").val(PARTS_CODE);
-                        getPARTS_DESC(PARTS_TYPE, PARTS_CODE);
-                    }
 
-                },
-                complete: function () {
+			$("#tblCOLOR_DESC").html('');
 
-                },
-                error: function (error) {
-                    alert("失敗");
-                }
-            });
-        }
+			$.ajax({
+				type: "POST",
+				url: "SAM_MAT_COLOR_DEF.ashx?fun=SearchCOLOR_DESC",
+				data: data,
+				dataType: 'json',
+				success: function (res) {
 
-        function getPARTS_DESC(PARTS_TYPE, PARTS_CODE) {
+					let html = "";
+					for (let i in res) {
+						html += "<tr>";
+						html += "<td><input type='radio' name='rbCOLOR_DESC' data-COLOR_DESC='" + res[i].COLOR_DESC + "' onchange='onRbCOLOR_DESC_change(this)' /></td>";
+						html += "<td>" + res[i].COLOR_DESC + "</td>";
+						html += "<td>" + res[i].COLOR_DESC_CHN + "</td>";
+						html += "</tr>";
+					}
+					$('#tblCOLOR_DESC').html(html);
+				},
+				complete: function () {
 
-            let MAT_NO = $('#orgText').val();
+				},
+				error: function (error) {
+					alert("失敗");
+				}
+			});
+		}
 
-            let data = {
-                MAT_NO: MAT_NO,
-                PARTS_TYPE: PARTS_TYPE,
-                PARTS_CODE: PARTS_CODE
-            };
+		function onRbCOLOR_DESC_change(obj) {
+			let COLOR_DESC = $(obj).attr('data-COLOR_DESC');
 
-            console.log(data);
+			$('#editText').val(COLOR_DESC);
+		}
 
-            $("#dlPARTS_DESC").html('');
+		function Open(filePath) {
+			window.open(filePath);
 
-            $.ajax({
-                type: "POST",
-                url: "SAM_MO_D.ashx?fun=getPARTS_DESC",
-                data: data,
-                dataType: 'json',
-                success: function (res) {
+		}
 
-                    let html = "<option value=''>請選擇</option>";
-                    for (let i in res) {
-                        html += "<option value='" + res[i].PARTS_DESC + "'>" + res[i].PARTS_DESC + "</option>";
-                    }
 
-                    $("#dlPARTS_DESC").html(html);
 
-                    if (PARTS_DESC) {
-                        $("#dlPARTS_DESC").val(PARTS_DESC);
-                        getMAT_ID(PARTS_TYPE, PARTS_CODE, PARTS_DESC);
-                    }
-                },
-                complete: function () {
 
-                },
-                error: function (error) {
-                    alert("失敗");
-                }
-            });
-        }
 
-        function getMAT_ID(PARTS_TYPE, PARTS_CODE, PARTS_DESC) {
-            let MAT_NO = $('#orgText').val();
-
-            let data = {
-                MAT_NO: MAT_NO,
-                PARTS_TYPE: PARTS_TYPE,
-                PARTS_CODE: PARTS_CODE,
-                PARTS_DESC: PARTS_DESC
-            };
-
-            console.log(data);
-
-            $("#dlMAT_ID").html('');
-
-            $.ajax({
-                type: "POST",
-                url: "SAM_MO_D.ashx?fun=getMAT_ID",
-                data: data,
-                dataType: 'json',
-                success: function (res) {
-
-                    let html = "<option value=''>請選擇</option>";
-                    for (let i in res) {
-                        html += "<option value='" + res[i].MAT_ID + "'>" + res[i].MAT_ID + "</option>";
-                    }
-
-                    $("#dlMAT_ID").html(html);
-
-                    if (MAT_ID) {
-                        $("#dlMAT_ID").val(MAT_ID);
-                    }
-                },
-                complete: function () {
-
-                },
-                error: function (error) {
-                    alert("失敗");
-                }
-            });
-        }
-
-
-        function onSearchMAT_NO() {
-
-            let MAT_NO = $('#txtSearchMAT_NO').val();
-            let searchonlyerp = "N";
-            if ($("input[name=rbERP_MAT]:checked").length > 0) searchonlyerp = "Y";
-
-            let data = {
-                MAT_NO: MAT_NO,
-                searchonlyerp: searchonlyerp,
-            };
-
-
-            $("#tblMAT_NO").html('');
-
-            $.ajax({
-                type: "POST",
-                url: "SAM_MAT_DEF.ashx?fun=SearchMAT_NO",
-                data: data,
-                dataType: 'json',
-                success: function (res) {
-
-                    let html = "";
-                    for (let i in res) {
-                        html += "<tr>";
-                        html += "<td><input type='radio' name='rbMAT_NO' data-MAT_NO='" + res[i].MAT_NO + "' onchange='onRbMAT_NO_change(this)' /></td>";
-                        html += "<td>" + res[i].MAT_NO + "</td>";
-                        html += "<td>" + res[i].MAT_NAME + "</td>";
-                        html += "<td>" + res[i].ERP_EXIST + "</td>";
-                        html += "</tr>";
-                    }
-                    $('#tblMAT_NO').html(html);
-
-                    if (res.length == 0) {
-                        alert('無對應資料。');
-                        $('#editText').val('');
-                    }
-                },
-                complete: function () {
-
-                },
-                error: function (error) {
-                    alert("失敗");
-                }
-            });
-        }
-
-        function onRbMAT_NO_change(obj) {
-            let MAT_NO = $(obj).attr('data-MAT_NO');
-
-            $('#editText').val(MAT_NO);
-        }
-
-
-        function onSearchCOLOR_DESC() {
-
-            let COLOR_DESC = $('#txtSearchCOLOR_DESC').val();
-
-            let data = {
-                COLOR_DESC: COLOR_DESC,
-            };
-
-
-            $("#tblCOLOR_DESC").html('');
-
-            $.ajax({
-                type: "POST",
-                url: "SAM_MAT_COLOR_DEF.ashx?fun=SearchCOLOR_DESC",
-                data: data,
-                dataType: 'json',
-                success: function (res) {
-
-                    let html = "";
-                    for (let i in res) {
-                        html += "<tr>";
-                        html += "<td><input type='radio' name='rbCOLOR_DESC' data-COLOR_DESC='" + res[i].COLOR_DESC + "' onchange='onRbCOLOR_DESC_change(this)' /></td>";
-                        html += "<td>" + res[i].COLOR_DESC + "</td>";
-                        html += "<td>" + res[i].COLOR_DESC_CHN + "</td>";
-                        html += "</tr>";
-                    }
-                    $('#tblCOLOR_DESC').html(html);
-                },
-                complete: function () {
-
-                },
-                error: function (error) {
-                    alert("失敗");
-                }
-            });
-        }
-
-        function onRbCOLOR_DESC_change(obj) {
-            let COLOR_DESC = $(obj).attr('data-COLOR_DESC');
-
-            $('#editText').val(COLOR_DESC);
-        }
-
-        function Open(filePath) {
-            window.open(filePath);
-
-        }
-
-
-
-
-
-    </script>
+	</script>
 </asp:Content>
