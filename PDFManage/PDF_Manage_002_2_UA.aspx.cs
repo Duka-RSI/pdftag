@@ -190,6 +190,9 @@ order by a.pidate,a.pipid";
 
 		public string SupplierArticle { get; set; }
 
+		public string W1 { get; set; }
+		public string W4 { get; set; }
+
 		//public string Supplier { get; set; }
 
 		public string ColorName { get; set; }
@@ -467,12 +470,15 @@ order by a.pidate,a.pipid";
 				#region UA_BOM
 
 				sSql = "select a.*,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,'0' as isExist \n";
+				sSql += ",(CASE WHEN c.EW1 is null or c.EW1='' THEN c.W1 ELSE c.EW1 End) as W1              \n";
+				sSql += ",(CASE WHEN c.EW4 is null or c.EW4='' THEN c.W4 ELSE c.EW4 End) as W4              \n";
 				sSql += "from PDFTAG.dbo.UA_BOM a              \n";
 				sSql += "join  PDFTAG.dbo.UA_BOMGarmentcolor b on a.lubcid=b.lubcid               \n";
+				sSql += " left join PDFTAG.dbo.UA_TagData c on a.lubid=c.lubid               \n";
 				sSql += " where 1=1   \n";
 				sSql += " and a.pipid = @pipid   \n";
-				sSql += "  order by (CASE WHEN org_lubid is null THEN lubid ELSE org_lubid END) asc ,rowid asc    \n";
-				Response.Write("<!--" + sSql.Replace("@luhid", luhid) + "-->");
+				sSql += "  order by (CASE WHEN org_lubid is null THEN a.lubid ELSE org_lubid END) asc ,rowid asc    \n";
+				Response.Write("<!--" + sSql.Replace("@pipid", sSource_pipid) + "-->");
 				cm.CommandText = sSql;
 				cm.Parameters.Clear();
 				cm.Parameters.AddWithValue("@pipid", sSource_pipid);
@@ -482,7 +488,7 @@ order by a.pidate,a.pipid";
 					da.Fill(dt);
 				}
 
-				Response.Write("<!--" + sSql.Replace("@luhid", compare_luhid) + "-->");
+				Response.Write("<!--" + sSql.Replace("@pipid", sCompare_pipid) + "-->");
 				cm.CommandText = sSql;
 				cm.Parameters.Clear();
 				cm.Parameters.AddWithValue("@pipid", sCompare_pipid);
@@ -682,6 +688,8 @@ order by a.pidate,a.pipid";
 
 								Usage_org = drBomMain["Usage"].ToString(),
 								SupplierArticle_org = drBomMain["SupplierArticle"].ToString(),
+								W1 = drBomMain["W1"].ToString().Trim(),
+								W4 = drBomMain["W4"].ToString().Trim(),
 
 								ColorName = sColorName,
 								ColorVal = sColorVal,
@@ -706,6 +714,8 @@ order by a.pidate,a.pipid";
 
 						string usage = "";
 						string supplierArticle = "";
+						string W1 = "";
+						string W4 = "";
 
 						string usage_note = "";
 						string supplierArticle_note = "";
@@ -720,6 +730,8 @@ order by a.pidate,a.pipid";
 
 							usage = drBoms[b]["usage"].ToString();
 							supplierArticle = drBoms[b]["SupplierArticle"].ToString();
+							W1 = drBoms[b]["W1"].ToString().Trim();
+							W4 = drBoms[b]["W4"].ToString().Trim();
 
 							usage_note = FilterNote(arrNotes, lubid, "usage");
 							supplierArticle_note = FilterNote(arrNotes, lubid, "SupplierArticle");
@@ -852,13 +864,22 @@ order by a.pidate,a.pipid";
 									//var resCompare = arrCompareData.FirstOrDefault(x => x.StandardPlacement == standardPlacement && x.SupplierArticle == supplierArticle && x.ColorName == color);
 
 									//20220719
-									var resCompare = arrCompareData.FirstOrDefault(x => x.Usage == usage && x.SupplierArticle == supplierArticle && x.ColorName == color);
+									//var resCompare = arrCompareData.FirstOrDefault(x => x.Usage == usage && x.SupplierArticle == supplierArticle && x.ColorName == color);
+									//20221124
+									var resCompare = arrCompareData.FirstOrDefault(x => x.Usage == usage
+									&& (itemType.type == "Fabric" ? x.W4 == W4 : x.W1 == W1)
+									&& x.ColorName == color);
 
 									if (resCompare != null)
 									{
 										isFind = true;
 										colorValCompare = resCompare.ColorVal;
 										resCompare.isExistA = true;
+									}
+									else
+									{
+										//if (resCompare != null)
+										//	Response.Write("<!--esCompare.ColorName=" + resCompare.ColorName + "  color=" + color + "-->");
 									}
 
 									if (isFind)
@@ -867,6 +888,7 @@ order by a.pidate,a.pipid";
 									}
 									else
 									{
+										//Response.Write("<!--" + Newtonsoft.Json.JsonConvert.SerializeObject(arrCompareData) + "-->");
 										sb.Append(" <td scope='col'>X</td>");
 									}
 								}

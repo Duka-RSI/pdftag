@@ -3235,13 +3235,20 @@ insert into PDFTAG.dbo.GAP_SizeTable
 			int iLineRow = 0;
 
 			string sGenerateddate = "";
+			string sHeaderStyleDesc = "";
 			using (StreamReader data = new StreamReader(sSaveTxtPath2))
 			{
 				while (!data.EndOfStream)
 				{
 					sLine = data.ReadLine();
 
-					if (sLine.Contains("Copyright") && sLine.Contains("All Rights Reserved"))
+					if (string.IsNullOrEmpty(sHeaderStyleDesc) && sLine.Contains("Lifecycle:") )
+					{
+
+						string desc = sLine.Split(':')[1].Trim().Replace("Regional Fit", "");
+						sHeaderStyleDesc = desc.Split(new string[] { "  " }, StringSplitOptions.RemoveEmptyEntries)[1];
+					}
+					else if (sLine.Contains("Copyright") && sLine.Contains("All Rights Reserved"))
 					{
 						sGenerateddate = sLastLine.Split(' ')[0];
 						break;
@@ -3278,15 +3285,17 @@ insert into PDFTAG.dbo.GAP_SizeTable
 						if (string.IsNullOrEmpty(ua_HeaderDto.style))
 						{
 							//@Row: Status: Prototype1363621 - BaseSeason: FW22Lifecycle: CarryoverUA Tech 6in Novelty 2 PackRegional Fit: US %% 
-							//@Row: Status: Pre-Production1361426 - MCSSeason: SS22Lifecycle: CarryoverUA Training Vent 2.0 SSRegional Fit: US %% 
+							//@Row: Status: Pre-Production1361426 - MCSSeason: SS22Lifecycle: CarryoverUA Training Vent 2.0 SSRegional Fit: US %%
+							//@Row: Status: Production1282508Season: FW23Lifecycle: CarryoverO-Series 6in Boxerjock 2pkRegional Fit: US %% 
 							string sTempLine = sLine.Replace("@Row:", "").Replace("Status: Prototype", "@Row").Replace("Status: Pre-Production", "@Row").Replace("Status: Production", "@Row").Replace("Season:", "@Row");
 							string style = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Split('-')[0].Trim();
 
-							sTempLine = sLine.Replace("@Row:", "").Replace("Lifecycle:", "@Row").Replace("Regional Fit:", "@Row");
+							sTempLine = sLine.Replace("@Row:", "").Replace("Lifecycle:", "@Row").Replace("Carryover", "").Replace("Regional Fit:", "@Row");
 							string styleDesc = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Trim();
 
 							ua_HeaderDto.style = style;
-							ua_HeaderDto.styledesc = styleDesc;
+							//ua_HeaderDto.styledesc = styleDesc;
+							ua_HeaderDto.styledesc = sHeaderStyleDesc;
 						}
 
 					}
@@ -3495,7 +3504,7 @@ values
 					sLine = data.ReadLine();
 					iLineRow++;
 
-					if (sLine.Contains("@Row:  %% (SET A:"))
+					if (sLine.Contains("@Row:  %% (SET A:") || sLine.Contains("@Row:  %% (SET B:") || sLine.Contains("@Row:  %% (SET C:"))
 					{
 						isBom = true;
 						isSizeTable = false;
@@ -3514,18 +3523,13 @@ values
 							sample = sLine.Trim().Split(new string[] { "%%" }, StringSplitOptions.None).Where(w => !string.IsNullOrWhiteSpace(w) && !w.Contains("CW#COLORWAY")).ToArray()[1].ToString().Trim();
 					}
 
-					if (false)
-					{
-
-					}
-
 					if (isBom)
 					{
 						#region isBom
 
 						sample = "";//清掉
 
-						if (sLine.Contains("@Row:  %% (SET A:"))
+						if (sLine.Contains("@Row:  %% (SET A:") || sLine.Contains("@Row:  %% (SET B:") || sLine.Contains("@Row:  %% (SET C:"))
 						{
 							isBomGarmentColor = true;
 

@@ -304,6 +304,7 @@
 
 			$('.rowCompareSupplierArticle').hide();
 			$('#rowCompareColor').hide();
+			$('#editText').prop('disabled', false);
 
 			objTd = $(td);
 			saveUrl = "UA_Header.ashx?fun=saveByCol"
@@ -346,7 +347,7 @@
 				MAT_ID = $(td).attr('data-MAT_ID');
 				isSaveRecord = false;
 				$('.rowCompareSupplierArticle').show();
-
+				$('#editText').prop('disabled', true);
 
 				isSaveUATagData = true;
 				getUADataTagTable(saveId);
@@ -361,7 +362,7 @@
 				MAT_ID = "";
 
 				$('.rowCompareSupplierArticle').hide();
-
+				$('#editText').prop('disabled', false);
 			}
 
 			orgUrl = "UA_BOM.ashx?fun=get_org"
@@ -455,7 +456,7 @@
 
 							html += "<tr>";
 							html += "<td>" + arrName[i-1] + "</td>";
-							html += "<td>" + res["W" + i] + "</td>";
+							html += "<td><span id='span_W"+i+"'>" + res["W" + i] + "</span></td>";
 							html += "<td><input type='text' id='EW" + i + "' value='' style='width:300px'>";
 
 							if ((!isFabric && i == 1) || (isFabric && i == 4)) {
@@ -544,6 +545,7 @@
 
 			$('.rowCompareSupplierArticle').hide();
 			$('#rowCompareColor').hide();
+			$('#editText').prop('disabled', false);
 
 			objTd = $(td);
 			saveUrl = "UA_SizeTable.ashx?fun=saveByCol"
@@ -660,6 +662,49 @@
 
 			if (isSaveUATagData) {
 				onSaveUATagData(saveId);
+
+				let W1 = $('#span_W1').text();
+				let W2 = $('#span_W2').text();
+				let W3 = $('#span_W3').text();
+				let W4 = $('#span_W4').text();
+				let W5 = $('#span_W5').text();
+				let W6 = $('#span_W6').text();
+				let W7 = $('#span_W7').text();
+				let W8 = $('#span_W8').text();
+
+				let EW1 = $('#EW1').val();
+				let EW2 = $('#EW2').val();
+				let EW3 = $('#EW3').val();
+				let EW4 = $('#EW4').val();
+				let EW5 = $('#EW5').val();
+				let EW6 = $('#EW6').val();
+				let EW7 = $('#EW7').val();
+				let EW8 = $('#EW8').val();
+
+				
+				if (W1 != EW1 || W2 != EW2 || W3 != EW3 || W4 != EW4 || W5 != EW5 || W6 != EW6 || W7 != EW7 || W8 != EW8) {
+					//有修改
+					var arrTagData = [];
+					if (W1)
+						arrTagData.push(EW1);
+					if (W2)
+						arrTagData.push(EW2);
+					if (W3)
+						arrTagData.push(EW3);
+					if (W4)
+						arrTagData.push(EW4);
+					if (W5)
+						arrTagData.push(EW5);
+					if (W6)
+						arrTagData.push(EW6);
+					if (W7)
+						arrTagData.push(EW7);
+					if (W8)
+						arrTagData.push(EW8);
+					
+
+					text = arrTagData.join(' / ');
+				}
 			}
 
 			let data = {
