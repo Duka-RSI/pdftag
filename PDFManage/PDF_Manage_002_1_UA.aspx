@@ -447,7 +447,7 @@
 						}
 						else if (bomType == "Trim") arrName = arrTrim;
 						else if (bomType == "Thread") arrName = arrThread;
-						else if (bomType.indexOf('Hangtag') > -1) arrName = arrHangtag;
+						else if (bomType.indexOf('Hangtag') > -1 || bomType == "Label") arrName = arrHangtag;
 						else if (bomType == "Embellishment") arrName = arrEmbellishment;
 
 

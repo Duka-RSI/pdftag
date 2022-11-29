@@ -630,16 +630,19 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 	}
 	public string Compare(string org, string newText, string note, bool IsMapping = true)
 	{
-		if (org == newText)
-			return org;
-		else
-		{
-			if (IsMapping)
-				return "<font>原:" + org + "</font><br><font color='red'>修:" + newText + "</font><br><font color='blue'>中:" + note + "</font>";
-			else
-				return "<font color='red'>修:無對應</font>";
-		}
-	}
+        if (org == newText)
+            if (string.IsNullOrEmpty(note))
+                return org;
+            else
+                return "<font>原:" + org + "</font><br><font color='blue'>中:" + note + "</font>";
+        else
+        {
+            if (IsMapping)
+                return "<font>原:" + org + "</font><br><font color='red'>修:" + newText + "</font><br><font color='blue'>中:" + note + "</font>";
+            else
+                return "<font color='red'>修:無對應</font>";
+        }
+    }
 
 
 	private void CleanObject()

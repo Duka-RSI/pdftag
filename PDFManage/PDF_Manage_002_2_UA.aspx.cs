@@ -1470,10 +1470,11 @@ order by a.pidate,a.pipid";
 						for (int s = 0; s < drSizeTables.Length; s++)
 						{
 							//找compare code符合的第一筆
-							var tmpSizetable = getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("Code").ToString().Replace(" ", "") == drSizeTables[s]["Code"].ToString().Replace(" ", "")
-								&& x.Field<string>("H1") == drSizeTables[s]["H1"].ToString());
+							var tmpSizetable = getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("Code").ToString().Replace(" ", "") == drSizeTables[s]["Code"].ToString().Replace(" ", ""));
+                            //var tmpSizetable = getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("Code").ToString().Replace(" ", "") == drSizeTables[s]["Code"].ToString().Replace(" ", "")
+                            //    && (x.Field<string>("H1") == drSizeTables[s]["H1"].ToString() || x.Field<string>("H1") == drSizeTables[s]["H2"].ToString()));
 
-							string lustid = "";
+                            string lustid = "";
 							string org_lustid = "";
 
 							string code_source = "";
@@ -1665,9 +1666,10 @@ order by a.pidate,a.pipid";
 							if (tmpSizetable == null) { continue; }
 							//如果有找到就刪掉，剩下的就是目的文件多的
 							if (!string.IsNullOrEmpty(code_compare))
-								getSizeTable.Rows.Remove(getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("code").ToString().Replace(" ", "") == drSizeTables[s]["code"].ToString().Replace(" ", "")
-										&& x.Field<string>("H1") == drSizeTables[s]["H1"].ToString()));
-						}
+								getSizeTable.Rows.Remove(getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("code").ToString().Replace(" ", "") == drSizeTables[s]["code"].ToString().Replace(" ", "")));
+                                //getSizeTable.Rows.Remove(getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("code").ToString().Replace(" ", "") == drSizeTables[s]["code"].ToString().Replace(" ", "")
+                                //        && x.Field<string>("H1") == drSizeTables[s]["H1"].ToString()));
+                        }
 						sb.Append("</table>");
 					}
 				}

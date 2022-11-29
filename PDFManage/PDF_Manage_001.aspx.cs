@@ -1327,107 +1327,35 @@ values
 				string lubid = drBom["lubid"].ToString();
 				string type = drBom["type"].ToString();
 				string supplierArticle = drBom["SupplierArticle"].ToString();
-				string w1 = "";
-				string w2 = "";
-				string w3 = "";
-				string w4 = "";
-				string w5 = "";
-				string w6 = "";
-				string w7 = "";
-				string w8 = "";
-				string w9 = "";
-				string w10 = "";
+                Dictionary<string, string> ws = new Dictionary<string, string>();
+                
 				try
 				{
-					if (type.Contains("Fabric"))
-					{
-						//  Fabric描述 / 物料描述 / 廠商 / 廠商料號 / 物料狀態 / 成份
-						string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
+                    if (type.Contains("Fabric"))
+                    {
+                        //  Fabric描述 / 物料描述 / 廠商 / 廠商料號 / 物料狀態 / 成份
+                        string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
 
-						w1 = arrData[0];
-						w2 = arrData[1];
-						w3 = arrData[2];
-						w4 = arrData[3];
-						w5 = arrData[4];
-						for (int i = 5; i < arrData.Length; i++)
-							w6 += arrData[i] + " / ";
+                        for (int i = 0; i < arrData.Count(); i++)
+                        {
+                            if (i == 5 && i < arrData.Length) { ws.Add(string.Format("w{0}", (i + 1)), arrData[i] + " / "); }
+                            else if (i > 5 && i < arrData.Length) { ws["w6"] = ws["w6"] + arrData[i] + " / "; }
+                            else
+                                ws.Add(string.Format("w{0}", (i + 1)), arrData[i].Trim());
+                        }
+                        ws["w6"] = ws["w6"].Trim().TrimEnd('/');
+                    }
+                    else
+                    {
+                        string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
+                        for (int i = 0; i < arrData.Count(); i++)
+                        {
+                            ws.Add(string.Format("w{0}", (i + 1)), arrData[i].Trim());
+                            if (i + 1 == arrData.Count()) { ws[string.Format("w{0}", (i + 1))] = ws[string.Format("w{0}", (i + 1))].Replace("UOM:", ""); }
+                        }
+                    }
 
-						w6 = w6.Trim().TrimEnd('/');
-					}
-					else if (type.Contains("Trim"))
-					{
-						//  戶料號 / (描述) / 物料描述 / 廠商 / (描述) / 物料狀態 / 規格 / 單位
-						string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
-
-						w1 = arrData[0];
-						w2 = arrData[1];
-						w3 = arrData[2];
-						w4 = arrData[3];
-						w5 = arrData[4];
-						w6 = arrData[5];
-						if (arrData.Count() == 6)
-						{
-							w6 = w6.Replace("UOM:", "");
-						}
-						else if (arrData.Count() == 7)
-						{
-							w7 = arrData[6];
-							w7 = w7.Replace("UOM:", "");
-						}
-						else if (arrData.Count() == 8)
-						{
-							w7 = arrData[6];
-							w8 = arrData[7];
-							w8 = w7.Replace("UOM:", "");
-						}
-					}
-					else if (type.Contains("Thread"))
-					{
-						//  客戶料號 / 物料描述 / 補充描述 / (描述) / 廠商 / / 物料狀態 / 規格 / 單位
-						string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
-
-						w1 = arrData[0];
-						w2 = arrData[1];
-						w3 = arrData[2];
-						w4 = arrData[3];
-						if (arrData.Count() == 8)
-						{
-							w5 = arrData[5];
-							w6 = arrData[6];
-							w7 = arrData[7];
-							w7 = w7.Replace("UOM:", "");
-						}
-						else if (arrData.Count() == 9)
-						{
-							w5 = arrData[4];
-							w6 = arrData[6];
-							w7 = arrData[7];
-							w8 = arrData[8];
-							w8 = w8.Replace("UOM:", "");
-						}
-					}
-					else if (type.Contains("Label") || type.Contains("Hangtag/Packaging") || type.Contains("Embellishment"))
-					{
-						//  客戶料號 / 物料描述 / 廠商 / (描述) / 物料狀態 / 單位
-						string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
-
-						w1 = arrData[0];
-						w2 = arrData[1];
-						w3 = arrData[2];
-						w4 = arrData[3];
-						w5 = arrData[4];
-						if (arrData.Count() == 5)
-						{
-							w5 = w5.Replace("UOM:", "");
-						}
-						else if (arrData.Count() == 6)
-						{
-							w6 = arrData[5];
-							w6 = w6.Replace("UOM:", "");
-						}
-					}
-
-					if (!string.IsNullOrEmpty(w1))
+                    if (!string.IsNullOrEmpty(ws["w1"]))
 					{
 						sSql = @"insert into PDFTAG.dbo.UA_TagData 
 (hdid,type,lubid,tagnum,W1,W2,W3,W4,W5,W6,W7,W8,W9,W10,creator,creatordate) 
@@ -1440,16 +1368,13 @@ values
 						cm.Parameters.AddWithValue("@type", type);
 						cm.Parameters.AddWithValue("@lubid", lubid);
 						cm.Parameters.AddWithValue("@tagnum", 0);
-						cm.Parameters.AddWithValue("@W1", w1);
-						cm.Parameters.AddWithValue("@W2", w2);
-						cm.Parameters.AddWithValue("@W3", w3);
-						cm.Parameters.AddWithValue("@W4", w4);
-						cm.Parameters.AddWithValue("@W5", w5);
-						cm.Parameters.AddWithValue("@W6", w6);
-						cm.Parameters.AddWithValue("@W7", w7);
-						cm.Parameters.AddWithValue("@W8", w8);
-						cm.Parameters.AddWithValue("@W9", w9);
-						cm.Parameters.AddWithValue("@W10", w10);
+                        for (int i = 1; i <= 10; i++)
+                        {
+                            if(i <= ws.Count())
+                                cm.Parameters.AddWithValue(string.Format("@W{0}", i), ws[string.Format("w{0}", i)]);
+                            else
+                                cm.Parameters.AddWithValue(string.Format("@W{0}", i), "");
+                        }
 						cm.Parameters.AddWithValue("@creator", LoginUser.PK);
 						cm.Parameters.AddWithValue("@creatordate", dtNow.ToString("yyyy/MM/dd HH:mm:ss"));
 						cm.ExecuteNonQuery();
