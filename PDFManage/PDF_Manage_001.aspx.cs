@@ -1327,35 +1327,35 @@ values
 				string lubid = drBom["lubid"].ToString();
 				string type = drBom["type"].ToString();
 				string supplierArticle = drBom["SupplierArticle"].ToString();
-                Dictionary<string, string> ws = new Dictionary<string, string>();
-                
+				Dictionary<string, string> ws = new Dictionary<string, string>();
+
 				try
 				{
-                    if (type.Contains("Fabric"))
-                    {
-                        //  Fabric描述 / 物料描述 / 廠商 / 廠商料號 / 物料狀態 / 成份
-                        string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
+					if (type.Contains("Fabric"))
+					{
+						//  Fabric描述 / 物料描述 / 廠商 / 廠商料號 / 物料狀態 / 成份
+						string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
 
-                        for (int i = 0; i < arrData.Count(); i++)
-                        {
-                            if (i == 5 && i < arrData.Length) { ws.Add(string.Format("w{0}", (i + 1)), arrData[i] + " / "); }
-                            else if (i > 5 && i < arrData.Length) { ws["w6"] = ws["w6"] + arrData[i] + " / "; }
-                            else
-                                ws.Add(string.Format("w{0}", (i + 1)), arrData[i].Trim());
-                        }
-                        ws["w6"] = ws["w6"].Trim().TrimEnd('/');
-                    }
-                    else
-                    {
-                        string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
-                        for (int i = 0; i < arrData.Count(); i++)
-                        {
-                            ws.Add(string.Format("w{0}", (i + 1)), arrData[i].Trim());
-                            if (i + 1 == arrData.Count()) { ws[string.Format("w{0}", (i + 1))] = ws[string.Format("w{0}", (i + 1))].Replace("UOM:", ""); }
-                        }
-                    }
+						for (int i = 0; i < arrData.Count(); i++)
+						{
+							if (i == 5 && i < arrData.Length) { ws.Add(string.Format("w{0}", (i + 1)), arrData[i] + " / "); }
+							else if (i > 5 && i < arrData.Length) { ws["w6"] = ws["w6"] + arrData[i] + " / "; }
+							else
+								ws.Add(string.Format("w{0}", (i + 1)), arrData[i].Trim());
+						}
+						ws["w6"] = ws["w6"].Trim().TrimEnd('/');
+					}
+					else
+					{
+						string[] arrData = supplierArticle.Split(new string[] { " /" }, StringSplitOptions.None);
+						for (int i = 0; i < arrData.Count(); i++)
+						{
+							ws.Add(string.Format("w{0}", (i + 1)), arrData[i].Trim());
+							if (i + 1 == arrData.Count()) { ws[string.Format("w{0}", (i + 1))] = ws[string.Format("w{0}", (i + 1))].Replace("UOM:", ""); }
+						}
+					}
 
-                    if (!string.IsNullOrEmpty(ws["w1"]))
+					if (!string.IsNullOrEmpty(ws["w1"]))
 					{
 						sSql = @"insert into PDFTAG.dbo.UA_TagData 
 (hdid,type,lubid,tagnum,W1,W2,W3,W4,W5,W6,W7,W8,W9,W10,creator,creatordate) 
@@ -1368,13 +1368,13 @@ values
 						cm.Parameters.AddWithValue("@type", type);
 						cm.Parameters.AddWithValue("@lubid", lubid);
 						cm.Parameters.AddWithValue("@tagnum", 0);
-                        for (int i = 1; i <= 10; i++)
-                        {
-                            if(i <= ws.Count())
-                                cm.Parameters.AddWithValue(string.Format("@W{0}", i), ws[string.Format("w{0}", i)]);
-                            else
-                                cm.Parameters.AddWithValue(string.Format("@W{0}", i), "");
-                        }
+						for (int i = 1; i <= 10; i++)
+						{
+							if (i <= ws.Count())
+								cm.Parameters.AddWithValue(string.Format("@W{0}", i), ws[string.Format("w{0}", i)]);
+							else
+								cm.Parameters.AddWithValue(string.Format("@W{0}", i), "");
+						}
 						cm.Parameters.AddWithValue("@creator", LoginUser.PK);
 						cm.Parameters.AddWithValue("@creatordate", dtNow.ToString("yyyy/MM/dd HH:mm:ss"));
 						cm.ExecuteNonQuery();
@@ -1979,13 +1979,27 @@ insert into PDFTAG.dbo.Lu_SizeTable
 			//    da.Fill(dtLu_LearnmgrItem);
 			//}
 
+			string gaptype = dt.Rows[0]["Gaptype"].ToString();
 			string titleType = dt.Rows[0]["titleType"].ToString();
 			string sPDFPath = Server.MapPath("~/PDFManage/" + dt.Rows[0]["piuploadfile"].ToString());
 			//string sSaveTxtPath = Server.MapPath("~/PdfToText/" + Path.GetFileNameWithoutExtension(dt.Rows[0]["piuploadfile"].ToString()) + ".txt");
-			string sSaveTxtPath = Server.MapPath("~/PDFManage/" + dt.Rows[0]["piuploadfile"].ToString().Replace(".pdf", "_2.txt")); ;
+			string sSaveTxtPath = Server.MapPath("~/PDFManage/" + dt.Rows[0]["piuploadfile"].ToString().Replace(".pdf", ".txt")); ;
+			string sSaveTxtPath3 = Server.MapPath("~/PDFManage/" + dt.Rows[0]["piuploadfile"].ToString().Replace(".pdf", "_3.txt")); ;
+
 
 			if (parse == "1" || !System.IO.File.Exists(sSaveTxtPath))
-				ConvertPDFToText3(sPDFPath, sSaveTxtPath);
+			{
+				if (gaptype == "2")
+				{
+					//有格線
+					ConvertPDFToText2(sPDFPath, sSaveTxtPath);
+				}
+				else
+				{
+					ConvertPDFToText3(sPDFPath, sSaveTxtPath);
+				}
+
+			}
 
 			if (!System.IO.File.Exists(sSaveTxtPath))
 			{
@@ -2007,128 +2021,273 @@ insert into PDFTAG.dbo.Lu_SizeTable
 
 			GAP_HeaderDto gAP_HeaderDto = new GAP_HeaderDto();
 
-			using (StreamReader data = new StreamReader(sSaveTxtPath))
+			if (gaptype == "2")
 			{
-				while (!data.EndOfStream)
+				#region 有格線
+
+				using (StreamReader data = new StreamReader(sSaveTxtPath))
 				{
-
-					sLine = data.ReadLine();
-					iLineRow++;
-
-
-					if (sLine.Contains("Cover Page %%"))
+					while (!data.EndOfStream)
 					{
-						if (string.IsNullOrEmpty(gAP_HeaderDto.brand))
-							gAP_HeaderDto.brand = sLine.Replace("Cover Page %%", "").Split(new string[] { "%%" }, StringSplitOptions.None)[1].Trim();
 
-					}
-
-					if (!isHeaderDone && sLine.Contains("Master Style:") && sLine.Contains("Line Plan:"))
-					{
-						isHeader = true;
-
-					}
-
-					if (sLine.Contains("MC Last Mod:"))
-					{
-						isHeaderMCLastMod = true;
-
-					}
-
-					if (isHeader)
-					{
-						#region Header
-
-						//Master Style:548553; Studio JacketLine Plan: Athleta Knit Outerwear / Jackets / VestsPerformance HO22Flow: ProductDescription: 92687 Salutation Jacket_black_L2Product Team: Athleta Knit Outerwear / Jackets / VestsArea:BULLSEYEProduct Status:Final for ProductionProduct Type:JacketTheme:1X - 3XCategory:IPSSSub - Category:PERFORMANCE 3RD PIECEItem Type:JACKET _ L2BOM #000636021Tech Designer:Flippin, JudyDesigner:Lee, Alford %% 
-
-						sLine = sLine.Replace("@Row:", "");
-						string sTempLine = sLine.Replace("Master Style:", "").Replace("Line Plan:", "@Row");
-
-						string style = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[0].Split(';')[0].Trim();
-						string styleDesc = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[0].Split(';')[1].Trim();
-
-						sTempLine = sLine.Replace("Line Plan:", "@Row").Replace("Flow:", "@Row");
-						var arrLinPlans = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Split(' ');
-						string season = arrLinPlans[arrLinPlans.Length - 1];
-
-						string year = season.Substring(season.Length - 2, 2);
-						season = year + season.Replace(year, "");
-
-						sTempLine = sLine.Replace("ProductDescription:", "@Row").Replace("Product Team:", "@Row");
-						string productDescription = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Trim();
+						sLine = data.ReadLine();
+						iLineRow++;
 
 
-						sTempLine = sLine.Replace("Product Status:", "@Row").Replace("Product Type:", "@Row");
-						string productStatus = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Trim();
+						if (sLine.Contains("Design Number"))
+						{
+							gAP_HeaderDto.style = sLine.Replace("Design Number", "").Trim().TrimStart('D');
+							isHeader = true;
+						}
+						if (isHeader)
+						{
+							if (sLine.Contains("Season"))
+							{
+								var arrSeason = sLine.Replace("Season", "").Trim().Replace(" ", "@").Split('@');
+								string year = arrSeason[1].Substring(arrSeason[1].Length - 2, 2);
+								string season2 = arrSeason[0];
+								string new_season = "";
 
-						sTempLine = sLine.Replace("Product Type:", "@Row").Replace("Theme:", "@Row");
-						string productType = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Trim();
+								if (season2.Contains("Spring"))
+								{
+									new_season = year + "SP";
 
-						isHeader = false;
-						isHeaderDone = true;
+								}
+								else if (season2.Contains("Summer"))
+								{
+									new_season = year + "SU";
+								}
+								else if (season2.Contains("Fall"))
+								{
+									new_season = year + "FA";
 
-						gAP_HeaderDto.style = style;
-						gAP_HeaderDto.styledesc = styleDesc;
-						gAP_HeaderDto.season = season;
-						gAP_HeaderDto.ProductDescription = productDescription;
-						gAP_HeaderDto.stylestatus = productStatus;
-						gAP_HeaderDto.sclass = productType;
+								}
+								else if (season2.Contains("Fall & Winter"))
+								{
+									new_season = year + "FW";
+
+								}
+								else if (season2.Contains("Winter"))
+								{
+									new_season = year + "HO";
+
+								}
+								else if (season2.Contains("Holiday"))
+								{
+									new_season = year + "HO";
+
+								}
+
+								gAP_HeaderDto.season = new_season;
+							}
+							else if (sLine.Contains("Description"))
+							{
+								string sDescription = sLine.Replace("Description", "").Trim();
+								sLine = data.ReadLine();
+
+								if (!sLine.Contains("BOM Numbern"))
+									sDescription += sLine.Trim();
+
+								gAP_HeaderDto.ProductDescription = sDescription;
+							}
+							else if (sLine.Contains("Status"))
+							{
+								if (string.IsNullOrEmpty(gAP_HeaderDto.stylestatus))
+									gAP_HeaderDto.stylestatus = sLine.Replace("Status", "").Trim();
+							}
+							else if (sLine.Contains("Brand/Division"))
+							{
+								gAP_HeaderDto.brand = sLine.Replace("Brand/Division", "").Trim();
+							}
+							else if (sLine.Contains("Collection"))
+							{
+								gAP_HeaderDto.sclass = sLine.Replace("Collection", "").Trim();
+							}
+							else if (sLine.Contains("Revision Modiﬁed"))
+							{
+								gAP_HeaderDto.generateddate = sLine.Replace("Revision Modiﬁed", "").Trim();
+								isHeaderDone = true;
+							}
+						}
+						if (isHeaderDone)
+						{
+							gAP_HeaderDto.styledesc = "";
 
 
-						#endregion
-					}
-					else if (isHeaderMCLastMod)
-					{
-						sLine = sLine.Replace("@Row:", "");
-						string sTempLine = sLine.Replace("MC Last Mod:", "@Row");
-
-						string MCLastMod = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Substring(0, 22).Trim();
-
-						gAP_HeaderDto.generateddate = MCLastMod;
-
-
-						sSql = "delete PDFTAG.dbo.GAP_BOM where pipid=@pipid;";
-						sSql += "delete PDFTAG.dbo.GAP_BOMGarmentcolor where pipid=@pipid;";
-						sSql += "delete PDFTAG.dbo.GAP_SizeTable where pipid=@pipid;";
-						//sSql += "delete PDFTAG.dbo.GAP_SizeTable_1 where pipid=@pipid;";
-						sSql += "delete PDFTAG.dbo.GAP_SizeTable_Header where pipid=@pipid;";
-						//sSql += "delete PDFTAG.dbo.GAP_SizeTable_Header_1 where pipid=@pipid;";
-						sSql += "delete PDFTAG.dbo.GAP_Header where pipid=@pipid;";
-						sSql += @"insert into PDFTAG.dbo.GAP_Header 
+							sSql = "delete PDFTAG.dbo.GAP_BOM where pipid=@pipid;";
+							sSql += "delete PDFTAG.dbo.GAP_BOMGarmentcolor where pipid=@pipid;";
+							sSql += "delete PDFTAG.dbo.GAP_SizeTable where pipid=@pipid;";
+							//sSql += "delete PDFTAG.dbo.GAP_SizeTable_1 where pipid=@pipid;";
+							sSql += "delete PDFTAG.dbo.GAP_SizeTable_Header where pipid=@pipid;";
+							//sSql += "delete PDFTAG.dbo.GAP_SizeTable_Header_1 where pipid=@pipid;";
+							sSql += "delete PDFTAG.dbo.GAP_Header where pipid=@pipid;";
+							sSql += @"insert into PDFTAG.dbo.GAP_Header 
 (pipid, season, style, styledesc,ProductDescription, productsize, brand, dividion,class,pod,stylestatus,generateddate,stylesketch,creator,createordate,mdate,isEdit) 
 values
 (@pipid, @season, @style, @styledesc,@ProductDescription, @productsize, @brand, @dividion, @class, @pod, @stylestatus, @generateddate, @stylesketch, @creator, @createordate, @mdate,0); SELECT SCOPE_IDENTITY();";
 
-						cm.CommandText = sSql;
-						cm.Parameters.Clear();
+							cm.CommandText = sSql;
+							cm.Parameters.Clear();
 
-						cm.Parameters.AddWithValue("@pipid", pipid);
-						cm.Parameters.AddWithValue("@season", gAP_HeaderDto.season);
-						cm.Parameters.AddWithValue("@style", gAP_HeaderDto.style);
-						cm.Parameters.AddWithValue("@styledesc", gAP_HeaderDto.styledesc);
-						cm.Parameters.AddWithValue("@ProductDescription", gAP_HeaderDto.ProductDescription);
-						cm.Parameters.AddWithValue("@productsize", "");
-						cm.Parameters.AddWithValue("@brand", gAP_HeaderDto.brand);
-						cm.Parameters.AddWithValue("@dividion", "");
-						cm.Parameters.AddWithValue("@class", gAP_HeaderDto.sclass);
-						cm.Parameters.AddWithValue("@pod", "");
-						cm.Parameters.AddWithValue("@stylestatus", gAP_HeaderDto.stylestatus);
-						cm.Parameters.AddWithValue("@generateddate", gAP_HeaderDto.generateddate);
-						cm.Parameters.AddWithValue("@stylesketch", "");
-						cm.Parameters.AddWithValue("@creator", LoginUser.PK);
-						cm.Parameters.AddWithValue("@createordate", sNow);
-						cm.Parameters.AddWithValue("@mdate", sNow);
-						cm.ExecuteNonQuery();
+							cm.Parameters.AddWithValue("@pipid", pipid);
+							cm.Parameters.AddWithValue("@season", gAP_HeaderDto.season);
+							cm.Parameters.AddWithValue("@style", gAP_HeaderDto.style);
+							cm.Parameters.AddWithValue("@styledesc", gAP_HeaderDto.styledesc);
+							cm.Parameters.AddWithValue("@ProductDescription", gAP_HeaderDto.ProductDescription);
+							cm.Parameters.AddWithValue("@productsize", "");
+							cm.Parameters.AddWithValue("@brand", gAP_HeaderDto.brand);
+							cm.Parameters.AddWithValue("@dividion", "");
+							cm.Parameters.AddWithValue("@class", gAP_HeaderDto.sclass);
+							cm.Parameters.AddWithValue("@pod", "");
+							cm.Parameters.AddWithValue("@stylestatus", gAP_HeaderDto.stylestatus);
+							cm.Parameters.AddWithValue("@generateddate", gAP_HeaderDto.generateddate);
+							cm.Parameters.AddWithValue("@stylesketch", "");
+							cm.Parameters.AddWithValue("@creator", LoginUser.PK);
+							cm.Parameters.AddWithValue("@createordate", sNow);
+							cm.Parameters.AddWithValue("@mdate", sNow);
+							cm.ExecuteNonQuery();
 
-						break;
+							break;
+						}
+
+
+						iRow++;
+
+						sLastLine = sLine;
 					}
-
-
-					iRow++;
-
-					sLastLine = sLine;
 				}
+
+				#endregion
 			}
+			else
+			{
+				#region 無格線
+				using (StreamReader data = new StreamReader(sSaveTxtPath))
+				{
+					while (!data.EndOfStream)
+					{
+
+						sLine = data.ReadLine();
+						iLineRow++;
+
+
+						if (sLine.Contains("Cover Page %%"))
+						{
+							if (string.IsNullOrEmpty(gAP_HeaderDto.brand))
+								gAP_HeaderDto.brand = sLine.Replace("Cover Page %%", "").Split(new string[] { "%%" }, StringSplitOptions.None)[1].Trim();
+
+						}
+
+						if (!isHeaderDone && sLine.Contains("Master Style:") && sLine.Contains("Line Plan:"))
+						{
+							isHeader = true;
+
+						}
+
+						if (sLine.Contains("MC Last Mod:"))
+						{
+							isHeaderMCLastMod = true;
+
+						}
+
+						if (isHeader)
+						{
+							#region Header
+
+							//Master Style:548553; Studio JacketLine Plan: Athleta Knit Outerwear / Jackets / VestsPerformance HO22Flow: ProductDescription: 92687 Salutation Jacket_black_L2Product Team: Athleta Knit Outerwear / Jackets / VestsArea:BULLSEYEProduct Status:Final for ProductionProduct Type:JacketTheme:1X - 3XCategory:IPSSSub - Category:PERFORMANCE 3RD PIECEItem Type:JACKET _ L2BOM #000636021Tech Designer:Flippin, JudyDesigner:Lee, Alford %% 
+
+							sLine = sLine.Replace("@Row:", "");
+							string sTempLine = sLine.Replace("Master Style:", "").Replace("Line Plan:", "@Row");
+
+							string style = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[0].Split(';')[0].Trim();
+							string styleDesc = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[0].Split(';')[1].Trim();
+
+							sTempLine = sLine.Replace("Line Plan:", "@Row").Replace("Flow:", "@Row");
+							var arrLinPlans = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Split(' ');
+							string season = arrLinPlans[arrLinPlans.Length - 1];
+
+							string year = season.Substring(season.Length - 2, 2);
+							season = year + season.Replace(year, "");
+
+							sTempLine = sLine.Replace("ProductDescription:", "@Row").Replace("Product Team:", "@Row");
+							string productDescription = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Trim();
+
+
+							sTempLine = sLine.Replace("Product Status:", "@Row").Replace("Product Type:", "@Row");
+							string productStatus = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Trim();
+
+							sTempLine = sLine.Replace("Product Type:", "@Row").Replace("Theme:", "@Row");
+							string productType = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Trim();
+
+							isHeader = false;
+							isHeaderDone = true;
+
+							gAP_HeaderDto.style = style;
+							gAP_HeaderDto.styledesc = styleDesc;
+							gAP_HeaderDto.season = season;
+							gAP_HeaderDto.ProductDescription = productDescription;
+							gAP_HeaderDto.stylestatus = productStatus;
+							gAP_HeaderDto.sclass = productType;
+
+
+							#endregion
+						}
+						else if (isHeaderMCLastMod)
+						{
+							sLine = sLine.Replace("@Row:", "");
+							string sTempLine = sLine.Replace("MC Last Mod:", "@Row");
+
+							string MCLastMod = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Substring(0, 22).Trim();
+
+							gAP_HeaderDto.generateddate = MCLastMod;
+
+
+							sSql = "delete PDFTAG.dbo.GAP_BOM where pipid=@pipid;";
+							sSql += "delete PDFTAG.dbo.GAP_BOMGarmentcolor where pipid=@pipid;";
+							sSql += "delete PDFTAG.dbo.GAP_SizeTable where pipid=@pipid;";
+							//sSql += "delete PDFTAG.dbo.GAP_SizeTable_1 where pipid=@pipid;";
+							sSql += "delete PDFTAG.dbo.GAP_SizeTable_Header where pipid=@pipid;";
+							//sSql += "delete PDFTAG.dbo.GAP_SizeTable_Header_1 where pipid=@pipid;";
+							sSql += "delete PDFTAG.dbo.GAP_Header where pipid=@pipid;";
+							sSql += @"insert into PDFTAG.dbo.GAP_Header 
+(pipid, season, style, styledesc,ProductDescription, productsize, brand, dividion,class,pod,stylestatus,generateddate,stylesketch,creator,createordate,mdate,isEdit) 
+values
+(@pipid, @season, @style, @styledesc,@ProductDescription, @productsize, @brand, @dividion, @class, @pod, @stylestatus, @generateddate, @stylesketch, @creator, @createordate, @mdate,0); SELECT SCOPE_IDENTITY();";
+
+							cm.CommandText = sSql;
+							cm.Parameters.Clear();
+
+							cm.Parameters.AddWithValue("@pipid", pipid);
+							cm.Parameters.AddWithValue("@season", gAP_HeaderDto.season);
+							cm.Parameters.AddWithValue("@style", gAP_HeaderDto.style);
+							cm.Parameters.AddWithValue("@styledesc", gAP_HeaderDto.styledesc);
+							cm.Parameters.AddWithValue("@ProductDescription", gAP_HeaderDto.ProductDescription);
+							cm.Parameters.AddWithValue("@productsize", "");
+							cm.Parameters.AddWithValue("@brand", gAP_HeaderDto.brand);
+							cm.Parameters.AddWithValue("@dividion", "");
+							cm.Parameters.AddWithValue("@class", gAP_HeaderDto.sclass);
+							cm.Parameters.AddWithValue("@pod", "");
+							cm.Parameters.AddWithValue("@stylestatus", gAP_HeaderDto.stylestatus);
+							cm.Parameters.AddWithValue("@generateddate", gAP_HeaderDto.generateddate);
+							cm.Parameters.AddWithValue("@stylesketch", "");
+							cm.Parameters.AddWithValue("@creator", LoginUser.PK);
+							cm.Parameters.AddWithValue("@createordate", sNow);
+							cm.Parameters.AddWithValue("@mdate", sNow);
+							cm.ExecuteNonQuery();
+
+							break;
+						}
+
+
+						iRow++;
+
+						sLastLine = sLine;
+					}
+				}
+				#endregion
+			}
+
+
 
 
 
@@ -3167,7 +3326,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
 				{
 					sLine = data.ReadLine();
 
-					if (string.IsNullOrEmpty(sHeaderStyleDesc) && sLine.Contains("Lifecycle:") )
+					if (string.IsNullOrEmpty(sHeaderStyleDesc) && sLine.Contains("Lifecycle:"))
 					{
 
 						string desc = sLine.Split(':')[1].Trim().Replace("Regional Fit", "");
@@ -4460,9 +4619,9 @@ where b.pipid=@pipid;
 			}
 
 			sSql = @"insert into PDFTAG.dbo.P_inProcess 
-(ptitle,pidate,piuploadfile,pver,creator,createordate,isShow,gmid,titleType,unit) 
+(ptitle,pidate,piuploadfile,pver,Gaptype,creator,createordate,isShow,gmid,titleType,unit) 
 values 
-(@ptitle,@pidate,@piuploadfile,@pver,@creator,@createordate,@isShow,@gmid,@titleType,@unit);SELECT SCOPE_IDENTITY();";
+(@ptitle,@pidate,@piuploadfile,@pver,@Gaptype,@creator,@createordate,@isShow,@gmid,@titleType,@unit);SELECT SCOPE_IDENTITY();";
 
 			using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
 			{
@@ -4472,6 +4631,7 @@ values
 				cm.Parameters.AddWithValue("@pidate", dtNow);
 				cm.Parameters.AddWithValue("@piuploadfile", sFilePath);
 				cm.Parameters.AddWithValue("@pver", ddlpver.SelectedItem.Value);
+				cm.Parameters.AddWithValue("@Gaptype", ddlpver.SelectedItem.Value == "3" ? dlGaptype.SelectedItem.Value : "0");
 				cm.Parameters.AddWithValue("@unit", dlunit.SelectedItem.Value);
 				cm.Parameters.AddWithValue("@creator", LoginUser.PK);
 				cm.Parameters.AddWithValue("@createordate", dtNow);
@@ -4524,7 +4684,7 @@ values
 			}
 
 			sSql = "update PDFTAG.dbo.P_inProcess    \n";
-			sSql += " set titleType=@titleType,ptitle=@ptitle,pver=@pver,gmid=@gmid,unit=@unit \n";
+			sSql += " set titleType=@titleType,ptitle=@ptitle,pver=@pver,Gaptype=@Gaptype,gmid=@gmid,unit=@unit \n";
 			if (!string.IsNullOrEmpty(sFilePath))
 			{
 				sSql += " ,piuploadfile=@piuploadfile \n";
@@ -4543,6 +4703,7 @@ values
 				if (!string.IsNullOrEmpty(sFilePath))
 					cm.Parameters.AddWithValue("@piuploadfile", sFilePath);
 				cm.Parameters.AddWithValue("@pver", ddlpver.SelectedItem.Value);
+				cm.Parameters.AddWithValue("@Gaptype", ddlpver.SelectedItem.Value == "3" ? dlGaptype.SelectedItem.Value : "0");
 				cm.Parameters.AddWithValue("@unit", dlunit.SelectedItem.Value);
 				//cm.Parameters.AddWithValue("@gmid", ddlGroup2.SelectedItem.Value);
 				cm.Parameters.AddWithValue("@gmid", hidgmid.Value);

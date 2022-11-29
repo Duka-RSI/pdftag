@@ -123,7 +123,7 @@
                                     </td>
                                     <td>
                                         <a href="#" onclick="showEdit('<%# Eval("pipid")%>','<%# Eval("gmid")%>','<%# Eval("ptitle")%>','<%# Eval("pidate")%>','<%# Eval("piuploadfile")%>'
-                                            ,'<%# Eval("pver")%>','<%# Eval("creator")%>','<%# Eval("createordate")%>','<%# Eval("mdate")%>','<%# Eval("isShow")%>','<%# Eval("titleType")%>','<%# Eval("unit")%>' );return false;">
+                                            ,'<%# Eval("pver")%>','<%# Eval("Gaptype")%>','<%# Eval("creator")%>','<%# Eval("createordate")%>','<%# Eval("mdate")%>','<%# Eval("isShow")%>','<%# Eval("titleType")%>','<%# Eval("unit")%>' );return false;">
                                             <input type="button" value="編輯" class="btn btn-secondary"></a>
                                         <asp:LinkButton ID="LinkButton2" CommandName="del" CommandArgument='<%# Eval("pipid")%>'
                                             runat="server" OnClientClick="return confirm('是否要刪除 ?');"><input type="button" value="刪除" class="btn btn-danger"></asp:LinkButton>
@@ -210,10 +210,20 @@
                             <th>版本:
                             </th>
                             <td align="left">
-                                <asp:DropDownList ID="ddlpver" runat="server" CssClass="form-control">
+                                <asp:DropDownList ID="ddlpver" runat="server" CssClass="form-control" onchange="ddlpver_change()">
                                   <%--  <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
                                     <asp:ListItem Value="2" Text="UA"></asp:ListItem>
                                     <asp:ListItem Value="3" Text="GAP"></asp:ListItem>--%>
+                                </asp:DropDownList>
+                            </td>
+                        </tr>
+                         <tr id="rowGap">
+                            <th>格式選項:
+                            </th>
+                            <td align="left">
+                                <asp:DropDownList ID="dlGaptype" runat="server" CssClass="form-control">
+                                  <asp:ListItem Value="1" Text="無格線"></asp:ListItem>
+                                    <asp:ListItem Value="2" Text="有格線"></asp:ListItem>
                                 </asp:DropDownList>
                             </td>
                         </tr>
@@ -271,6 +281,17 @@
             hideLoading();
         });
 
+        function ddlpver_change() {
+			let pver = $('#<%= ddlpver.ClientID %>').val();
+			if (pver == "3") {
+				$('#rowGap').show();
+            } else {
+				$('#rowGap').val('1');
+				$('#rowGap').hide();
+
+			}
+        }
+
         function onParsePDF() {
             if (confirm('是否要執行 ?')) {
                 showLoading();
@@ -299,6 +320,9 @@
             $('#<%= dlTitleType.ClientID %>').val("1");
             dlTitleType_change();
             $('#<%=ptitle.ClientID %>').val('');
+			$('#<%=ddlpver.ClientID %>').val('1');
+            ddlpver_change();
+
             $('#<%=FileUpload1.ClientID %>').val('');
             $("#divFile").html('');
 
@@ -309,7 +333,7 @@
             $('#addModal').modal('show')
         }
 
-        function showEdit(pipid, gmid, ptitle, pidate, piuploadfile, pver, creator, createordate, mdate, isShow, titleType, unit) {
+		function showEdit(pipid, gmid, ptitle, pidate, piuploadfile, pver, Gaptype, creator, createordate, mdate, isShow, titleType, unit) {
             $('#<%=btnAdd.ClientID %>').hide();
             $('#<%=btnEdit.ClientID %>').show();
 
@@ -319,6 +343,9 @@
             dlTitleType_change();
             $('#<%=ptitle.ClientID %>').val(ptitle);
             $('#<%=ddlpver.ClientID %>').val(pver);
+			$('#<%=dlGaptype.ClientID %>').val(Gaptype);
+			ddlpver_change()
+
             $('#<%=dlunit.ClientID %>').val(unit);
 
             $("#divFile").html('<a href="#" onclick="Open(&#039;' + piuploadfile + '&#039;)">檢視</a> ');
@@ -446,5 +473,5 @@
 
 
 
-    </script>
+	</script>
 </asp:Content>
