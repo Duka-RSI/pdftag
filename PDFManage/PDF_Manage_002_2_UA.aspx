@@ -22,6 +22,12 @@
         .rowCompare {
             background-color: #CCEEFF;
         }
+        .span_w {
+			overflow-wrap: break-word;
+			-webkit-hyphens: auto;
+			-ms-hyphens: auto;
+			hyphens: auto;
+		}
     </style>
     <div class="">
         <table class="table table-sm">

@@ -208,12 +208,15 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 				arrNotes = dtNote.AsEnumerable().Select(s => new UA_Ch_Note { Id = s.Field<long>("Id"), ColName = s.Field<string>("ColName"), Note = s.Field<string>("Note") }).ToList();
 
 
-				sSql = "select * \n";
+				sSql = "select a.* \n";
+				sSql += ",(CASE WHEN c.EW1 is null or c.EW1='' THEN c.W1 ELSE c.EW1 End) as W1              \n";
+				sSql += ",(CASE WHEN c.EW4 is null or c.EW4='' THEN c.W4 ELSE c.EW4 End) as W4              \n";
 				sSql += "from PDFTAG.dbo.UA_BOM a              \n";
+				sSql += " left join PDFTAG.dbo.UA_TagData c on a.lubid=c.lubid               \n";
 				sSql += " where 1=1   \n";
 				sSql += " and a.luhid = '" + luhid + "'   \n";
 				//sSql += " order by lubid,rowid asc    \n";
-				sSql += "  order by (CASE WHEN org_lubid is null THEN lubid ELSE org_lubid END) asc ,rowid asc    \n";
+				sSql += "  order by (CASE WHEN a.org_lubid is null THEN a.lubid ELSE org_lubid END) asc ,rowid asc    \n";
 				Response.Write("<!--" + sSql + "-->");
 				cm.CommandText = sSql;
 				dt = new DataTable();
@@ -222,11 +225,14 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 					da.Fill(dt);
 				}
 
-				sSql = "select * \n";
+				sSql = "select a.* \n";
+				sSql += ",(CASE WHEN c.EW1 is null or c.EW1='' THEN c.W1 ELSE c.EW1 End) as W1              \n";
+				sSql += ",(CASE WHEN c.EW4 is null or c.EW4='' THEN c.W4 ELSE c.EW4 End) as W4              \n";
 				sSql += "from PDFTAG.dbo.UA_BOM a              \n";
+				sSql += " left join PDFTAG.dbo.UA_TagData c on a.lubid=c.lubid               \n";
 				sSql += " where 1=1   \n";
 				sSql += " and a.lubid in (select org_lubid as lubid from  PDFTAG.dbo.UA_BOM where luhid = '" + luhid + "' )   \n";
-				sSql += " order by lubid,rowid asc    \n";
+				sSql += " order by a.lubid,a.rowid asc    \n";
 				Response.Write("<!--" + sSql + "-->");
 				cm.CommandText = sSql;
 				DataTable dtUA_BOM_Org = new DataTable();
@@ -305,9 +311,18 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 						string org_lubid = drBom["org_lubid"].ToString();
 						bool isEdit = (drBom["isEdit"].ToString().ToLower() == "true" ? true : false);
 
+						string type = drBom["type"].ToString();
 						string standardPlacement = drBom["StandardPlacement"].ToString();
 						string usage = drBom["Usage"].ToString();
 						string supplierArticle = drBom["SupplierArticle"].ToString();
+						string supplierArticle2 = "";
+
+						if (type == "Fabric")
+							supplierArticle2 = drBom["W4"].ToString();
+						else
+							supplierArticle2 = drBom["W1"].ToString();
+
+
 						//bool IsMappingSupplierArticle = (drBom["IsMappingSupplierArticle"].ToString().ToLower() == "true" ? true : false);
 						bool IsMappingSupplierArticle = false;
 						string supplier = drBom["Supplier"].ToString();
@@ -330,13 +345,20 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 								standardPlacement = Compare(drOrgBom["StandardPlacement"].ToString(), standardPlacement, FilterNote(arrNotes, lubid, "StandardPlacement"));
 								usage = Compare(drOrgBom["usage"].ToString(), usage, FilterNote(arrNotes, lubid, "usage"));
 
-								if (drOrgBom["supplierArticle"].ToString() == supplierArticle)
+								string org_supplierArticle2 = "";
+								if (drOrgBom["type"].ToString() == "Fabric")
+									org_supplierArticle2 = drOrgBom["W4"].ToString();
+								else
+									org_supplierArticle2 = drOrgBom["W1"].ToString();
+
+								//if (drOrgBom["supplierArticle"].ToString() == supplierArticle)
+								if (org_supplierArticle2 == supplierArticle2)
 								{
 									sSql = @"select distinct MAT_NO,MAT_NAME from [RD_SAMPLE].[dbo].[SAM_MAT_DEF] where UPPER(MAT_NO)=@MAT_NO";
 									Response.Write("<!--" + sSql + "-->");
 									cm.CommandText = sSql;
 									cm.Parameters.Clear();
-									cm.Parameters.AddWithValue("@MAT_NO", supplierArticle);
+									cm.Parameters.AddWithValue("@MAT_NO", supplierArticle2);
 									DataTable dtSAM_MAT_DEF = new DataTable();
 									using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
 									{
@@ -345,10 +367,18 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 									if (dtSAM_MAT_DEF.Rows.Count > 0) { }
 									//supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"));
 									else
-										supplierArticle = supplierArticle + "<br><font color='red'>修:無對應</font>";
+										supplierArticle = supplierArticle + "<br><font color='red' data-id='1'>修:無對應</font>";
 								}
 								else
-									supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle, IsMappingSupplierArticle"));
+								{
+									//supplierArticle = Compare(org_supplierArticle2, supplierArticle2, FilterNote(arrNotes, lubid, "supplierArticle, IsMappingSupplierArticle"));
+
+									string newText = supplierArticle2;
+
+									supplierArticle = "<font>原:" + supplierArticle + "</font><br><font color='red'>修:" + newText + "</font><br><font color='blue'>中:" + FilterNote(arrNotes, lubid, "supplierArticle, IsMappingSupplierArticle") + "</font>";
+
+								}
+
 
 								//supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"), IsMappingSupplierArticle);
 								supplier = Compare(drOrgBom["supplier"].ToString(), supplier, FilterNote(arrNotes, lubid, "supplier"));
@@ -365,12 +395,12 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 							{
 								DataRow drOrgBom = drOrgBoms[0];
 
-								supplierArticle += "<br><font color='red'>修:無對應</font>"; ;
+								supplierArticle += "<br><font color='red' data-id='2'>修:無對應</font>"; ;
 							}
 
 						}
 
-						string parts = " data-type='"+ itemType.type + "' data-PARTS_TYPE='" + PARTS_TYPE + "' data-PARTS_CODE='" + PARTS_CODE + "' data-PARTS_DESC='" + PARTS_DESC + "'  data-MAT_ID='" + MAT_ID + "' ";
+						string parts = " data-type='" + itemType.type + "' data-PARTS_TYPE='" + PARTS_TYPE + "' data-PARTS_CODE='" + PARTS_CODE + "' data-PARTS_DESC='" + PARTS_DESC + "'  data-MAT_ID='" + MAT_ID + "' ";
 
 						iSeq++;
 						sb.Append("<tr data-rowid='" + drBom["rowid"].ToString() + "' id='row" + iSeq + "'>");
@@ -519,7 +549,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 					sb.Append(" <th scope='col'></th>");
 					sb.Append("</tr>");
 					sb.Append("<tr>");
-					sb.Append(" <th scope='col' colspan='"+(4+ iOtherCnt) +"'>" + dtUA_SizeTable_Header.Rows[0]["HeaderDesc"].ToString() + "</th>");
+					sb.Append(" <th scope='col' colspan='" + (4 + iOtherCnt) + "'>" + dtUA_SizeTable_Header.Rows[0]["HeaderDesc"].ToString() + "</th>");
 					sb.Append("</tr>");
 
 					DataRow[] drSizeTables = dt.Select("lusthid='" + lusthid + "'", "rowid asc");
@@ -630,19 +660,19 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 	}
 	public string Compare(string org, string newText, string note, bool IsMapping = true)
 	{
-        if (org == newText)
-            if (string.IsNullOrEmpty(note))
-                return org;
-            else
-                return "<font>原:" + org + "</font><br><font color='blue'>中:" + note + "</font>";
-        else
-        {
-            if (IsMapping)
-                return "<font>原:" + org + "</font><br><font color='red'>修:" + newText + "</font><br><font color='blue'>中:" + note + "</font>";
-            else
-                return "<font color='red'>修:無對應</font>";
-        }
-    }
+		if (org == newText)
+			if (string.IsNullOrEmpty(note))
+				return org;
+			else
+				return "<font>原:" + org + "</font><br><font color='blue'>中:" + note + "</font>";
+		else
+		{
+			if (IsMapping)
+				return "<font>原:" + org + "</font><br><font color='red'>修:" + newText + "</font><br><font color='blue'>中:" + note + "</font>";
+			else
+				return "<font color='red'>修:無對應</font>";
+		}
+	}
 
 
 	private void CleanObject()
@@ -828,6 +858,62 @@ values
 
 			using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
 			{
+				#region UA_TagData
+
+				sSql = "select c.* \n";
+				sSql += "from PDFTAG.dbo.UA_BOM a              \n";
+				sSql += " join PDFTAG.dbo.UA_BOMGarmentcolor b on a.lubcid=b.lubcid              \n";
+				sSql += " join PDFTAG.dbo.UA_TagData c on a.lubid=c.lubid               \n";
+				sSql += " where 1=1   \n";
+				sSql += " and a.luhid=(select luhid from PDFTAG.dbo.UA_Header where isshow=0 and pipid='" + hidpipid.Value + "')   \n";
+				Response.Write("<!--" + sSql + "-->");
+				cm.CommandText = sSql;
+				cm.Parameters.Clear();
+				DataTable dtUA_TagData = new DataTable();
+				using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+				{
+					da.Fill(dtUA_TagData);
+				}
+
+				foreach (DataRow drUA_TagData in dtUA_TagData.Rows)
+				{
+					string utdid = drUA_TagData["utdid"].ToString();
+					
+					string sEW = "";
+
+
+					for (int i = 1; i <= 8; i++)
+					{
+						string SubColName = "W" + i;
+						string sW = drUA_TagData[SubColName].ToString();
+
+						#region 比對詞彙
+
+						var res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "SupplierArticle" && x.SubColName == SubColName
+					 && x.Termname_org.Trim() == sW.Trim());
+
+						if (res != null)
+						{
+							sEW = res.Termname;
+
+							sSql = "update PDFTAG.dbo.UA_TagData  set E" + SubColName + "=@E" + SubColName + " where utdid=@utdid";
+							cm.CommandText = sSql;
+							cm.Parameters.Clear();
+							cm.Parameters.AddWithValue("@utdid", utdid);
+							cm.Parameters.AddWithValue("@E" + SubColName, sEW);
+							cm.ExecuteNonQuery();
+						}
+					}
+
+
+
+					#endregion
+				}
+
+
+				#endregion
+
+
 				#region UA_BOM
 
 				sSql = "select a.*,b.* \n";

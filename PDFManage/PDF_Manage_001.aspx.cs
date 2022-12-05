@@ -3863,8 +3863,11 @@ values
 								}
 							}
 
-							sLine = data.ReadLine();//Header 有2行
-							string sHeaderDesc = sLine.Replace("@Row:", "").Replace("%%", "").Trim();
+
+							//sLine = data.ReadLine();//Header 有2行
+							string sHeaderDesc = "";
+							//if (sLine.Split(new string[] { "%%" }, StringSplitOptions.None).Length < 3)
+							//	sHeaderDesc = sLine.Replace("@Row:", "").Replace("%%", "").Trim();
 
 							int iSizeHeaderLength = arrSizeHeaders.Count;
 							resUA_SizeTableHeaderDto = new UA_SizeTableHeaderDto()
@@ -3912,6 +3915,14 @@ values
 
 								string[] arrParts = sLine.Trim().Split(new string[] { "%%" }, StringSplitOptions.None);
 								int iLength = arrParts.Length;
+
+
+								if (arrParts.Length < 3)
+								{
+									sHeaderDesc = sLine.Replace("@Row:", "").Replace("%%", "").Trim();
+									resUA_SizeTableHeaderDto.HeaderDesc = sHeaderDesc;
+									continue;
+								}
 
 								arrUA_SizeTableDtos.Add(new UA_SizeTableDto()
 								{

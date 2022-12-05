@@ -190,8 +190,17 @@ order by a.pidate,a.pipid";
 
 		public string SupplierArticle { get; set; }
 
-		public string W1 { get; set; }
-		public string W4 { get; set; }
+		public string W1 { get; set; }//Key
+		public string W2 { get; set; }
+		public string W3 { get; set; }
+		public string W4 { get; set; }//Key
+		public string W5 { get; set; }
+		public string W6 { get; set; }
+		public string W7 { get; set; }
+		public string W8 { get; set; }
+		public string W9 { get; set; }
+		public string W10 { get; set; }
+
 
 		//public string Supplier { get; set; }
 
@@ -471,7 +480,13 @@ order by a.pidate,a.pipid";
 
 				sSql = "select a.*,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,'0' as isExist \n";
 				sSql += ",(CASE WHEN c.EW1 is null or c.EW1='' THEN c.W1 ELSE c.EW1 End) as W1              \n";
+				sSql += ",(CASE WHEN c.EW2 is null or c.EW2='' THEN c.W2 ELSE c.EW2 End) as W2              \n";
+				sSql += ",(CASE WHEN c.EW3 is null or c.EW3='' THEN c.W3 ELSE c.EW3 End) as W3              \n";
 				sSql += ",(CASE WHEN c.EW4 is null or c.EW4='' THEN c.W4 ELSE c.EW4 End) as W4              \n";
+				sSql += ",(CASE WHEN c.EW5 is null or c.EW5='' THEN c.W5 ELSE c.EW5 End) as W5              \n";
+				sSql += ",(CASE WHEN c.EW6 is null or c.EW6='' THEN c.W6 ELSE c.EW6 End) as W6              \n";
+				sSql += ",(CASE WHEN c.EW7 is null or c.EW7='' THEN c.W7 ELSE c.EW7 End) as W7              \n";
+				sSql += ",(CASE WHEN c.EW8 is null or c.EW8='' THEN c.W8 ELSE c.EW8 End) as W8              \n";
 				sSql += "from PDFTAG.dbo.UA_BOM a              \n";
 				sSql += "join  PDFTAG.dbo.UA_BOMGarmentcolor b on a.lubcid=b.lubcid               \n";
 				sSql += " left join PDFTAG.dbo.UA_TagData c on a.lubid=c.lubid               \n";
@@ -708,6 +723,7 @@ order by a.pidate,a.pipid";
 					{
 						string lubid = "";
 						string org_lubid = "";
+						string type = "";
 
 						string usage_source = "";
 						string supplierArticle_source = "";
@@ -725,6 +741,7 @@ order by a.pidate,a.pipid";
 							lubid = drBoms[b]["lubid"].ToString();
 							org_lubid = drBoms[b]["org_lubid"].ToString();
 
+							type = drBoms[b]["type"].ToString();
 							usage_source = drBoms[b]["usage"].ToString();
 							supplierArticle_source = drBoms[b]["SupplierArticle"].ToString();
 
@@ -752,6 +769,7 @@ order by a.pidate,a.pipid";
 						string usage_compare_note = "";
 						string supplierArticle_compare_note = "";
 
+						bool isHasCompareRow = true;
 						try
 						{
 							lubid_compare = drComareBoms[b]["lubid"].ToString();
@@ -764,7 +782,8 @@ order by a.pidate,a.pipid";
 						}
 						catch (Exception ex)
 						{
-							//Response.Write("<!--" + ex.ToString() + "-->");
+							isHasCompareRow = false;
+							Response.Write("<!--" + ex.ToString() + "-->");
 						}
 
 						bool isCompare = false;
@@ -825,7 +844,34 @@ order by a.pidate,a.pipid";
 							isCompare = false;
 
 							sb.Append("<tr  class='rowCompare'>");
-							sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' data-col='SupplierArticle' >" + (isCompare ? Compare(sType, supplierArticle, supplierArticle_compare, supplierArticle_compare_note) : "") + "</td>");
+							sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' data-col='SupplierArticle' >" + (isCompare ? Compare(sType, supplierArticle, supplierArticle_compare, supplierArticle_compare_note) : "") + "");
+
+							if (isHasCompareRow)
+							{
+								List<string> arrText = new List<string>();
+								int iWCnt = 8;
+								if (type == "Fabric" || type== "Hangtag") iWCnt = 6;
+								else if (type == "Embellishment") iWCnt = 7;
+
+								for (int i = 1; i <= iWCnt; i++)
+								{
+									string sW = drBoms[b]["W" + i].ToString().Trim().Replace(" ", "");
+									string sCW = drComareBoms[b]["W" + i].ToString().Replace(" ", "");
+
+									if (sW != sCW)
+									{
+										arrText.Add("<font color='red'>" + sCW + "</font>");
+									}
+									else
+										arrText.Add(sCW);
+								}
+								if (arrText.Any(x => x.Contains("color='red'")))
+									sb.Append("<div style='width:250px'><span class='span_w'>" + string.Join(" / ", arrText)+ "</span></div>");
+							}
+
+							sb.Append("</td>");
+
+
 							sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' data-col='usage' >" + (isCompare ? Compare(sType, usage, usage_compare, usage_compare_note) : "") + "</td>");
 
 							isCompare = true;
@@ -1471,10 +1517,10 @@ order by a.pidate,a.pipid";
 						{
 							//找compare code符合的第一筆
 							var tmpSizetable = getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("Code").ToString().Replace(" ", "") == drSizeTables[s]["Code"].ToString().Replace(" ", ""));
-                            //var tmpSizetable = getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("Code").ToString().Replace(" ", "") == drSizeTables[s]["Code"].ToString().Replace(" ", "")
-                            //    && (x.Field<string>("H1") == drSizeTables[s]["H1"].ToString() || x.Field<string>("H1") == drSizeTables[s]["H2"].ToString()));
+							//var tmpSizetable = getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("Code").ToString().Replace(" ", "") == drSizeTables[s]["Code"].ToString().Replace(" ", "")
+							//    && (x.Field<string>("H1") == drSizeTables[s]["H1"].ToString() || x.Field<string>("H1") == drSizeTables[s]["H2"].ToString()));
 
-                            string lustid = "";
+							string lustid = "";
 							string org_lustid = "";
 
 							string code_source = "";
@@ -1667,9 +1713,9 @@ order by a.pidate,a.pipid";
 							//如果有找到就刪掉，剩下的就是目的文件多的
 							if (!string.IsNullOrEmpty(code_compare))
 								getSizeTable.Rows.Remove(getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("code").ToString().Replace(" ", "") == drSizeTables[s]["code"].ToString().Replace(" ", "")));
-                                //getSizeTable.Rows.Remove(getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("code").ToString().Replace(" ", "") == drSizeTables[s]["code"].ToString().Replace(" ", "")
-                                //        && x.Field<string>("H1") == drSizeTables[s]["H1"].ToString()));
-                        }
+							//getSizeTable.Rows.Remove(getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("code").ToString().Replace(" ", "") == drSizeTables[s]["code"].ToString().Replace(" ", "")
+							//        && x.Field<string>("H1") == drSizeTables[s]["H1"].ToString()));
+						}
 						sb.Append("</table>");
 					}
 				}

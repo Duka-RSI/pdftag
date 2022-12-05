@@ -14,5 +14,6 @@ public class UA_LearnmgrItemDto
     public string FirstCharTermname_org { get; set; }
     public string Termname_org { get; set; }
     public string Termname { get; set; }
+    public string SubColName { get; set; }
 
 }

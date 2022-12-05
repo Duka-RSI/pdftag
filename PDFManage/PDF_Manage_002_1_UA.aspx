@@ -18,6 +18,13 @@
 			background-color: #555555;
 		}
 		/* Black */
+
+		.span_w {
+			overflow-wrap: break-word;
+			-webkit-hyphens: auto;
+			-ms-hyphens: auto;
+			hyphens: auto;
+		}
 	</style>
 	<div class="">
 		<table class="table table-sm">
@@ -73,23 +80,24 @@
 					</button>
 				</div>
 				<div class="modal-body">
-					<table class="table">
-						<tr>
-							<td align="left">原文件
-							</td>
-							<td align="left">
-								<textarea id="orgText" class="form-control" disabled></textarea>
-							</td>
-						</tr>
-						<tr class="rowCompareSupplierArticleHide" style="display: none">
-							<td align="left">比對
-							</td>
-							<td align="left">
-								<%--  <select id="dlPARTS_TYPE" onchange="dlPARTS_TYPE_change()"></select>
+					<div style="overflow-y: scroll; height: 600px">
+						<table class="table">
+							<tr>
+								<td align="left">原文件
+								</td>
+								<td align="left">
+									<textarea id="orgText" class="form-control" disabled></textarea>
+								</td>
+							</tr>
+							<tr class="rowCompareSupplierArticleHide" style="display: none">
+								<td align="left">比對
+								</td>
+								<td align="left">
+									<%--  <select id="dlPARTS_TYPE" onchange="dlPARTS_TYPE_change()"></select>
                                 <select id="dlPARTS_CODE" onchange="dlPARTS_CODE_change()"></select>
                                 <select id="dlPARTS_DESC" onchange="dlPARTS_DESC_change()"></select>
                                 <select id="dlMAT_ID"></select>--%>
-								<%--<asp:HiddenField ID="hidPARTS_TYPE" runat="server" />
+									<%--<asp:HiddenField ID="hidPARTS_TYPE" runat="server" />
 								<asp:HiddenField ID="hidPARTS_CODE" runat="server" />
 								<asp:HiddenField ID="hidPARTS_DESC" runat="server" />
 								<asp:HiddenField ID="hidMAT_ID" runat="server" />
@@ -110,50 +118,50 @@
 										<tbody id="tblMAT_NO"></tbody>
 									</table>
 								</div>--%>
-							</td>
-						</tr>
-						<tr id="rowCompareColor">
-							<td align="left">比對
-							</td>
-							<td align="left">關鍵字:<input type="text" id="txtSearchCOLOR_DESC"><input type="button" value="查詢" onclick="onSearchCOLOR_DESC()" />
-								<div style="height: 200px; width: 650px; overflow: scroll">
+								</td>
+							</tr>
+							<tr id="rowCompareColor">
+								<td align="left">比對
+								</td>
+								<td align="left">關鍵字:<input type="text" id="txtSearchCOLOR_DESC"><input type="button" value="查詢" onclick="onSearchCOLOR_DESC()" />
+									<div style="height: 200px; width: 650px; overflow: scroll">
+										<table class="table">
+											<tr>
+												<th></th>
+												<th>COLOR_DESC	
+												</th>
+												<th>COLOR_DESC_CHN
+												</th>
+											</tr>
+											<tbody id="tblCOLOR_DESC"></tbody>
+										</table>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td align="left">更改
+								</td>
+								<td align="left">
+									<textarea id="editText" class="form-control"></textarea>
+								</td>
+							</tr>
+							<tr>
+								<td align="left">中文備註
+								</td>
+								<td align="left">
+									<textarea id="noteText" class="form-control"></textarea>
+								</td>
+							</tr>
+							<tr class="rowCompareSupplierArticle">
+								<td align="left" colspan="2">
 									<table class="table">
 										<tr>
 											<th></th>
-											<th>COLOR_DESC	
-											</th>
-											<th>COLOR_DESC_CHN
-											</th>
+											<th>原文件</th>
+											<th>更改</th>
 										</tr>
-										<tbody id="tblCOLOR_DESC"></tbody>
-									</table>
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<td align="left">更改
-							</td>
-							<td align="left">
-								<textarea id="editText" class="form-control"></textarea>
-							</td>
-						</tr>
-						<tr>
-							<td align="left">中文備註
-							</td>
-							<td align="left">
-								<textarea id="noteText" class="form-control"></textarea>
-							</td>
-						</tr>
-						<tr class="rowCompareSupplierArticle">
-							<td align="left" colspan="2">
-								<table class="table">
-									<tr>
-										<th></th>
-										<th>原文件</th>
-										<th>更改</th>
-									</tr>
-									<tbody id="tblUATagData">
-										<%--<tr>
+										<tbody id="tblUATagData">
+											<%--<tr>
 											<td>描述</td>
 											<td><span id="span_W1"></span></td>
 											<td>
@@ -203,19 +211,23 @@
 											<td>
 												<input type="text" id="EW8" value="" style="width: 300px"></td>
 										</tr>--%>
-									</tbody>
-								</table>
-							</td>
-						</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<table class="table">
 						<tr>
-							<td align="center" colspan="2">
+							<td align="center">
 								<input type="button" value="取消" class="btn btn-danger" data-dismiss="modal" />
 								<input type="button" value="儲存" class="btn btn-success" onclick="onSave()" />
 							</td>
 						</tr>
 					</table>
-				</div>
-				<div class="modal-footer">
+
 				</div>
 			</div>
 		</div>
@@ -436,6 +448,8 @@
 						let arrFabric = ["描述", "物料描述", "廠商", "廠商料號", "物料狀態", "成份"];
 						let arrTrim = ["客戶料號", "物料描述", "補充描述", "(描述)", "廠商", "物料狀態", "規格", "單位"];
 						let arrThread = ["客戶料號", "物料描述", "補充描述", "(描述)", "廠商", "物料狀態", "規格", "單位"];
+						let arrThread2 = ["客戶料號", "物料描述", "補充描述", "廠商", "(描述)", "物料狀態", "規格", "單位"];
+
 						let arrHangtag = ["客戶料號", "物料描述", "廠商", "(描述)", "物料狀態", "單位"];
 						let arrEmbellishment = ["描述", "物料描述", "廠商", "(描述)", "物料狀態", "規格", "單位"];
 
@@ -446,21 +460,28 @@
 							isFabric = true;
 						}
 						else if (bomType == "Trim") arrName = arrTrim;
-						else if (bomType == "Thread") arrName = arrThread;
+						else if (bomType == "Thread") {
+							if (!res["W5"])
+								arrName = arrThread2;
+							else
+								arrName = arrThread;
+						}
 						else if (bomType.indexOf('Hangtag') > -1 || bomType == "Label") arrName = arrHangtag;
 						else if (bomType == "Embellishment") arrName = arrEmbellishment;
 
 
 						for (let i = 1; i <= arrName.length; i++) {
+							let isHideRow = false;
+							if (i==5 && bomType == "Thread" && !res["W5"])
+								isHideRow = true;
 
-
-							html += "<tr>";
-							html += "<td>" + arrName[i-1] + "</td>";
-							html += "<td><span id='span_W"+i+"'>" + res["W" + i] + "</span></td>";
-							html += "<td><input type='text' id='EW" + i + "' value='' style='width:300px'>";
+							html += "<tr " + (isHideRow?"style='display:none'":"")+">";
+							html += "<td>" + arrName[i - 1] + "</td>";
+							html += "<td><div style='width:100px'><span id='span_W" + i + "' class='span_w'>" + res["W" + i] + "</span></div></td>";
+							html += "<td><input type='text' id='EW" + i + "' value='' style='width:100%'>";
 
 							if ((!isFabric && i == 1) || (isFabric && i == 4)) {
-								html += "<input type='button' value='挑選' onclick='showSelectMatNo("+i+"); return false;' />";
+								html += "<input type='button' value='挑選' onclick='showSelectMatNo(" + i + "); return false;' />";
 							}
 							html += "</td>";
 							html += "</tr>";
@@ -524,6 +545,7 @@
 				type: "POST",
 				url: "UA_TagData.ashx?fun=edit",
 				data: data,
+				async: false,
 				dataType: 'json',
 				success: function (res) {
 
@@ -660,6 +682,24 @@
 				}
 			}
 
+			let data = {
+				orgId: orgId,
+				id: saveId,
+				col: saveCol,
+				colorCol: saveColorCol,
+				text: text,
+				chNote: note,
+
+				PARTS_TYPE: PARTS_TYPE,
+				PARTS_CODE: PARTS_CODE,
+				PARTS_DESC: PARTS_DESC,
+				MAT_ID: MAT_ID,
+				isRecord: isRecord
+
+			};
+
+
+
 			if (isSaveUATagData) {
 				onSaveUATagData(saveId);
 
@@ -681,7 +721,7 @@
 				let EW7 = $('#EW7').val();
 				let EW8 = $('#EW8').val();
 
-				
+
 				if (W1 != EW1 || W2 != EW2 || W3 != EW3 || W4 != EW4 || W5 != EW5 || W6 != EW6 || W7 != EW7 || W8 != EW8) {
 					//有修改
 					var arrTagData = [];
@@ -701,26 +741,24 @@
 						arrTagData.push(EW7);
 					if (W8)
 						arrTagData.push(EW8);
-					
+
 
 					text = arrTagData.join(' / ');
 				}
+
+				data["EW1"] = EW1;
+				data["EW2"] = EW2;
+				data["EW3"] = EW3;
+				data["EW4"] = EW4;
+				data["EW5"] = EW5;
+				data["EW6"] = EW6;
+				if (W7)
+					data["EW7"] = EW7;
+				if (W8)
+					data["EW8"] = EW8;
 			}
 
-			let data = {
-				orgId: orgId,
-				id: saveId,
-				col: saveCol,
-				colorCol: saveColorCol,
-				text: text,
-				chNote: note,
 
-				PARTS_TYPE: PARTS_TYPE,
-				PARTS_CODE: PARTS_CODE,
-				PARTS_DESC: PARTS_DESC,
-				MAT_ID: MAT_ID,
-				isRecord: isRecord
-			};
 
 			console.log(data);
 
