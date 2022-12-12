@@ -448,7 +448,7 @@
 						let arrFabric = ["描述", "物料描述", "廠商", "廠商料號", "物料狀態", "成份"];
 						let arrTrim = ["客戶料號", "物料描述", "補充描述", "(描述)", "廠商", "物料狀態", "規格", "單位"];
 						let arrThread = ["客戶料號", "物料描述", "補充描述", "(描述)", "廠商", "物料狀態", "規格", "單位"];
-						let arrThread2 = ["客戶料號", "物料描述", "補充描述", "廠商", "(描述)", "物料狀態", "規格", "單位"];
+						let arrThread2 = ["客戶料號", "物料描述", "補充描述", "廠商", "物料狀態", "規格", "單位"];
 
 						let arrHangtag = ["客戶料號", "物料描述", "廠商", "(描述)", "物料狀態", "單位"];
 						let arrEmbellishment = ["描述", "物料描述", "廠商", "(描述)", "物料狀態", "規格", "單位"];
@@ -461,7 +461,7 @@
 						}
 						else if (bomType == "Trim") arrName = arrTrim;
 						else if (bomType == "Thread") {
-							if (!res["W5"])
+							if (!res["W6"])
 								arrName = arrThread2;
 							else
 								arrName = arrThread;
