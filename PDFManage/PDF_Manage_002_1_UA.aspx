@@ -461,9 +461,9 @@
 						}
 						else if (bomType == "Trim") arrName = arrTrim;
 						else if (bomType == "Thread") {
-							if (!res["W6"])
-								arrName = arrThread2;
-							else
+							//if (!res["W6"])
+							//	arrName = arrThread2;
+							//else
 								arrName = arrThread;
 						}
 						else if (bomType.indexOf('Hangtag') > -1 || bomType == "Label") arrName = arrHangtag;
@@ -472,8 +472,11 @@
 
 						for (let i = 1; i <= arrName.length; i++) {
 							let isHideRow = false;
-							if (i==5 && bomType == "Thread" && !res["W5"])
+							if (bomType == "Thread" && i == 4 &&  !res["W6"]) {
 								isHideRow = true;
+								res["W6"] = res["W5"];
+								res["W5"] = res["W4"];
+							}
 
 							html += "<tr " + (isHideRow?"style='display:none'":"")+">";
 							html += "<td>" + arrName[i - 1] + "</td>";
