@@ -448,7 +448,7 @@
 						let arrFabric = ["描述", "物料描述", "廠商", "廠商料號", "物料狀態", "成份"];
 						let arrTrim = ["客戶料號", "物料描述", "補充描述", "(描述)", "廠商", "物料狀態", "規格", "單位"];
 						let arrThread = ["客戶料號", "物料描述", "補充描述", "(描述)", "廠商", "物料狀態", "規格", "單位"];
-						let arrThread2 = ["客戶料號", "物料描述", "補充描述", "廠商", "物料狀態", "規格", "單位"];
+						let arrThread2 = ["客戶料號", "物料描述", "補充描述", "(描述)", "廠商","", "物料狀態", "規格", "單位"];
 
 						let arrHangtag = ["客戶料號", "物料描述", "廠商", "(描述)", "物料狀態", "單位"];
 						let arrEmbellishment = ["描述", "物料描述", "廠商", "(描述)", "物料狀態", "規格", "單位"];
@@ -461,26 +461,28 @@
 						}
 						else if (bomType == "Trim") arrName = arrTrim;
 						else if (bomType == "Thread") {
-							//if (!res["W6"])
-							//	arrName = arrThread2;
-							//else
+							if (!res["W6"])
+								arrName = arrThread2;
+							else
 								arrName = arrThread;
 						}
 						else if (bomType.indexOf('Hangtag') > -1 || bomType == "Label") arrName = arrHangtag;
 						else if (bomType == "Embellishment") arrName = arrEmbellishment;
 
-
+						
 						for (let i = 1; i <= arrName.length; i++) {
 							let isHideRow = false;
-							if (bomType == "Thread" && i == 4 &&  !res["W6"]) {
-								isHideRow = true;
-								res["W6"] = res["W5"];
-								res["W5"] = res["W4"];
+							if (bomType == "Thread") {
+								//isHideRow = true;
+								//res["W6"] = res["W5"];
+								//res["W5"] = res["W4"];
+								if (!arrName[i - 1])
+									isHideRow = true;
 							}
 
 							html += "<tr " + (isHideRow?"style='display:none'":"")+">";
 							html += "<td>" + arrName[i - 1] + "</td>";
-							html += "<td><div style='width:100px'><span id='span_W" + i + "' class='span_w'>" + res["W" + i] + "</span></div></td>";
+							html += "<td><div style='width:100%'><span id='span_W" + i + "' class='span_w'>" + res["W" + i] + "</span></div></td>";
 							html += "<td><input type='text' id='EW" + i + "' value='' style='width:100%'>";
 
 							if ((!isFabric && i == 1) || (isFabric && i == 4)) {
@@ -488,14 +490,21 @@
 							}
 							html += "</td>";
 							html += "</tr>";
+
+							
 						}
 
 						$("#tblUATagData").html(html);
 
+						let arrVal = [];
 						for (let i = 1; i <= arrName.length; i++) {
 
 							$('#EW' + i).val((res["EW" + i] ?? res["W" + i]));
+
+							arrVal.push((res["EW" + i] ?? res["W" + i]));
 						}
+
+						$('#editText').val(arrVal.join(' / '));
 
 						//$('#EW1').val((res.EW1 ?? res.W1));
 						//$('#EW2').val((res.EW2 ?? res.W2));
@@ -610,11 +619,13 @@
 					if (res) {
 
 						$('#orgText').val(res.orgText);
-						$('#editText').val(res.newText);
+						
 
 						if (saveCol == "SupplierArticle") {
 
 							getPARTS_TYPE(res.orgText);
+						} else {
+							$('#editText').val(res.newText);
 						}
 					}
 

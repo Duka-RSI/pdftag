@@ -2796,6 +2796,9 @@ values
 
 								sLastLine = sLine;
 
+								if (string.IsNullOrEmpty(sLine))
+									continue;
+
 								if (sLine.Contains("Generated Date/Time"))
 								{
 									break;
