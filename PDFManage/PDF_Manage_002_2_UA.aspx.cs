@@ -855,10 +855,10 @@ order by a.pidate,a.pipid";
 
 								for (int i = 1; i <= iWCnt; i++)
 								{
-									string sW = drBoms[b]["W" + i].ToString().Trim().Replace(" ", "");
-									string sCW = drComareBoms[b]["W" + i].ToString().Replace(" ", "");
+									string sW = drBoms[b]["W" + i].ToString();
+									string sCW = drComareBoms[b]["W" + i].ToString();
 
-									if (sW != sCW)
+									if (sW.Trim().Replace(" ", "") != sCW.Trim().Replace(" ", ""))
 									{
 										arrText.Add("<font color='red'>" + sCW + "</font>");
 									}
