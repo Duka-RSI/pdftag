@@ -19,7 +19,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 	protected string parse = "0";
 	List<string> listSampleStep = new List<string>();
 	List<string> listSampleSize = new List<string>();
-
+    bool isChina = false;
 	protected void Page_Load(object sender, EventArgs e)
 	{
 		parse = Request["parse"];
@@ -279,6 +279,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 		}
 		if ("parsePDF_UA" == e.CommandName)
 		{
+            isChina = false;
 			PaseUA_Header(e.CommandArgument.ToString());
 			parsePDF_UA(e.CommandArgument.ToString());
 			parsePDF_UA_BOM_TagData(e.CommandArgument.ToString());
@@ -3373,8 +3374,9 @@ insert into PDFTAG.dbo.GAP_SizeTable
 							//@Row: Status: Production1282508Season: FW23Lifecycle: CarryoverO-Series 6in Boxerjock 2pkRegional Fit: US %% 
 							string sTempLine = sLine.Replace("@Row:", "").Replace("Status: Prototype", "@Row").Replace("Status: Pre-Production", "@Row").Replace("Status: Production", "@Row").Replace("Season:", "@Row");
 							string style = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Split('-')[0].Trim();
+                            if (sTempLine.Contains("Regional Fit: Asia"))   isChina = true;
 
-							sTempLine = sLine.Replace("@Row:", "").Replace("Lifecycle:", "@Row").Replace("Carryover", "").Replace("Regional Fit:", "@Row");
+                            sTempLine = sLine.Replace("@Row:", "").Replace("Lifecycle:", "@Row").Replace("Carryover", "").Replace("Regional Fit:", "@Row");
 							string styleDesc = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Trim();
 
 							ua_HeaderDto.style = style;
@@ -4059,13 +4061,13 @@ values
 				}
 
 				string ptitle = dt.Rows[0]["style"].ToString();
-				string season2 = dt.Rows[0]["season"].ToString();
+                string season2 = dt.Rows[0]["season"].ToString();
 				string new_season = "";
 				if (titleType == "1")
 				{
 					ptitle += "-" + season2;
-
-				}
+                    if (isChina) ptitle += "(CN)";
+                }
 
 				sSql = "update PDFTAG.dbo.P_inProcess    \n";
 				sSql += " set mdate=@mdate \n";
