@@ -3620,7 +3620,9 @@ values
 
 						if (sLine.Contains("@Row:  %% (SET A:") || sLine.Contains("@Row:  %% (SET B:") || sLine.Contains("@Row:  %% (SET C:"))
 						{
-							isBomGarmentColor = true;
+                            string colorSet = sLine.Replace("@Row:  %%", "").Replace("%%", "").Trim();
+
+                            isBomGarmentColor = true;
 
 							#region BomGarmentColor Header
 
@@ -3707,12 +3709,13 @@ values
 									string[] arrParts = sLine.Trim().Split(new string[] { "%%" }, StringSplitOptions.None);
 									int iLength = arrParts.Length;
 
-									arrUA_BomDto.Add(new UA_BomDto()
-									{
-										Type = sBomType,
-										rowid = iRow,
-										SupplierArticle = arrParts[0].Replace("@Row:", "").Trim(),
-										Usage = arrParts[2].Replace("@Row:", "").Trim(),
+                                    arrUA_BomDto.Add(new UA_BomDto()
+                                    {
+                                        Type = sBomType,
+                                        rowid = iRow,
+                                        SupplierArticle = arrParts[0].Replace("@Row:", "").Trim(),
+                                        Usage = arrParts[2].Replace("@Row:", "").Trim(),
+                                        colorSet = colorSet,
 
 										B1 = iLength >= 5 ? arrParts[4].Trim() : "",
 										B2 = iLength >= 6 ? arrParts[5].Trim() : "",
@@ -3787,9 +3790,9 @@ values
 								{
 
 									sSql = @"insert into  PDFTAG.dbo.UA_BOM
-                                                                (pipid,luhid,lubcid,type,rowid,Usage,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,isEdit) 
+                                                                (pipid,luhid,lubcid,type,rowid,Usage,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,isEdit,COLOR_SET) 
                                                                 values 
-                                                                (@pipid,@luhid,@lubcid,@type,@rowid,@Usage,@SupplierArticle,@Supplier,@B1,@B2,@B3,@B4,@B5,@B6,@B7,@B8,@B9,@B10,@isEdit);";
+                                                                (@pipid,@luhid,@lubcid,@type,@rowid,@Usage,@SupplierArticle,@Supplier,@B1,@B2,@B3,@B4,@B5,@B6,@B7,@B8,@B9,@B10,@isEdit,@COLOR_SET);";
 
 									cm.CommandText = sSql;
 									cm.Parameters.Clear();
@@ -3815,7 +3818,8 @@ values
 									cm.Parameters.AddWithValue("@B10", item.B10);
 
 									cm.Parameters.AddWithValue("@isEdit", 0);
-									cm.ExecuteNonQuery();
+									cm.Parameters.AddWithValue("@COLOR_SET", item.colorSet);
+                                    cm.ExecuteNonQuery();
 								}
 
 								#endregion
@@ -4204,8 +4208,8 @@ from PDFTAG.dbo.UA_Header where pipid=@pipid; SELECT SCOPE_IDENTITY();";
    from PDFTAG.dbo.UA_BOMGarmentcolor where pipid=@pipid;
 
 insert into PDFTAG.dbo.UA_BOM 
-(pipid,luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,org_lubid,lubcid,isEdit) 
- select '" + new_pipid + @"'as pipid,'" + new_luhid + @"' as luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,lubid as org_lubid,lubcid,0 as isEdit
+(pipid,luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,org_lubid,lubcid,isEdit,COLOR_SET) 
+ select '" + new_pipid + @"'as pipid,'" + new_luhid + @"' as luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,lubid as org_lubid,lubcid,0 as isEdit,COLOR_SET
   from PDFTAG.dbo.UA_BOM where pipid=@pipid;
 
 insert into PDFTAG.dbo.UA_SizeTable 
@@ -4793,8 +4797,9 @@ values
 
 
 		}
+        btnQuery_Click(sender, e);
 
-	}
+    }
 
 	/// <summary>
 	/// 找出資料庫是否有備註，若有再確認該PDF是否已有備註，若無則依學習新增一筆備註

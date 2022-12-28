@@ -71,8 +71,8 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
 
 		sSql = @"insert into PDFTAG.dbo.UA_SizeTable 
-(luhid,rowid,codeid,Name,Criticality,TolA,TolB,HTMInstruction,lusthid,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,org_lustid) 
- select luhid,rowid,codeid,Name,Criticality,TolA,TolB,HTMInstruction,lusthid,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10, org_lustid
+(luhid,rowid,Code,Description,Criticality,TolA,TolB,HTMInstruction,lusthid,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,org_lustid,pipid) 
+ select luhid,rowid,Code,Description,Criticality,TolA,TolB,HTMInstruction,lusthid,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10, org_lustid,pipid
    from PDFTAG.dbo.UA_SizeTable where lustid=@lustid;";
 
 

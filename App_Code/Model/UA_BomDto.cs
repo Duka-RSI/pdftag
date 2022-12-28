@@ -35,4 +35,5 @@ public class UA_BomDto
     public long org_lubid { get; set; }
     public long lubcid { get; set; }
     public bool isEdit { get; set; }
+    public string colorSet { get; set; }
 }

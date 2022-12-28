@@ -68,8 +68,8 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
 
 		sSql = @"insert into PDFTAG.dbo.UA_BOM 
-(luhid,type,rowid,StandardPlacement,Placement,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,org_lubid,lubcid) 
- select luhid,type,rowid,StandardPlacement,Placement,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,org_lubid,lubcid
+(luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,org_lubid,lubcid,pipid,COLOR_SET) 
+ select luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,org_lubid,lubcid,pipid,COLOR_SET
   from PDFTAG.dbo.UA_BOM where lubid=@lubid";
 
 

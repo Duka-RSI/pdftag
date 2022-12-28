@@ -266,13 +266,21 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 				//    da.Fill(dtUA_BOMGarmentcolor);
 				//}
 
-				var arrTypes = dt.AsEnumerable().Select(s => new { lubcid = s.Field<long>("lubcid"), type = s.Field<string>("type") }).Distinct().ToList();
+				var arrTypes = dt.AsEnumerable().Select(s => new { lubcid = s.Field<long>("lubcid"), type = s.Field<string>("type"), COLOR_SET = s.Field<string>("COLOR_SET") }).Distinct().ToList();
+                List<string> checkColorSet = new List<string>();
 
 				foreach (var itemType in arrTypes)
 				{
 					//sb.Append("<h4>" + itemType.type + "</h4>");
 					sb.Append("<table class='table table-hover'>");
-					sb.Append("<tr>");
+                    if (!checkColorSet.Contains(itemType.COLOR_SET))
+                    {
+                        sb.Append("<tr>");
+                        sb.Append(" <th scope='col'>" + itemType.COLOR_SET + "</th>");
+                        sb.Append("</tr>");
+                        checkColorSet.Add(itemType.COLOR_SET);
+                    }
+                    sb.Append("<tr>");
 					//sb.Append(" <th scope='col'>Standard Placement</th>");
 					sb.Append(" <th scope='col'>" + itemType.type + "</th>");
 					sb.Append(" <th scope='col'>Usage</th>");
