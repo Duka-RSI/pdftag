@@ -1163,8 +1163,11 @@ order by a.pidate,a.pipid";
 
 								SupplierArticle_org = drBomMain["SupplierArticle"].ToString(),
 								Usage_org = drBomMain["Usage"].ToString(),
+                                W1 = drBomMain["W1"].ToString().Trim(),
+                                W4 = drBomMain["W4"].ToString().Trim(),
 
-								ColorName = sColorName,
+
+                                ColorName = sColorName,
 								ColorVal = sColorVal,
 								ColorBName = "B" + i,
 								isExistA = false
@@ -1186,8 +1189,10 @@ order by a.pidate,a.pipid";
 
 						string supplierArticle = "";
 						string usage = "";
+                        string W1 = "";
+                        string W4 = "";
 
-						string supplierArticle_note = "";
+                        string supplierArticle_note = "";
 						string usage_note = "";
 
 						lubid = drBoms[b]["lubid"].ToString();
@@ -1198,8 +1203,10 @@ order by a.pidate,a.pipid";
 
 						supplierArticle = drBoms[b]["SupplierArticle"].ToString();
 						usage = drBoms[b]["usage"].ToString();
+                        W1 = drBoms[b]["W1"].ToString().Trim();
+                        W4 = drBoms[b]["W4"].ToString().Trim();
 
-						supplierArticle_note = FilterNote(arrNotes, lubid, "SupplierArticle");
+                        supplierArticle_note = FilterNote(arrNotes, lubid, "SupplierArticle");
 						usage_note = FilterNote(arrNotes, lubid, "usage");
 
 						#region         
@@ -1249,7 +1256,9 @@ order by a.pidate,a.pipid";
 								supplierArticle = supplierArticle.Replace(" ", string.Empty);
 								usage = usage.Replace(" ", string.Empty);
 
-								var resCompare = arrCompareData.FirstOrDefault(x => x.SupplierArticle == supplierArticle && x.Usage == usage && x.ColorName == color);
+								var resCompare = arrCompareData.FirstOrDefault(x => x.Usage == usage
+                                && (itemType.type == "Fabric" ? x.W4 == W4 : x.W1 == W1)
+                                && x.ColorName == color);
 
 								if (resCompare != null)
 								{
