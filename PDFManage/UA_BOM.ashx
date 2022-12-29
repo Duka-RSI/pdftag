@@ -50,7 +50,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
 		string sSql = "";
 
 
-		sSql = "delete  PDFTAG.dbo.UA_BOM  where lubid=@lubid  ";
+		sSql = "delete  PDFTAG.dbo.UA_BOM  where lubid=@lubid  delete  PDFTAG.dbo.UA_TagData  where lubid=@lubid  ";
 
 
 		using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
@@ -66,7 +66,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
 		string sSql = "";
 
-
+        //UA_BOM
 		sSql = @"insert into PDFTAG.dbo.UA_BOM 
 (luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,org_lubid,lubcid,pipid,COLOR_SET) 
  select luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,org_lubid,lubcid,pipid,COLOR_SET
@@ -79,6 +79,25 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
 			context.Response.Write(JsonConvert.SerializeObject(res));
 		}
+
+        //UA_TagData
+        sSql = @"insert into PDFTAG.dbo.UA_TagData 
+(hdid,type,lubid,tagnum,W1,W2,W3,W4,W5,W6,W7,W8,W9,W10,creator,creatordate,EW1,EW2,EW3,EW4,EW5,EW6,EW7,EW8,EW9,EW10)  
+select t.hdid,t.type,bc.lubid,t.tagnum,t.W1,t.W2,t.W3,t.W4,t.W5,t.W6,t.W7,t.W8,t.W9,t.W10,@creator,@creatordate,t.EW1,t.EW2,t.EW3,t.EW4,t.EW5,t.EW6,t.EW7,t.EW8,t.EW9,t.EW10
+  from PDFTAG.dbo.UA_TagData t
+  inner join UA_BOM b on t.lubid = b.lubid
+  inner join UA_BOM bc on b.org_lubid = bc.org_lubid and b.lubid <> bc.lubid
+  where t.lubid=@lubid";
+
+
+		using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
+		{
+            DateTime dtNow = DateTime.Now;
+			var res = cn.Execute(sSql, new { lubid = lubid, creator = LoginUser.PK, creatordate = dtNow.ToString("yyyy/MM/dd HH:mm:ss") });
+
+			context.Response.Write(JsonConvert.SerializeObject(res));
+		}
+
 	}
 	public void get(HttpContext context)
 	{

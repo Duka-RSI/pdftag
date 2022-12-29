@@ -863,11 +863,11 @@
 					dataType: 'json',
 					success: function (res) {
 
-						if (res == 1) {
+						//if (res == 1) {
 
 							//$('#row' + iSeq).hide();
 							window.location.reload();
-						}
+						//}
 
 					},
 					complete: function () {
@@ -965,11 +965,11 @@
 				dataType: 'json',
 				success: function (res) {
 
-					if (res == 1) {
+					//if (res == 1) {
 
 						//$('#row' + iSeq).hide();
 						window.location.reload();
-					}
+					//}
 
 				},
 				complete: function () {
