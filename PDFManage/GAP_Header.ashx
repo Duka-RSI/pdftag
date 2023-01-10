@@ -157,7 +157,7 @@ from PDFTAG.dbo.GAP_Header where luhid=@luhid;";
                 var res2 = cn.Execute(sSql, new { IdName = "luhid", id = luhid, ColName = col, note = chNote, creator = LoginUser.PK, createordate = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") });
             }
 
-            context.Response.Write(JsonConvert.SerializeObject(res));
+            context.Response.Write(JsonConvert.SerializeObject(new { data = res, learnmgrItem = "" }));
         }
     }
 

@@ -27,6 +27,7 @@
                         <a href="PDF_Manage_002.aspx">歷程管理</a> >>
                         <asp:Label ID="lblInfo" runat="server"></asp:Label>:進入編輯
                         <asp:HiddenField ID="hidpipid" runat="server" />
+                        <asp:HiddenField ID="hidgaptype" runat="server" />
                     </th>
                 </tr>
             </thead>

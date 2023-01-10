@@ -273,6 +273,9 @@ order by a.pidate,a.pipid";
                 string luhid = dt.Rows[0]["luhid"].ToString();
                 string org_luhid = dt.Rows[0]["org_luhid"].ToString();
 
+                if (string.IsNullOrEmpty(org_luhid))
+                    org_luhid = luhid;//原文件
+
                 cm.CommandText = sSql;
                 cm.Parameters.Clear();
                 cm.Parameters.AddWithValue("@pipid", sCompare_pipid);
@@ -283,6 +286,9 @@ order by a.pidate,a.pipid";
 
                 string compare_luhid = dtCompare.Rows[0]["luhid"].ToString();
                 string compare_org_luhid = dtCompare.Rows[0]["org_luhid"].ToString();
+
+                if (string.IsNullOrEmpty(compare_org_luhid))
+                    compare_org_luhid = compare_luhid;//原文件
 
                 #region GAP_Header
 
@@ -754,6 +760,9 @@ order by a.pidate,a.pipid";
                             lubid = drBoms[b]["lubid"].ToString();
                             org_lubid = drBoms[b]["org_lubid"].ToString();
 
+                            if (string.IsNullOrEmpty(org_lubid))
+                                org_lubid = lubid;//原文件
+
                             standardPlacement_source = drBoms[b]["StandardPlacement"].ToString();
                             usage_source = drBoms[b]["usage"].ToString();
                             supplierArticle_source = drBoms[b]["SupplierArticle"].ToString();
@@ -794,6 +803,11 @@ order by a.pidate,a.pipid";
                         {
                             lubid_compare = drComareBoms[b]["lubid"].ToString();
                             lubid_org_compare = drComareBoms[b]["org_lubid"].ToString();
+
+                            if (string.IsNullOrEmpty(lubid_org_compare))
+                                lubid_org_compare = lubid_compare;//原文件
+
+
                             standardPlacement_compare = drComareBoms[b]["StandardPlacement"].ToString();
                             placement_compare = drComareBoms[b]["Placement"].ToString();
                             usage_compare = drComareBoms[b]["usage"].ToString();
@@ -1293,6 +1307,9 @@ order by a.pidate,a.pipid";
                                 lustid = drSizeTables[s]["lustid"].ToString();
                                 org_lustid = drSizeTables[s]["org_lustid"].ToString();
 
+                                if (string.IsNullOrEmpty(org_lustid))
+                                    org_lustid = lustid;//原文件
+
                                 POM_source = drSizeTables[s]["POM"].ToString();
                                 Description_source = drSizeTables[s]["Description"].ToString();
                                 AddlComments_source = drSizeTables[s]["AddlComments"].ToString();
@@ -1309,12 +1326,12 @@ order by a.pidate,a.pipid";
                                 Variation = drSizeTables[s]["Variation"].ToString();
 
 
-                                POM_note = drSizeTables[s]["POM"].ToString();
-                                Description_note = drSizeTables[s]["Description"].ToString();
-                                AddlComments_note = drSizeTables[s]["AddlComments"].ToString();
-                                tolA_note = drSizeTables[s]["TolA"].ToString();
-                                tolB_note = drSizeTables[s]["TolB"].ToString();
-                                Variation_note = drSizeTables[s]["Variation"].ToString();
+                                POM_note = FilterNote(arrNotes, lustid, "POM");
+                                Description_note = FilterNote(arrNotes, lustid, "Description");
+                                AddlComments_note = FilterNote(arrNotes, lustid, "AddlComments");
+                                tolA_note = FilterNote(arrNotes, lustid, "TolA");
+                                tolB_note = FilterNote(arrNotes, lustid, "TolB");
+                                Variation_note = FilterNote(arrNotes, lustid, "Variation");
 
                            
                             }
@@ -1324,7 +1341,9 @@ order by a.pidate,a.pipid";
                             {
                                 lustid_compare = drCompareSizeTables[s]["lustid"].ToString();
                                 lustid_org_compare = drCompareSizeTables[s]["org_lustid"].ToString();
-                              
+
+                                if (string.IsNullOrEmpty(lustid_org_compare))
+                                    lustid_org_compare = lustid_compare;//原文件
 
                                 POM_compare = drCompareSizeTables[s]["POM"].ToString();
                                 Description_compare = drCompareSizeTables[s]["Description"].ToString();
