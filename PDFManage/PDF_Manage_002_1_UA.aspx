@@ -447,8 +447,8 @@
 
 						let arrFabric = ["描述", "物料描述", "廠商", "廠商料號", "物料狀態", "成份"];
 						let arrTrim = ["客戶料號", "物料描述", "補充描述", "(描述)", "廠商", "物料狀態", "規格", "單位"];
-						let arrThread = ["客戶料號", "物料描述", "補充描述", "(描述)", "廠商", "物料狀態", "規格", "單位"];
-						let arrThread2 = ["客戶料號", "物料描述", "補充描述", "(描述)", "廠商","", "物料狀態", "規格", "單位"];
+						let arrThread = ["客戶料號", "物料描述", "補充描述", "廠商", "", "物料狀態", "規格", "單位"];
+						let arrThread2 = ["客戶料號", "物料描述", "補充描述", "(描述)", "廠商","", "物料狀態", "規格", ""];
 
 						let arrHangtag = ["客戶料號", "物料描述", "廠商", "(描述)", "物料狀態", "單位"];
 						let arrEmbellishment = ["描述", "物料描述", "廠商", "(描述)", "物料狀態", "規格", "單位"];
@@ -482,8 +482,8 @@
 
 							html += "<tr " + (isHideRow?"style='display:none'":"")+">";
 							html += "<td>" + arrName[i - 1] + "</td>";
-							html += "<td><div style='width:100%'><span id='span_W" + i + "' class='span_w'>" + res["W" + i] + "</span></div></td>";
-							html += "<td><input type='text' id='EW" + i + "' value='' style='width:100%'>";
+							html += "<td style='width:50%'><div><span id='span_W" + i + "' class='span_w'>" + res["W" + i] + "</span></div></td>";
+							html += "<td style='width:50%'><input type='text' id='EW" + i + "' value='' style='width:100%'>";
 
 							if ((!isFabric && i == 1) || (isFabric && i == 4)) {
 								html += "<input type='button' value='挑選' onclick='showSelectMatNo(" + i + "); return false;' />";

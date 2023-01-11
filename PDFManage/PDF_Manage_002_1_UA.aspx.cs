@@ -364,6 +364,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 							{
 								DataRow drOrgBom = drOrgBoms[0];
 
+								supplierArticle= drOrgBom["supplierArticle"].ToString();
 								standardPlacement = Compare(drOrgBom["StandardPlacement"].ToString(), standardPlacement, FilterNote(arrNotes, lubid, "StandardPlacement"));
 								usage = Compare(drOrgBom["usage"].ToString(), usage, FilterNote(arrNotes, lubid, "usage"));
 
@@ -452,12 +453,28 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 						{
 							//Response.Write("<!--supplierArticle=" + supplierArticle + " IsMappingSupplierArticle=" + IsMappingSupplierArticle + "-->");
 
-							if (drOrgBoms.Length > 0)
+							sSql = @"select distinct MAT_NO,MAT_NAME from [RD_SAMPLE].[dbo].[SAM_MAT_DEF] where UPPER(MAT_NO)=@MAT_NO";
+							Response.Write("<!--" + sSql + "-->");
+							cm.CommandText = sSql;
+							cm.Parameters.Clear();
+							cm.Parameters.AddWithValue("@MAT_NO", supplierArticle2);
+							DataTable dtSAM_MAT_DEF = new DataTable();
+							using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
 							{
-								DataRow drOrgBom = drOrgBoms[0];
-
-								supplierArticle += "<br><font color='red' data-id='2'>修:無對應</font>"; ;
+								da.Fill(dtSAM_MAT_DEF);
 							}
+							if (dtSAM_MAT_DEF.Rows.Count > 0)
+							{
+								supplierArticle += " <br><font color='red' data-id='2'>MAT_NO :" + dtSAM_MAT_DEF.Rows[0]["MAT_NO"].ToString() + "</font>";
+
+							}
+
+							//if (drOrgBoms.Length > 0)
+							//{
+							//	DataRow drOrgBom = drOrgBoms[0];
+
+							//	supplierArticle += "<br><font color='red' data-id='2'>修:無對應</font>"; ;
+							//}
 
 						}
 
