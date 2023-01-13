@@ -50,13 +50,14 @@
                       <a href="Login.aspx">會員登入</a>
                   </div>
                 </div>                
-            </div></div>
+            </div>
+          </div>
         </nav>
     </header>
         <main role="main">
         <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
         </asp:ContentPlaceHolder>
-        <div id="contact-us-box" class="container">
+        <%--<div id="contact-us-box" class="container">
             <h2 class="mb-3 main-color">
                 聯絡我們
             </h2>
@@ -75,16 +76,16 @@
                     
                 </div>
             </div>
-        </div>
+        </div>--%>
     </main>
         <!-- FOOTER -->
-         <footer class="text-center">
+         <%--<footer class="text-center">
         <div class="container position-relative">
             <div>Copyright © by Reliable Source Industrial Co., Ltd.</div>
            
         </div>
        
-    </footer>
+    </footer>--%>
     </form>
 </body>
 </html>

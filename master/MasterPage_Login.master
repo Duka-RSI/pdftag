@@ -156,7 +156,7 @@
            
         </main>
         <!-- FOOTER -->
-        <footer class="text-center">
+        <%--<footer class="text-center">
             <div class="container position-relative">
                 <div>Copyright ©2020 by Reliable Source Industrial Co., Ltd.</div>
                 <!-- <a href="javascript:;" id="back2Top" class="cd-is-visible"><i class="icofont-rounded-up"></i></a> -->
@@ -164,7 +164,7 @@
             </div>
             <!-- <p>&copy; 2017-{{ site.time | date: "%Y" }} Company, Inc. &middot; <a href="#">Privacy</a> &middot; <a
         href="#">Terms</a></p> -->
-        </footer>
+        </footer>--%>
         <div class="modal fade" id="changePwModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
