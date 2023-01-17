@@ -465,8 +465,12 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 							}
 							if (dtSAM_MAT_DEF.Rows.Count > 0)
 							{
-								supplierArticle += " <br><font color='red' data-id='2'>MAT_NO :" + dtSAM_MAT_DEF.Rows[0]["MAT_NO"].ToString() + "</font>";
-
+								//supplierArticle += " <br><font color='red' data-id='2'>MAT_NO :" + dtSAM_MAT_DEF.Rows[0]["MAT_NO"].ToString() + "</font>";
+                            }
+                            else
+                            {
+								//20230117 有對應到的MAT_NO料號(不用顯示)。沒有找到MAT_NO料號，需顯示 MAT_NO:無對應
+								supplierArticle += " <br><font color='red' data-id='2'>MAT_NO:無對應</font>";
 							}
 
 							//if (drOrgBoms.Length > 0)

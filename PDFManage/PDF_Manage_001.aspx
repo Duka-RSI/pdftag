@@ -36,8 +36,8 @@
                         </div>
                         <div class="col-4 col-md-3">
                             <asp:DropDownList ID="dlVersion" runat="server" CssClass="form-control" OnSelectedIndexChanged="dlVersion_SelectedIndexChanged" AutoPostBack="true">
-                               <%-- <asp:ListItem Value="" Text="全部"></asp:ListItem>--%>
-                               <%-- <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
+                                <%-- <asp:ListItem Value="" Text="全部"></asp:ListItem>--%>
+                                <%-- <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
                                 <asp:ListItem Value="2" Text="UA"></asp:ListItem>
                                 <asp:ListItem Value="3" Text="GAP"></asp:ListItem>--%>
                             </asp:DropDownList>
@@ -128,22 +128,22 @@
                                         <asp:LinkButton ID="LinkButton2" CommandName="del" CommandArgument='<%# Eval("pipid")%>'
                                             runat="server" OnClientClick="return confirm('是否要刪除 ?');"><input type="button" value="刪除" class="btn btn-danger"></asp:LinkButton>
 
-                                          <span <%# ((int)Eval("pver")==1 && string.IsNullOrEmpty(Eval("mdate").ToString()))?"":"style='display:none'"%>>
-                                        <asp:LinkButton ID="LinkButton1" CommandName="parsePDF" CommandArgument='<%# Eval("pipid")%>'
-                                            runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>
-                                              </span>
+                                        <span <%# ((int)Eval("pver")==1 && string.IsNullOrEmpty(Eval("mdate").ToString()))?"":"style='display:none'"%>>
+                                            <asp:LinkButton ID="LinkButton1" CommandName="parsePDF" CommandArgument='<%# Eval("pipid")%>'
+                                                runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>
+                                        </span>
 
-                                           <span <%# ((int)Eval("pver")==2 && string.IsNullOrEmpty(Eval("mdate").ToString()))?"":"style='display:none'"%>>
-                                         <%--<a href="#" onclick="showExecuteGAP('<%# Eval("pipid")%>');return false;"><input type="button" value="執行" class="btn btn-secondary"></a>--%>
+                                        <span <%# ((int)Eval("pver")==2 && string.IsNullOrEmpty(Eval("mdate").ToString()))?"":"style='display:none'"%>>
+                                            <%--<a href="#" onclick="showExecuteGAP('<%# Eval("pipid")%>');return false;"><input type="button" value="執行" class="btn btn-secondary"></a>--%>
                                             <asp:LinkButton ID="LinkButton4" CommandName="parsePDF_UA" CommandArgument='<%# Eval("pipid")%>'
-                                            runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>
-                                            </span>
+                                                runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>
+                                        </span>
 
                                         <span <%# ((int)Eval("pver")==3 && string.IsNullOrEmpty(Eval("mdate").ToString()))?"":"style='display:none'"%>>
-                                         <%--<a href="#" onclick="showExecuteGAP('<%# Eval("pipid")%>');return false;"><input type="button" value="執行" class="btn btn-secondary"></a>--%>
+                                            <%--<a href="#" onclick="showExecuteGAP('<%# Eval("pipid")%>');return false;"><input type="button" value="執行" class="btn btn-secondary"></a>--%>
                                             <asp:LinkButton ID="LinkButton3" CommandName="parsePDF_GAP" CommandArgument='<%# Eval("pipid")%>'
-                                            runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>
-                                            </span>
+                                                runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>
+                                        </span>
                                     </td>
                                 </tr>
                             </ItemTemplate>
@@ -211,19 +211,20 @@
                             </th>
                             <td align="left">
                                 <asp:DropDownList ID="ddlpver" runat="server" CssClass="form-control" onchange="ddlpver_change()">
-                                  <%--  <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
+                                    <%--  <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
                                     <asp:ListItem Value="2" Text="UA"></asp:ListItem>
                                     <asp:ListItem Value="3" Text="GAP"></asp:ListItem>--%>
                                 </asp:DropDownList>
                             </td>
                         </tr>
-                         <tr id="rowGap">
+                        <tr id="rowGap">
                             <th>格式選項:
                             </th>
                             <td align="left">
                                 <asp:DropDownList ID="dlGaptype" runat="server" CssClass="form-control">
-                                  <asp:ListItem Value="1" Text="無格線"></asp:ListItem>
                                     <asp:ListItem Value="2" Text="有格線"></asp:ListItem>
+                                    <asp:ListItem Value="1" Text="無格線"></asp:ListItem>
+
                                 </asp:DropDownList>
                             </td>
                         </tr>
@@ -240,7 +241,7 @@
                         <tr>
                             <td align="left" colspan="2">群組類別:
                                 <asp:DropDownList ID="dlgmcate" runat="server">
-                                   <%-- <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
+                                    <%-- <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
                                     <asp:ListItem Value="2" Text="UA"></asp:ListItem>
                                     <asp:ListItem Value="3" Text="GAP"></asp:ListItem>--%>
                                 </asp:DropDownList>
@@ -282,14 +283,14 @@
         });
 
         function ddlpver_change() {
-			let pver = $('#<%= ddlpver.ClientID %>').val();
-			if (pver == "3") {
-				$('#rowGap').show();
+            let pver = $('#<%= ddlpver.ClientID %>').val();
+            if (pver == "3") {
+                $('#rowGap').show();
             } else {
-				$('#rowGap').val('1');
-				$('#rowGap').hide();
+                $('#rowGap').val('1');
+                $('#rowGap').hide();
 
-			}
+            }
         }
 
         function onParsePDF() {
@@ -320,7 +321,7 @@
             $('#<%= dlTitleType.ClientID %>').val("1");
             dlTitleType_change();
             $('#<%=ptitle.ClientID %>').val('');
-			$('#<%=ddlpver.ClientID %>').val('1');
+            $('#<%=ddlpver.ClientID %>').val('1');
             ddlpver_change();
 
             $('#<%=FileUpload1.ClientID %>').val('');
@@ -333,7 +334,7 @@
             $('#addModal').modal('show')
         }
 
-		function showEdit(pipid, gmid, ptitle, pidate, piuploadfile, pver, Gaptype, creator, createordate, mdate, isShow, titleType, unit) {
+        function showEdit(pipid, gmid, ptitle, pidate, piuploadfile, pver, Gaptype, creator, createordate, mdate, isShow, titleType, unit) {
             $('#<%=btnAdd.ClientID %>').hide();
             $('#<%=btnEdit.ClientID %>').show();
 
@@ -343,8 +344,8 @@
             dlTitleType_change();
             $('#<%=ptitle.ClientID %>').val(ptitle);
             $('#<%=ddlpver.ClientID %>').val(pver);
-			$('#<%=dlGaptype.ClientID %>').val(Gaptype);
-			ddlpver_change()
+            $('#<%=dlGaptype.ClientID %>').val(Gaptype);
+            ddlpver_change()
 
             $('#<%=dlunit.ClientID %>').val(unit);
 
@@ -418,7 +419,7 @@
 
             $.ajax({
                 type: "post",
-                url: 'GroupManage.ashx?fun=getSearch&gmcate=' + gmcate+'&txt=' + txt,
+                url: 'GroupManage.ashx?fun=getSearch&gmcate=' + gmcate + '&txt=' + txt,
                 dataType: 'json',
                 data: {},
                 success: function (res) {
@@ -451,16 +452,16 @@
                 dataType: 'json',
                 data: {},
                 success: function (res) {
-                   
 
-                 },
-                 complete: function () {
 
-                 },
-                 error: function (error) {
+                },
+                complete: function () {
 
-                 }
-             });
+                },
+                error: function (error) {
+
+                }
+            });
 
         }
 
@@ -473,5 +474,5 @@
 
 
 
-	</script>
+    </script>
 </asp:Content>

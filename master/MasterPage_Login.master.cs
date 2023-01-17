@@ -9,6 +9,15 @@ using System.Text;
 public partial class master_MasterPage_Login : System.Web.UI.MasterPage
 {
     protected string script;
+    protected override void OnInit(EventArgs e)
+    {
+        if (!LoginUser.isLogin())
+        {
+            Response.Redirect("../Login.aspx");
+            Response.End();
+        }
+
+    }
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!LoginUser.isLogin())

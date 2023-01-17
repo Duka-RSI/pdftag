@@ -343,25 +343,25 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 								DataRow drOrgBom = drOrgBoms[0];
 
 								standardPlacement = Compare(drOrgBom["StandardPlacement"].ToString(), standardPlacement, FilterNote(arrNotes, lubid, "StandardPlacement"));
-								supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"), IsMappingSupplierArticle);
+								supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"));
 								supplier = Compare(drOrgBom["supplier"].ToString(), supplier, FilterNote(arrNotes, lubid, "supplier"));
 							}
 
 						}
 
 
-						if (!IsMappingSupplierArticle)
-						{
-							Response.Write("<!--supplierArticle=" + supplierArticle + " IsMappingSupplierArticle=" + IsMappingSupplierArticle + "-->");
+						//if (!IsMappingSupplierArticle)
+						//{
+						//	Response.Write("<!--supplierArticle=" + supplierArticle + " IsMappingSupplierArticle=" + IsMappingSupplierArticle + "-->");
 
-							if (drOrgBoms.Length > 0)
-							{
-								DataRow drOrgBom = drOrgBoms[0];
+						//	if (drOrgBoms.Length > 0)
+						//	{
+						//		DataRow drOrgBom = drOrgBoms[0];
 
-								supplierArticle += "<br><font color='red'>修:無對應</font>"; ;
-							}
+						//		supplierArticle += "<br><font color='red'>修:無對應</font>"; ;
+						//	}
 
-						}
+						//}
 
 						string parts = " data-PARTS_TYPE='" + PARTS_TYPE + "' data-PARTS_CODE='" + PARTS_CODE + "' data-PARTS_DESC='" + PARTS_DESC + "'  data-MAT_ID='" + MAT_ID + "' ";
 
@@ -497,10 +497,11 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 					sb.Append("<tr>");
 					sb.Append(" <th scope='col'>POM</th>");
 					sb.Append(" <th scope='col'>Description</th>");
-					sb.Append(" <th scope='col'>AddlComments</th>");
+					//sb.Append(" <th scope='col'>AddlComments</th>");
+					sb.Append(" <th scope='col'>POM Variation</th>");
 					sb.Append(" <th scope='col'>Tol(-)</th>");
 					sb.Append(" <th scope='col'>Tol(+)</th>");
-					sb.Append(" <th scope='col'>Variation</th>");
+					//sb.Append(" <th scope='col'>Variation</th>");
 
 					int iOtherCnt = 0;
 					if (dtGAP_SizeTable_Header.Rows.Count > 0)
@@ -532,6 +533,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 						bool isEdit = (drSizeTable["isEdit"].ToString().ToLower() == "true" ? true : false);
 
 						string POM = drSizeTable["POM"].ToString();
+						string POMNote = drSizeTable["POMNote"].ToString();
 						string Description = drSizeTable["Description"].ToString();
 						string AddlComments = drSizeTable["AddlComments"].ToString();
 						string tolA = drSizeTable["TolA"].ToString();
@@ -561,11 +563,12 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 						iSeq++;
 						sb.Append("<tr data-rowid='" + drSizeTable["rowid"].ToString() + "' id='row" + iSeq + "'>");
 						sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='POM' onclick='editSizeTable(this)'>" + POM + "</td>");
-						sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Name' onclick='editSizeTable(this)'>" + Description + "</td>");
-						sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Criticality' onclick='editSizeTable(this)'>" + AddlComments + "</td>");
+						sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Description' onclick='editSizeTable(this)'>" + Description + "</td>");
+						//sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Criticality' onclick='editSizeTable(this)'>" + AddlComments + "</td>");
+						sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Variation' onclick='editSizeTable(this)'>" + Variation + "</td>");
 						sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolA' onclick='editSizeTable(this)'>" + tolA + "</td>");
 						sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolB' onclick='editSizeTable(this)'>" + tolB + "</td>");
-						sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Variation' onclick='editSizeTable(this)'>" + Variation + "</td>");
+						//sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Variation' onclick='editSizeTable(this)'>" + Variation + "</td>");
 
 						for (int i = 1; i <= iOtherCnt; i++)
 						{
@@ -592,6 +595,14 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 						sb.Append("   <input typ='button' class='btn btn-secondary btn-sm' value='整筆新增'  onclick='copySizeTable(" + lustid + ")'/>");
 						sb.Append(" </td>");
 						sb.Append("</tr>");
+
+                        if (!string.IsNullOrEmpty(POMNote))
+                        {
+							sb.Append("<tr>");
+							sb.Append("<td colspan='"+(5+ iOtherCnt) + "'>   -> " + POMNote + "</td>");
+							sb.Append("</tr>");
+						}
+
 
 						idx++;
 					}
@@ -846,7 +857,7 @@ values
 				{
 					string lubid = drBom["lubid"].ToString();
 					string StandardPlacement = drBom["StandardPlacement"].ToString();
-					string Placement = drBom["Placement"].ToString();
+					string Usage = drBom["Usage"].ToString();
 					string SupplierArticle = drBom["SupplierArticle"].ToString();
 					string Supplier = drBom["Supplier"].ToString();
 
@@ -885,12 +896,12 @@ values
 						isUpdate = true;
 					}
 
-					res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "Placement"
-					 && x.Termname_org == Placement.Trim().Replace(" ", "").ToLower());
+					res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "Usage"
+					 && x.Termname_org == Usage.Trim().Replace(" ", "").ToLower());
 
 					if (res != null)
 					{
-						Placement = res.Termname;
+						Usage = res.Termname;
 						isUpdate = true;
 					}
 
@@ -1030,14 +1041,14 @@ values
 					if (isUpdate)
 					{
 						sSql = "update PDFTAG.dbo.GAP_BOM \n";
-						sSql += "set  StandardPlacement=@StandardPlacement,Placement=@Placement,SupplierArticle=@SupplierArticle,Supplier=@Supplier           \n";
+						sSql += "set  StandardPlacement=@StandardPlacement,Usage=@Usage,SupplierArticle=@SupplierArticle,Supplier=@Supplier           \n";
 						sSql += " ,B1=@B1,B2=@B2,B3=@B3,B4=@B4,B5=@B5,B6=@B6,B7=@B7,B8=@B8,B9=@B9,B10=@B10,isEdit=1           \n";
 						sSql += "where lubid=@lubid\n";
 						cm.CommandText = sSql;
 						cm.Parameters.Clear();
 						cm.Parameters.AddWithValue("@lubid", lubid);
 						cm.Parameters.AddWithValue("@StandardPlacement", StandardPlacement);
-						cm.Parameters.AddWithValue("@Placement", Placement);
+						cm.Parameters.AddWithValue("@Usage", Usage);
 						cm.Parameters.AddWithValue("@SupplierArticle", SupplierArticle);
 						cm.Parameters.AddWithValue("@Supplier", Supplier);
 						cm.Parameters.AddWithValue("@B1", B1);
@@ -1075,8 +1086,8 @@ values
 				foreach (DataRow drGAP_SizeTable in dtGAP_SizeTable.Rows)
 				{
 					string lustid = drGAP_SizeTable["lustid"].ToString();
-					string Name = drGAP_SizeTable["Name"].ToString();
-					string Criticality = drGAP_SizeTable["Criticality"].ToString();
+					string POM = drGAP_SizeTable["POM"].ToString();
+					string Description = drGAP_SizeTable["Description"].ToString();
 
 					string A1 = drGAP_SizeTable["A1"].ToString();
 					string A2 = drGAP_SizeTable["A2"].ToString();
@@ -1114,21 +1125,21 @@ values
 
 					#region 比對詞彙
 
-					var res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "Size" && x.ColName == "Name"
-								  && x.Termname_org == Name.Trim().Replace(" ", "").ToLower());
+					var res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "Size" && x.ColName == "POM"
+								  && x.Termname_org == POM.Trim().Replace(" ", "").ToLower());
 
 					if (res != null)
 					{
-						Name = res.Termname;
+						POM = res.Termname;
 						isUpdate = true;
 					}
 
-					res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "Size" && x.ColName == "Criticality"
-					 && x.Termname_org == Criticality.Trim().Replace(" ", "").ToLower());
+					res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "Size" && x.ColName == "Description"
+					 && x.Termname_org == Description.Trim().Replace(" ", "").ToLower());
 
 					if (res != null)
 					{
-						Criticality = res.Termname;
+						Description = res.Termname;
 						isUpdate = true;
 					}
 
@@ -1137,13 +1148,13 @@ values
 					if (isUpdate)
 					{
 						sSql = "update PDFTAG.dbo.GAP_SizeTable \n";
-						sSql += "set  Name=@Name,Criticality=@Criticality          \n";
+						sSql += "set  POM=@POM,Description=@Description          \n";
 						sSql += "where lustid=@lustid\n";
 						cm.CommandText = sSql;
 						cm.Parameters.Clear();
 						cm.Parameters.AddWithValue("@lustid", lustid);
-						cm.Parameters.AddWithValue("@Name", Name);
-						cm.Parameters.AddWithValue("@Criticality", Criticality);
+						cm.Parameters.AddWithValue("@POM", POM);
+						cm.Parameters.AddWithValue("@Description", Description);
 						cm.ExecuteNonQuery();
 					}
 				}

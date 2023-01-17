@@ -12,6 +12,10 @@ public class GAP_SizeTableDto
     public long luhid { get; set; }
     public int rowid { get; set; }
     public string POM { get; set; }
+    /// <summary>
+    /// 物料備註
+    /// </summary>
+    public string POMNote { get; set; }
     public string Description { get; set; }
     public string AddlComments { get; set; }
     public string Variation { get; set; }

@@ -2004,7 +2004,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
             {
                 if (gaptype == "2")
                 {
-                   
+
                     //有格線
                     if (!System.IO.File.Exists(sSaveTxtPath))
                         ConvertPDFToText2(sPDFPath, sSaveTxtPath);
@@ -3200,7 +3200,7 @@ values
             int iRow = 1;
             int iLineRow = 0;
             long lubcid = 0;
-            string type = "";
+            int iSizeTableArea = 0;
 
             using (StreamReader data = new StreamReader(sSaveTxtPath3))
             {
@@ -3209,6 +3209,9 @@ values
 
                     sLine = data.ReadLine();
                     iLineRow++;
+
+                    if (string.IsNullOrEmpty(sLine))
+                        continue;
 
                     if (sLine.StartsWith("@Row: Product"))
                     {
@@ -3219,6 +3222,13 @@ values
                     {
                         isBom = false;
                         isSizeTable = true;
+                        iSizeTableArea++;
+
+                        //20230117尺寸表會有2份，要抓後面的為主
+                        if (iSizeTableArea <= 2)
+                            isSizeTable = false;
+
+                        //LogFile.Logger.Log("iSizeTableArea=" + iSizeTableArea + " isSizeTable=" + isSizeTable + " iLineRow=" + iLineRow);
                     }
 
 
@@ -3227,12 +3237,12 @@ values
                         #region isBom
 
                         //@Row: Fabric (1) %%
-                        if (sLine.StartsWith("@Row: Fabric") || sLine.StartsWith("@Row: Trim") || sLine.StartsWith("@Row: Embellishment")
-                                || sLine.StartsWith("@Row: Thread") || sLine.StartsWith("@Row: Packaging and Labels") || sLine.StartsWith("@Row: Hangtag/Packaging"))
+                        //if (sLine.StartsWith("@Row: Fabric") || sLine.StartsWith("@Row: Trim") || sLine.StartsWith("@Row: Embellishment")
+                        //        || sLine.StartsWith("@Row: Thread") || sLine.StartsWith("@Row: Packaging and Labels") || sLine.StartsWith("@Row: Hangtag/Packaging"))
                         {
 
-                            sBomType = sLine.Replace("@Row:", "").Split(new string[] { "(" }, StringSplitOptions.None)[0].Trim();
-                            isBomTypeData = true;
+                            //sBomType = sLine.Replace("@Row:", "").Split(new string[] { "(" }, StringSplitOptions.None)[0].Trim();
+                            //isBomTypeData = true;
 
                             #region Bom Type Data
 
@@ -3242,21 +3252,31 @@ values
                             List<GAP_BomDto> arrRowDatas = new List<GAP_BomDto>();
 
                             iRow = 1;
-                            while (iRow < 100)
+                            //while (iRow < 100)
+                            for (int i = 1; i <= 100; i++)
                             {
                                 sLastLine = sLine;
-                                sLine = data.ReadLine();
+                                if (i > 1)
+                                    sLine = data.ReadLine();
                                 iLineRow++;
+
+                                if (string.IsNullOrEmpty(sLine))
+                                    continue;
 
                                 if (sLine.StartsWith("@Row: POM Name %%") || sLine.StartsWith("@Row: POMName %%"))
                                 {
-                                    isSizeTable = true;
+                                    //isSizeTable = true;
+                                    //20230117尺寸表會有2份，要抓後面的為主
+                                    isBom = false;
+                                    iSizeTableArea++;
                                     break;
                                 }
 
+
+                                //LogFile.Logger.Log("sLine.StartsWith(@Row: Product)=" + sLine.StartsWith("@Row: Product") + " Any=" + !arrBomColorHeaders.Any() + " sLine=" + sLine);
+
                                 if (sLine.StartsWith("@Row: Product") && !arrBomColorHeaders.Any())
                                 {
-
                                     string[] arrHeaders = sLine.Trim().Split(new string[] { "%%" }, StringSplitOptions.None).ToArray();
 
                                     bool isStartColor = false;
@@ -3268,7 +3288,7 @@ values
                                             continue;
                                         }
 
-                                        if (!isStartColor && header.Contains("OnlyforProductColors"))
+                                        if (!isStartColor && header.Replace(" ", "").ToLower().Contains("onlyforproductcolors"))
                                         {
                                             isStartColor = true;
                                         }
@@ -3308,7 +3328,7 @@ values
                                 if (sLine.StartsWith("@Row: Fabric") || sLine.StartsWith("@Row: Trim") || sLine.StartsWith("@Row: Embellishment")
                                     || sLine.StartsWith("@Row: Thread") || sLine.StartsWith("@Row: Packaging and Labels") || sLine.StartsWith("@Row: Hangtag/Packaging"))
                                 {
-                                    //新Type, 相同欄位
+                                    //BomType
                                     sBomType = sLine.Replace("@Row:", "").Split(new string[] { "(" }, StringSplitOptions.None)[0].Trim();
                                     continue;
                                 }
@@ -3403,11 +3423,13 @@ values
                     }
                     if (isSizeTable)
                     {
-                        #region SizeTable
-
                         #region SizeTable Data
 
+                        #region  SizeTableHeader
                         //@Row: POM Name %% Description %% POM Variation %% QC %% TolFraction(- ) %% TolFraction(+) %% ToleranceMessage %% Grading OverrideMessage %% XXS %% XS %% S %% M %% L %% XL %% 
+                        //@Row: POM Name %% Description %% POM Variation %% TolFraction(- ) %% TolFraction(+) %% ToleranceMessage %% Grading OverrideMessage %% XXS %% XS %% S %% M %% L %% XL %%
+                        if (string.IsNullOrEmpty(sLine))
+                            continue;
 
                         List<string> arrSizes = new List<string>() { "0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL" };
                         List<string> arrSizeHeaders = new List<string>();
@@ -3423,6 +3445,13 @@ values
                                 if (iStartSizeIdx == 0)
                                     iStartSizeIdx = i;
                             }
+                        }
+
+                        //20230117 尺寸表..若標題=Evaluation 則不用抓
+                        if (sLine.Contains("%% QC %%") || sLine.Contains("Measurement Chart Review %%"))
+                        {
+                            isSizeTable = false;
+                            continue;
                         }
 
                         int iSizeHeaderLength = arrSizeHeaders.Count;
@@ -3449,29 +3478,46 @@ values
 
                         long lusthid = Convert.ToInt64(cm.ExecuteScalar().ToString());
 
+                        #endregion
+
                         iRow = 1;
 
 
                         List<GAP_SizeTableDto> arrP_SizeTableDtos = new List<GAP_SizeTableDto>();
-                        while (iRow < 100)
+                        //while (iRow < 100)
+                        for (int i = 1; i <= 100; i++)
                         {
                             sLine = data.ReadLine();
                             iLineRow++;
                             iRow++;
                             sLastLine = sLine;
 
-                            if(string.IsNullOrEmpty(sLine))
+                            if (string.IsNullOrEmpty(sLine))
                                 continue;
 
-                            if (sLine.StartsWith("@Row: POM Name %%") || sLine.StartsWith("@Row: POMName %%"))
+                            //if (sLine.StartsWith("@Row: POM Name %%") || sLine.StartsWith("@Row: POMName %%"))
+                            if (sLine.StartsWith("@Row: Displaying"))
                             {
+                                isSizeTable = false;
                                 break;
                             }
 
                             string[] arrParts = sLine.Trim().Replace("@Row:", "").Split(new string[] { "%%" }, StringSplitOptions.None);
 
+
                             if (arrParts.Length < 5)
+                            {
+                                if (sLine.StartsWith("@Row: "))
+                                {
+
+                                    string sPomNote = sLine.Trim().Replace("@Row:", "").Replace("%%", "").Replace("", "").Trim();
+                                    arrP_SizeTableDtos[arrP_SizeTableDtos.Count - 1].POMNote = sPomNote;
+
+                                    //LogFile.Logger.Log(" iLineRow=" + iLineRow + " sPomNote="+ sPomNote + " sLine=" + sLine);
+                                }
                                 continue;
+                            }
+
 
                             int iSizeLength = arrSizeHeaders.Count;
 
@@ -3479,11 +3525,13 @@ values
                             {
                                 rowid = iRow,
                                 POM = arrParts[0].Trim(),
+                                POMNote = "",
                                 Description = arrParts[1].Trim(),
                                 Variation = arrParts[2].Trim(),
-                                QC = arrParts[3].Trim(),
-                                TolA = arrParts[4].Trim(),
-                                TolB = arrParts[5].Trim(),
+                                //QC = arrParts[3].Trim(),
+                                QC = "",
+                                TolA = arrParts[3].Trim(),
+                                TolB = arrParts[4].Trim(),
 
                                 A1 = iSizeLength >= 1 ? arrParts[iStartSizeIdx].Trim() : "",
                                 A2 = iSizeLength >= 2 ? arrParts[iStartSizeIdx + 1].Trim() : "",
@@ -3504,7 +3552,7 @@ values
                             });
 
 
-                            
+
                         }
 
                         #region Insert PDFTAG.dbo.GAP_SizeTable
@@ -3513,9 +3561,9 @@ values
                         foreach (var item in arrP_SizeTableDtos)
                         {
                             sSql = @"insert into PDFTAG.dbo.GAP_SizeTable 
-(pipid,luhid,rowid,POM,Description,AddlComments,Variation,QC,TolA,TolB,lusthid,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,isEdit) 
+(pipid,luhid,rowid,POM,POMNote,Description,AddlComments,Variation,QC,TolA,TolB,lusthid,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,isEdit) 
 values 
-(@pipid,@luhid,@rowid,@POM,@Description,@AddlComments,@Variation,@QC,@TolA,@TolB,@lusthid,@A1,@A2,@A3,@A4,@A5,@A6,@A7,@A8,@A9,@A10,@A11,@A12,@A13,@A14,@A15,@isEdit)  SELECT SCOPE_IDENTITY();";
+(@pipid,@luhid,@rowid,@POM,@POMNote,@Description,@AddlComments,@Variation,@QC,@TolA,@TolB,@lusthid,@A1,@A2,@A3,@A4,@A5,@A6,@A7,@A8,@A9,@A10,@A11,@A12,@A13,@A14,@A15,@isEdit)  SELECT SCOPE_IDENTITY();";
 
                             cm.CommandText = sSql;
                             cm.Parameters.Clear();
@@ -3523,6 +3571,7 @@ values
                             cm.Parameters.AddWithValue("@luhid", 0);
                             cm.Parameters.AddWithValue("@rowid", item.rowid);
                             cm.Parameters.AddWithValue("@POM", item.POM);
+                            cm.Parameters.AddWithValue("@POMNote", item.POMNote);
                             cm.Parameters.AddWithValue("@Description", item.Description);
                             cm.Parameters.AddWithValue("@AddlComments", "");
                             cm.Parameters.AddWithValue("@Variation", item.Variation);
@@ -3556,8 +3605,6 @@ values
                         #endregion
 
 
-
-                        #endregion
 
                         #endregion
 
@@ -3725,13 +3772,13 @@ from PDFTAG.dbo.GAP_Header where pipid=@pipid; SELECT SCOPE_IDENTITY();";
    from PDFTAG.dbo.GAP_BOMGarmentcolor where pipid=@pipid;
 
 insert into PDFTAG.dbo.GAP_BOM 
-(pipid,luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,org_lubid,lubcid,isEdit) 
- select '" + new_pipid + @"'as pipid,'" + new_luhid + @"' as luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,lubid as org_lubid,lubcid,0 as isEdit
+(pipid,luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,QualityDetails,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,org_lubid,lubcid,isEdit) 
+ select '" + new_pipid + @"'as pipid,'" + new_luhid + @"' as luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,QualityDetails,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,lubid as org_lubid,lubcid,0 as isEdit
   from PDFTAG.dbo.GAP_BOM where pipid=@pipid;
 
 insert into PDFTAG.dbo.GAP_SizeTable 
-(pipid,luhid,rowid,POM,Description,AddlComments,TolA,TolB,Variation,lusthid,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,org_lustid,isEdit) 
- select '" + new_pipid + @"'as pipid,'" + new_luhid + @"' as luhid,rowid,POM,Description,AddlComments,TolA,TolB,Variation,lusthid,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15, lustid as org_lustid,0 as isEdit
+(pipid,luhid,rowid,POM,POMNote,Description,AddlComments,TolA,TolB,Variation,lusthid,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,org_lustid,isEdit) 
+ select '" + new_pipid + @"'as pipid,'" + new_luhid + @"' as luhid,rowid,POM,POMNote,Description,AddlComments,TolA,TolB,Variation,lusthid,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15, lustid as org_lustid,0 as isEdit
    from PDFTAG.dbo.GAP_SizeTable where pipid=@pipid;
 
 ";
