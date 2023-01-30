@@ -187,8 +187,9 @@ order by a.pidate,a.pipid";
 
         public string Placement { get; set; }
         public string Usage { get; set; }
-
         public string SupplierArticle { get; set; }
+        public string Supplier { get; set; }
+        public string QualityDetails { get; set; }
 
         public string ColorName { get; set; }
 
@@ -206,6 +207,7 @@ order by a.pidate,a.pipid";
         public string SupplierArticle_org { get; set; }
 
         public string Supplier_org { get; set; }
+        public string QualityDetails_org { get; set; }
 
         public bool isExistA { get; set; }
     }
@@ -609,9 +611,15 @@ order by a.pidate,a.pipid";
 
                     sb.Append("<table class='table table-hover'>");
                     sb.Append("<tr>");
-                    sb.Append(" <th scope='col'>Standard Placement</th>");
-                    sb.Append(" <th scope='col'>Placement</th>");
-                    sb.Append(" <th scope='col'>Supplier / Supplier Article</th>"); ;
+                    //sb.Append(" <th scope='col'>Standard Placement</th>");
+                    //sb.Append(" <th scope='col'>Placement</th>");
+                    //sb.Append(" <th scope='col'>Supplier / Supplier Article</th>"); ;
+
+                    sb.Append(" <th scope='col'>Product</th>");
+                    sb.Append(" <th scope='col'>Usage</th>");
+                    sb.Append(" <th scope='col'>Supplier Article Number</th>");
+                    sb.Append(" <th scope='col'>Quality Details</th>");
+                    sb.Append(" <th scope='col'>Supplier[Allocate]</th>");
 
 
                     List<bool> arrCompareHeaderResult = new List<bool>();
@@ -710,12 +718,15 @@ order by a.pidate,a.pipid";
                                 //Placement = drBomMain["Placement"].ToString().Replace(" ", string.Empty),
                                 Usage = drBomMain["Usage"].ToString().Replace(" ", string.Empty),
                                 SupplierArticle = drBomMain["SupplierArticle"].ToString().Replace(" ", string.Empty),
+                                Supplier = drBomMain["Supplier"].ToString(),
+                                QualityDetails = drBomMain["QualityDetails"].ToString(),
 
                                 StandardPlacement_org = drBomMain["StandardPlacement"].ToString(),
                                 //Placement_org = drBomMain["Placement"].ToString(),
                                 Usage_org = drBomMain["Usage"].ToString(),
                                 SupplierArticle_org = drBomMain["SupplierArticle"].ToString(),
                                 Supplier_org = drBomMain["Supplier"].ToString(),
+                                QualityDetails_org = drBomMain["QualityDetails"].ToString(),
 
                                 ColorName = sColorName,
                                 ColorVal = sColorVal,
@@ -740,12 +751,14 @@ order by a.pidate,a.pipid";
                         string usage_source = "";
                         string supplierArticle_source = "";
                         string supplier_source = "";
+                        string QualityDetails_source = "";
 
                         string standardPlacement = "";
                         string placement = "";
                         string usage = "";
                         string supplierArticle = "";
                         string supplier = "";
+                        string QualityDetails = "";
 
 
                         string standardPlacement_note = "";
@@ -753,6 +766,7 @@ order by a.pidate,a.pipid";
                         string usage_note = "";
                         string supplierArticle_note = "";
                         string supplier_note = "";
+                        string QualityDetails_note = "";
 
 
                         try
@@ -767,16 +781,19 @@ order by a.pidate,a.pipid";
                             usage_source = drBoms[b]["usage"].ToString();
                             supplierArticle_source = drBoms[b]["SupplierArticle"].ToString();
                             supplier_source = drBoms[b]["Supplier"].ToString();
+                            QualityDetails_source = drBoms[b]["QualityDetails"].ToString();
 
                             standardPlacement = drBoms[b]["StandardPlacement"].ToString();
                             usage = drBoms[b]["usage"].ToString();
                             supplierArticle = drBoms[b]["SupplierArticle"].ToString();
                             supplier = drBoms[b]["Supplier"].ToString();
+                            QualityDetails = drBoms[b]["QualityDetails"].ToString();
 
                             standardPlacement_note = FilterNote(arrNotes, lubid, "StandardPlacement");
                             usage_note = FilterNote(arrNotes, lubid, "usage");
                             supplierArticle_note = FilterNote(arrNotes, lubid, "SupplierArticle");
                             supplier_note = FilterNote(arrNotes, lubid, "Supplier");
+                            QualityDetails_note = FilterNote(arrNotes, lubid, "QualityDetails");
                         }
                         catch (Exception ex)
                         {
@@ -792,12 +809,14 @@ order by a.pidate,a.pipid";
                         string usage_compare = "";
                         string supplierArticle_compare = "";
                         string supplier_compare = "";
+                        string QualityDetails_compare = "";
 
                         string standardPlacement_compare_note = "";
                         string placement_compare_note = "";
                         string usage_compare_note = "";
                         string supplierArticle_compare_note = "";
                         string supplier_compare_note = "";
+                        string QualityDetails_compare_note = "";
 
                         try
                         {
@@ -813,12 +832,14 @@ order by a.pidate,a.pipid";
                             usage_compare = drComareBoms[b]["usage"].ToString();
                             supplierArticle_compare = drComareBoms[b]["SupplierArticle"].ToString();
                             supplier_compare = drComareBoms[b]["Supplier"].ToString();
+                            QualityDetails_compare = drComareBoms[b]["QualityDetails"].ToString();
 
                             standardPlacement_compare_note = FilterNote(arrNotesCompare, lubid_compare, "StandardPlacement");
                             placement_compare_note = FilterNote(arrNotesCompare, lubid_compare, "Placement");
                             usage_compare_note = FilterNote(arrNotesCompare, lubid_compare, "usage");
                             supplierArticle_compare_note = FilterNote(arrNotesCompare, lubid_compare, "SupplierArticle");
                             supplier_compare_note = FilterNote(arrNotesCompare, lubid_compare, "Supplier");
+                            QualityDetails_compare_note = FilterNote(arrNotesCompare, lubid_compare, " QualityDetails");
                         }
                         catch (Exception ex)
                         {
@@ -841,13 +862,14 @@ order by a.pidate,a.pipid";
                                 usage = usage_note;
                                 supplierArticle = supplierArticle_note;
                                 supplier = supplier_note;
-
+                                QualityDetails = QualityDetails_note;
 
                                 standardPlacement_compare = standardPlacement_compare_note;
                                 placement_compare = placement_compare_note;
                                 usage_compare = usage_compare_note;
                                 supplierArticle_compare = supplierArticle_compare_note;
                                 supplier_compare = supplier_compare_note;
+                                QualityDetails_compare = QualityDetails_compare_note;
 
                             }
 
@@ -855,9 +877,11 @@ order by a.pidate,a.pipid";
                             sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='StandardPlacement' onclick='editBom(this,1)'>" + standardPlacement_source + (string.IsNullOrEmpty(standardPlacement_note) ? "" : "<br>中:" + standardPlacement_note) + "</td>");
                             sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='usage' onclick='editBom(this,1)'>" + usage_source + (string.IsNullOrEmpty(usage_note) ? "" : "<br>中:" + usage_note) + "</td>");
                             sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='SupplierArticle' onclick='editBom(this,1)'>" + supplierArticle_source + (string.IsNullOrEmpty(supplierArticle_note) ? "" : "<br>中:" + supplierArticle_note) + "</td>");
-                            //sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='Supplier' onclick='editBom(this)'>" + supplier_source + (string.IsNullOrEmpty(supplier_note) ? "" : "<br>中:" + supplier_note) + "</td>");
 
-                            List<string> arrColorNameSource = new List<string>();
+                            sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='QualityDetails' onclick='editBom(this)'>" + QualityDetails_source + (string.IsNullOrEmpty(QualityDetails_note) ? "" : "<br>中:" + QualityDetails_note) + "</td>");
+                            sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='Supplier' onclick='editBom(this)'>" + supplier_source + (string.IsNullOrEmpty(supplier_note) ? "" : "<br>中:" + supplier_note) + "</td>");
+
+							List<string> arrColorNameSource = new List<string>();
                             List<string> arrColorValSource = new List<string>();
 
                             foreach (var color in arrGAP_BOMGarmentcolors)
@@ -896,9 +920,11 @@ order by a.pidate,a.pipid";
                             sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' onclick='editBom(this,1)' data-col='StandardPlacement' >" + (isCompare ? Compare(sType, standardPlacement, standardPlacement_compare, standardPlacement_compare_note) : "") + "</td>");
                             sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' onclick='editBom(this,1)' data-col='usage' >" + (isCompare ? Compare(sType, usage, usage_compare, usage_compare_note) : "") + "</td>");
                             sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' onclick='editBom(this,1)' data-col='SupplierArticle' >" + (isCompare ? Compare(sType, supplierArticle, supplierArticle_compare, supplierArticle_compare_note) : "") + "</td>");
-                            //sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' onclick='editBom(this,1)' data-col='Supplier' >" + (isCompare ? Compare(sType, supplier, supplier_compare, supplier_compare_note) : "") + "</td>");
 
-                            isCompare = true;
+                            sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' onclick='editBom(this,1)' data-col='QualityDetails' >" + (isCompare ? Compare(sType, QualityDetails, QualityDetails_compare, QualityDetails_compare_note) : "") + "</td>");
+                            sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' onclick='editBom(this,1)' data-col='Supplier' >" + (isCompare ? Compare(sType, supplier, supplier_compare, supplier_compare_note) : "") + "</td>");
+
+							isCompare = true;
 
                             int iIndexSource = 0;
                             foreach (var color in arrGAP_BOMGarmentcolors)
@@ -936,7 +962,10 @@ order by a.pidate,a.pipid";
                                     //var resCompare = arrCompareData.FirstOrDefault(x => x.StandardPlacement == standardPlacement && x.SupplierArticle == supplierArticle && x.ColorName == color);
 
                                     //20220719
-                                    var resCompare = arrCompareData.FirstOrDefault(x => x.Usage == usage && x.SupplierArticle == supplierArticle && x.ColorName == color);
+                                    //var resCompare = arrCompareData.FirstOrDefault(x => x.Usage == usage && x.SupplierArticle == supplierArticle && x.ColorName == color);
+
+                                    //20230130
+                                    var resCompare = arrCompareData.FirstOrDefault(x => x.StandardPlacement == standardPlacement && x.Usage == usage && x.SupplierArticle == supplierArticle && x.ColorName == color);
 
                                     if (resCompare != null)
                                     {
@@ -997,9 +1026,15 @@ order by a.pidate,a.pipid";
                         sbNotExit.Append("<h4>" + itemType.type + "</h4>");
                         sbNotExit.Append("<table class='table table-hover'>");
                         sbNotExit.Append("<tr>");
-                        sbNotExit.Append(" <th scope='col'>Standard Placement</th>");
-                        sbNotExit.Append(" <th scope='col'>Placement</th>");
-                        sbNotExit.Append(" <th scope='col'>Supplier / Supplier Article</th>"); ;
+                        //sbNotExit.Append(" <th scope='col'>Standard Placement</th>");
+                        //sbNotExit.Append(" <th scope='col'>Placement</th>");
+                        //sbNotExit.Append(" <th scope='col'>Supplier / Supplier Article</th>");
+
+                        sbNotExit.Append(" <th scope='col'>Product</th>");
+                        sbNotExit.Append(" <th scope='col'>Usage</th>");
+                        sbNotExit.Append(" <th scope='col'>Supplier Article Number</th>");
+                        sbNotExit.Append(" <th scope='col'>Quality Details</th>");
+                        sbNotExit.Append(" <th scope='col'>Supplier[Allocate]</th>");
 
                         //foreach (var color in arrGAP_BOMGarmentcolors)
                         //{
@@ -1038,7 +1073,8 @@ order by a.pidate,a.pipid";
                             sbNotExit.Append(" <td scope='col'>" + resItem.StandardPlacement_org + "</td>");
                             sbNotExit.Append(" <td scope='col'>" + resItem.Usage_org + "</td>");
                             sbNotExit.Append(" <td scope='col'>" + resItem.SupplierArticle_org + "</td>");
-                            //sbNotExit.Append(" <td scope='col'>" + resItem.Supplier_org + "</td>");
+                            sbNotExit.Append(" <td scope='col'>" + resItem.QualityDetails_org + "</td>");
+                            sbNotExit.Append(" <td scope='col'>" + resItem.Supplier_org + "</td>");
 
 
                             foreach (var color in arrGAP_BOMGarmentcolorsCompare)
@@ -1061,7 +1097,7 @@ order by a.pidate,a.pipid";
                         if (!isHasDifferent) 
                             sbNotExit.Length = 0;
                     }
-                    divHeaderNotCompare.InnerHtml = sbNotExit.ToString();
+                    //divHeaderNotCompare.InnerHtml = sbNotExit.ToString();
                     //Response.Write("<!--sbNotExit =" + sbNotExit.ToString() + "-->");
                 }
 
@@ -1070,6 +1106,9 @@ order by a.pidate,a.pipid";
                 #endregion
 
                 #region GAP_SizeTable
+
+                List<string> listSourceSizeTableHeader = new List<string>();       //來源的尺寸
+                List<string> listCompareSizeTableHeader = new List<string>();    //目的的尺寸
 
                 sSql = "select a.*,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15 \n";
                 sSql += "from PDFTAG.dbo.GAP_SizeTable a              \n";
@@ -1092,6 +1131,30 @@ order by a.pidate,a.pipid";
 
                 var arr_lusthids = dt.AsEnumerable().Select(s => s.Field<long>("lusthid")).Distinct().OrderBy(o => o).ToList();
 
+                Dictionary<string, List<string>> dicHeardersSource = new Dictionary<string, List<string>>();
+
+                for (int h = 0; h < arr_lusthids.Count; h++)
+                {
+                    string lusthid = arr_lusthids[h].ToString();
+                    List<string> tmpSize = new List<string>();
+
+                    sSql = @"select *
+                        from PDFTAG.dbo.GAP_SizeTable_Header a
+                        where a.lusthid in ('" + lusthid + "') ";
+                    cm.CommandText = sSql;
+                    DataTable dtUA_SizeTable_Header = new DataTable();
+                    using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                    {
+                        da.Fill(dtUA_SizeTable_Header);
+                    }
+                    for (int i = 1; i <= 15; i++)
+                    {
+                        string sH = dtUA_SizeTable_Header.Rows[0]["H" + i].ToString();
+                        if (string.IsNullOrEmpty(sH)) { dicHeardersSource.Add(lusthid, tmpSize); break; }
+                        if (!tmpSize.Contains(sH)) { tmpSize.Add(sH); listSourceSizeTableHeader.Add(sH); }
+                    }
+                }
+
 
                 sSql = "select a.*,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15 \n";
                 sSql += "from PDFTAG.dbo.GAP_SizeTable a              \n";
@@ -1106,13 +1169,40 @@ order by a.pidate,a.pipid";
                 //cm.Parameters.AddWithValue("@luhid", compare_luhid);
                 cm.Parameters.AddWithValue("@pipid", sCompare_pipid);
                 dtCompare = new DataTable();
+                DataTable getSizeTable = new DataTable();
                 using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
                 {
                     da.Fill(dtCompare);
+                    //複製一份Compare的，比對時找code的第一筆然後刪掉
+                    da.Fill(getSizeTable);
                 }
 
                 var arr_Comparelusthids = dtCompare.AsEnumerable().Select(s => s.Field<long>("lusthid")).Distinct().OrderBy(o => o).ToList();
                 Response.Write("<!--luhid=" + luhid + ";compare_luhid=" + compare_luhid + "-->");
+
+                Dictionary<string, List<string>> dicHeardersCompare = new Dictionary<string, List<string>>();
+
+                for (int h = 0; h < arr_Comparelusthids.Count; h++)
+                {
+                    string lusthidCompare = arr_Comparelusthids[h].ToString();
+                    List<string> tmpSize = new List<string>();
+
+                    sSql = @"select *
+                        from PDFTAG.dbo.GAP_SizeTable_Header a
+                        where a.lusthid in ('" + lusthidCompare + "') ";
+                    cm.CommandText = sSql;
+                    DataTable dtUA_SizeTable_Header = new DataTable();
+                    using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                    {
+                        da.Fill(dtUA_SizeTable_Header);
+                    }
+                    for (int i = 1; i <= 15; i++)
+                    {
+                        string sH = dtUA_SizeTable_Header.Rows[0]["H" + i].ToString();
+                        if (string.IsNullOrEmpty(sH)) { dicHeardersCompare.Add(lusthidCompare, tmpSize); break; }
+                        if (!tmpSize.Contains(sH)) { tmpSize.Add(sH); listCompareSizeTableHeader.Add(sH); }
+                    }
+                }
 
                 arrNotes = new List<GAP_Ch_Note>();
                 arrNotesCompare = new List<GAP_Ch_Note>();
@@ -1152,7 +1242,7 @@ order by a.pidate,a.pipid";
                     #endregion
                 }
 
-                //foreach (var lusthid in arr_lusthids)
+                #region 比對
                 for (int h = 0; h < arr_lusthids.Count; h++)
                 {
                     string lusthid = "";
@@ -1260,6 +1350,8 @@ order by a.pidate,a.pipid";
                         //foreach (DataRow drSizeTable in drSizeTables)
                         for (int s = 0; s < drSizeTables.Length; s++)
                         {
+                            //找compare code符合的第一筆
+                            var tmpSizetable = getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("POM").ToString().Replace(" ", "") == drSizeTables[s]["POM"].ToString().Replace(" ", ""));
 
                             string lustid = "";
                             string org_lustid = "";
@@ -1337,31 +1429,53 @@ order by a.pidate,a.pipid";
                             }
                             catch (Exception ex) { }
 
+
+
+                            //try
+                            //{
+                            //    lustid_compare = drCompareSizeTables[s]["lustid"].ToString();
+                            //    lustid_org_compare = drCompareSizeTables[s]["org_lustid"].ToString();
+
+                            //    if (string.IsNullOrEmpty(lustid_org_compare))
+                            //        lustid_org_compare = lustid_compare;//原文件
+
+                            //    POM_compare = drCompareSizeTables[s]["POM"].ToString();
+                            //    Description_compare = drCompareSizeTables[s]["Description"].ToString();
+                            //    AddlComments_compare = drCompareSizeTables[s]["AddlComments"].ToString();
+                            //    tolA_compare = drCompareSizeTables[s]["TolA"].ToString();
+                            //    tolB_compare = drCompareSizeTables[s]["TolB"].ToString();
+                            //    Variation_compare = drCompareSizeTables[s]["Variation"].ToString();
+
+
+                            //    POM_compare_note = FilterNote(arrNotesCompare, lustid_compare, "POM");
+                            //    Description_compare_note = FilterNote(arrNotesCompare, lustid_compare, "Description");
+                            //    AddlComments_compare_note = FilterNote(arrNotesCompare, lustid_compare, "AddlComments");
+                            //    tolA_compare_note = FilterNote(arrNotesCompare, lustid_compare, "tolA");
+                            //    tolB_compare_note = FilterNote(arrNotesCompare, lustid_compare, "tolB");
+                            //    Variation_compare_note = FilterNote(arrNotesCompare, lustid_compare, "Variation");
+
+
+
+                            //}
+                            //catch (Exception ex) { }
+
                             try
                             {
-                                lustid_compare = drCompareSizeTables[s]["lustid"].ToString();
-                                lustid_org_compare = drCompareSizeTables[s]["org_lustid"].ToString();
+                                lustid_compare = tmpSizetable["lustid"].ToString();
+                                lustid_org_compare = tmpSizetable["org_lustid"].ToString();
+                                POM_compare = tmpSizetable["POM"].ToString();
+                                Description_compare = tmpSizetable["Description"].ToString();
+                                AddlComments_compare = tmpSizetable["AddlComments"].ToString();
+                                tolA_compare = tmpSizetable["TolA"].ToString();
+                                tolB_compare = tmpSizetable["TolB"].ToString();
+                                Variation_compare = tmpSizetable["Variation"].ToString();
 
-                                if (string.IsNullOrEmpty(lustid_org_compare))
-                                    lustid_org_compare = lustid_compare;//原文件
-
-                                POM_compare = drCompareSizeTables[s]["POM"].ToString();
-                                Description_compare = drCompareSizeTables[s]["Description"].ToString();
-                                AddlComments_compare = drCompareSizeTables[s]["AddlComments"].ToString();
-                                tolA_compare = drCompareSizeTables[s]["TolA"].ToString();
-                                tolB_compare = drCompareSizeTables[s]["TolB"].ToString();
-                                Variation_compare = drCompareSizeTables[s]["Variation"].ToString();
-
-
-                                POM_compare_note = FilterNote(arrNotesCompare, lustid_compare, "POM");
+                                POM_compare_note = FilterNote(arrNotesCompare, lustid_compare, "Code");
                                 Description_compare_note = FilterNote(arrNotesCompare, lustid_compare, "Description");
                                 AddlComments_compare_note = FilterNote(arrNotesCompare, lustid_compare, "AddlComments");
                                 tolA_compare_note = FilterNote(arrNotesCompare, lustid_compare, "tolA");
                                 tolB_compare_note = FilterNote(arrNotesCompare, lustid_compare, "tolB");
                                 Variation_compare_note = FilterNote(arrNotesCompare, lustid_compare, "Variation");
-
-
-
                             }
                             catch (Exception ex) { }
 
@@ -1423,7 +1537,7 @@ order by a.pidate,a.pipid";
                                         }
                                     }
                                     if (!isFind)
-                                        sb.Append(" <td scope='col'></td>");
+                                        sb.Append(" <td scope='col'>X</td>");
                                 }
                                 sb.Append("</tr>");
 
@@ -1502,7 +1616,7 @@ order by a.pidate,a.pipid";
 
                                     }
                                     if (!isFind)
-                                        sb.Append(" <td scope='col'></td>");
+                                        sb.Append(" <td scope='col'>X</td>");
                                 }
 
 
@@ -1516,6 +1630,12 @@ order by a.pidate,a.pipid";
                             {
                                 Response.Write("<!--" + ex.ToString() + "-->");
                             }
+
+                            //如果不存在就表示是來源多的
+                            if (tmpSizetable == null) { continue; }
+                            //如果有找到就刪掉，剩下的就是目的文件多的
+                            if (!string.IsNullOrEmpty(POM_compare))
+                                getSizeTable.Rows.Remove(getSizeTable.AsEnumerable().FirstOrDefault(x => x.Field<string>("POM").ToString().Replace(" ", "") == drSizeTables[s]["POM"].ToString().Replace(" ", "")));
                         }
 
 
@@ -1528,14 +1648,235 @@ order by a.pidate,a.pipid";
                     }
 
                 }
+                #endregion
+                #region 沒比對到的
+                #region 尺寸
+                StringBuilder sbNotExitSizeHeader = new StringBuilder();
+                StringBuilder sbNotExitSizeTableHeader = new StringBuilder();
+                StringBuilder sbNotExitSizeTableBody = new StringBuilder();
+                bool initFlag = true;
+                for (int h = 0; h < arr_Comparelusthids.Count; h++)
+                {
+                    List<string> curCompareSize = new List<string>();
+                    List<string> tmpSize = new List<string>();
+                    List<string> listSourcelusthids = new List<string>();
+                    bool isMatch = false;
+                    if (dicHeardersCompare.ContainsKey(arr_Comparelusthids[h].ToString()))
+                    {
+                        string lusthidCompare = arr_Comparelusthids[h].ToString();
+                        curCompareSize = dicHeardersCompare[arr_Comparelusthids[h].ToString()];
+                        foreach (string compareKey in dicHeardersSource.Keys)
+                        {
+                            //找有沒有相同的尺寸
+                            if (dicHeardersSource[compareKey].SequenceEqual(curCompareSize))
+                            {
+                                listSourcelusthids.Add(compareKey);
+                                isMatch = true;
+                            }
+                        }
+                        //這邊找多的尺寸
+                        if (!isMatch)
+                        {
+                            foreach (string SourceKey in dicHeardersSource.Keys)
+                            {
+                                //if (curCompareSize.All(x => dicHeardersSource[compareKey].Any(y => y == x)) || dicHeardersSource[compareKey].All(x => curCompareSize.Any(y => y == x)))
+                                if (dicHeardersSource[SourceKey].All(x => curCompareSize.Any(y => y == x)))
+                                {
+                                    listSourcelusthids.Add(SourceKey);
+                                    foreach (string Size in curCompareSize)
+                                    {
+                                        if (!dicHeardersSource[SourceKey].Contains(Size) && !tmpSize.Contains(Size))
+                                            tmpSize.Add(Size);
+                                    }
+                                }
+                            }
+                        }
+                        //剩下是同時有少跟有多
+                        if (listSourcelusthids == null)
+                        { }
 
+                        //這邊是沒比對到的，所以沒MATCH且目的文件多的才繼續
+                        if (!isMatch && tmpSize.Count > 0)
+                        {
+                            DataTable dtUA_SizeTableSource_Header = new DataTable();
+                            string lusthid_compare = string.Join("','", listSourcelusthids);
 
+                            sSql = @"select * 
+                            from PDFTAG.dbo.UA_SizeTable_Header a
+                            where a.lusthid in ('" + lusthid_compare + "') ";
+                            Response.Write("<!--" + sSql + "-->");
+                            cm.CommandText = sSql;
+
+                            using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                            {
+                                da.Fill(dtUA_SizeTableSource_Header);
+                            }
+
+                            StringBuilder sbNotExitSizeTmpTable = new StringBuilder();
+                            if (initFlag)
+                            {
+                                sbNotExitSizeHeader.Append("<h4>尺寸</h4>");
+                                sbNotExitSizeHeader.Append("<h4>Size Table</h4>");
+                                initFlag = false;
+                            }
+                            bool sizeTableFlag = false;
+                            sbNotExitSizeTmpTable.Append("<table class='table table-hover'>");
+                            sbNotExitSizeTmpTable.Append("<tr>");
+                            sbNotExitSizeTmpTable.Append(" <th scope='col'>POM</th>");
+                            sbNotExitSizeTmpTable.Append(" <th scope='col'>Description</th>");
+                            sbNotExitSizeTmpTable.Append(" <th scope='col'>AddlComments</th>");
+                            sbNotExitSizeTmpTable.Append(" <th scope='col'>Tol(-)</th>");
+                            sbNotExitSizeTmpTable.Append(" <th scope='col'>Tol(+)</th>");
+                            sbNotExitSizeTmpTable.Append(" <th scope='col'>Variation</th>");
+
+                            foreach (var size in tmpSize)
+                            {
+                                sbNotExitSizeTmpTable.Append(" <th scope='col' style='background-color:red'>" + size + "</th>");
+                            }
+
+                            sbNotExitSizeTmpTable.Append("</tr>");
+
+                            //DataRow[] drSizeTables = dt.Select("lusthid='" + lusthid + "'", "rowid asc");
+                            DataRow[] drCompareSizeTables = dtCompare.Select("lusthid='" + lusthidCompare + "'", "rowid asc");
+
+                            for (int s = 0; s < drCompareSizeTables.Length; s++)
+                            {
+                                string lustid = "";
+                                string org_lustid = "";
+
+                                string POM = "";
+                                string description = "";
+                                string tolA = "";
+                                string tolB = "";
+                                string AddlComments = "";
+                                string Variation = "";
+
+                                POM = drCompareSizeTables[s]["POM"].ToString();
+                                description = drCompareSizeTables[s]["Description"].ToString();
+                                AddlComments = drCompareSizeTables[s]["AddlComments"].ToString();
+                                tolA = drCompareSizeTables[s]["TolA"].ToString();
+                                tolB = drCompareSizeTables[s]["TolB"].ToString();
+                                Variation = drCompareSizeTables[s]["Variation"].ToString();
+
+                                sbNotExitSizeTableBody.Append("<tr data-rowid='" + drCompareSizeTables[s]["rowid"].ToString() + "'>");
+                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='POM' >" + POM + "</td>");
+                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Description' >" + description + "</td>");
+                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='AddlComments' >" + AddlComments + "</td>");
+                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolA' >" + tolA + "</td>");
+                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolB' >" + tolB + "</td>");
+                                sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Variation' >" + Variation + "</td>");
+
+                                bool bodyFlag = false;
+                                for (int i = 1; i <= 15; i++)
+                                {
+                                    string compareHeader = drCompareSizeTables[s]["H" + i].ToString();
+                                    if (string.IsNullOrEmpty(compareHeader)) { break; }
+                                    else if (tmpSize.Contains(compareHeader))
+                                    {
+                                        sizeTableFlag = true;
+                                        bodyFlag = true;
+                                        sbNotExitSizeTableBody.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='A" + i + "' >" + drCompareSizeTables[s]["A" + i].ToString() + "</td>");
+                                    }
+                                }
+                                sbNotExitSizeTableBody.Append("</tr>");
+                                if (!bodyFlag) { sbNotExitSizeTableBody.Clear(); }
+                                sbNotExitSizeTmpTable.Append(sbNotExitSizeTableBody.ToString());
+                                sbNotExitSizeTableBody.Clear();
+                            }
+                            sbNotExitSizeTmpTable.Append("</table>");
+                            if (!sizeTableFlag) { sbNotExitSizeTmpTable.Clear(); }
+                            sbNotExitSizeTableHeader.Append(sbNotExitSizeTmpTable.ToString());
+                            sbNotExitSizeTmpTable.Clear();
+                        }
+                    }
+                }
+                if (sbNotExitSizeTableHeader.Length == 0) sbNotExitSizeHeader.Clear();
+                sbNotExit.Append(sbNotExitSizeHeader);
+                sbNotExit.Append(sbNotExitSizeTableHeader);
+                #endregion
+                #region 資料列
+                //如果有代表有沒比對到的，沒有就不跑
+                initFlag = true;
+
+                Response.Write("<!--沒比對到的 資料列SizeTable=" + getSizeTable.Rows.Count + "-->");
+
+                if (getSizeTable.Rows.Count > 0)
+                {
+                    List<List<string>> getHeader = new List<List<string>>();
+
+                    foreach (DataRow getdata in getSizeTable.Rows)
+                    {
+                        List<string> sizeHeader = new List<string>();
+
+                        for (int i = 1; i <= 15; i++)
+                        {
+                            string sH = getdata["H" + i].ToString();
+                            if (!string.IsNullOrEmpty(sH))
+                            {
+                                sizeHeader.Add(sH);
+                            }
+                        }
+                        if (!(getHeader.Any(x => x.SequenceEqual(sizeHeader))))
+                        {
+                            if (initFlag)
+                            {
+                                sbNotExit.Append("<h4>資料列</h4>");
+                                sbNotExit.Append("<h4>Size Table</h4>");
+                                initFlag = false;
+                            }
+                            else if (!initFlag) sbNotExit.Append("</table>");
+                            sbNotExit.Append("<table class='table table-hover'>");
+                            sbNotExit.Append("<tr>");
+                            sbNotExit.Append(" <th scope='col'>POM</th>");
+                            sbNotExit.Append(" <th scope='col'>Description</th>");
+                            sbNotExit.Append(" <th scope='col'>AddlComments</th>");
+                            sbNotExit.Append(" <th scope='col'>Tol(-)</th>");
+                            sbNotExit.Append(" <th scope='col'>Tol(+)</th>");
+                            sbNotExit.Append(" <th scope='col'>Variation</th>");
+
+                            for (int i = 1; i <= 15; i++)
+                            {
+                                string sH = getdata["H" + i].ToString();
+                                if (!string.IsNullOrEmpty(sH))
+                                {
+                                    if (listSourceSizeTableHeader.Any(x => x == sH))
+                                    {
+                                        sbNotExit.Append("  <th scope='col'>" + sH + "</th>");
+                                    }
+                                    else
+                                    {
+                                        sbNotExit.Append("  <th scope='col' style='background-color:red'>" + sH + "</th>");
+                                    }
+                                }
+                            }
+                            getHeader.Add(sizeHeader);
+                        }
+
+                        sbNotExit.Append("<tr data-rowid='" + getdata["rowid"].ToString() + "'>");
+                        sbNotExit.Append(" <td scope='col' data-lustid='" + getdata["lustid"].ToString() + "' data-org_lustid='" + getdata["org_lustid"].ToString() + "' data-col='POM' >" + getdata["POM"].ToString() + "</td>");
+                        sbNotExit.Append(" <td scope='col' data-lustid='" + getdata["lustid"].ToString() + "' data-org_lustid='" + getdata["org_lustid"].ToString() + "' data-col='Description' >" + getdata["description"].ToString() + "</td>");
+                        sbNotExit.Append(" <td scope='col' data-lustid='" + getdata["lustid"].ToString() + "' data-org_lustid='" + getdata["org_lustid"].ToString() + "' data-col='AddlComments' >" + getdata["AddlComments"].ToString() + "</td>");
+                        sbNotExit.Append(" <td scope='col' data-lustid='" + getdata["lustid"].ToString() + "' data-org_lustid='" + getdata["org_lustid"].ToString() + "' data-col='TolA' >" + getdata["TolA"].ToString() + "</td>");
+                        sbNotExit.Append(" <td scope='col' data-lustid='" + getdata["lustid"].ToString() + "' data-org_lustid='" + getdata["org_lustid"].ToString() + "' data-col='TolB' >" + getdata["TolB"].ToString() + "</td>");
+                        sbNotExit.Append(" <td scope='col' data-lustid='" + getdata["lustid"].ToString() + "' data-org_lustid='" + getdata["org_lustid"].ToString() + "' data-col='Variation' >" + getdata["Variation"].ToString() + "</td>");
+                        for (int i = 1; i <= 15; i++)
+                        {
+                            //if ((string.IsNullOrEmpty(getdata["A" + i].ToString()) || getdata["A" + i].ToString() == "----") && getdata["H" + i].ToString().Replace(" ", "") != "Comments") break;
+                            sbNotExit.Append(" <td scope='col' data-lustid='" + getdata["lustid"].ToString() + "' data-org_lustid='" + getdata["org_lustid"].ToString() + "' data-col='A" + i + "' >" + getdata["A" + i].ToString() + "</td>");
+                        }
+                        sbNotExit.Append("</tr>");
+                    }
+                    if (getSizeTable.Rows.Count > 0) sbNotExit.Append("</table>");
+                }
+                #endregion
+                #endregion
 
                 #endregion
 
             }
 
             divHeader.InnerHtml = sb.ToString();
+            divHeaderNotCompare.InnerHtml = sbNotExit.ToString();
             script = "onShow(1);";
 
         }
@@ -1543,6 +1884,7 @@ order by a.pidate,a.pipid";
         {
             script = "alert('比對失敗!')";
             Response.Write("<!--比對失敗:" + err.ToString() + "-->");
+            LogFile.Logger.LogException(err);
         }
     }
 

@@ -345,23 +345,36 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 								standardPlacement = Compare(drOrgBom["StandardPlacement"].ToString(), standardPlacement, FilterNote(arrNotes, lubid, "StandardPlacement"));
 								supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"));
 								supplier = Compare(drOrgBom["supplier"].ToString(), supplier, FilterNote(arrNotes, lubid, "supplier"));
+								QualityDetails = Compare(drOrgBom["QualityDetails"].ToString(), QualityDetails, FilterNote(arrNotes, lubid, "QualityDetails"));
 							}
 
 						}
 
 
-						//if (!IsMappingSupplierArticle)
-						//{
-						//	Response.Write("<!--supplierArticle=" + supplierArticle + " IsMappingSupplierArticle=" + IsMappingSupplierArticle + "-->");
+						if (!isEdit && !IsMappingSupplierArticle)
+						{
+							//Response.Write("<!--supplierArticle=" + supplierArticle + " IsMappingSupplierArticle=" + IsMappingSupplierArticle + "-->");
 
-						//	if (drOrgBoms.Length > 0)
-						//	{
-						//		DataRow drOrgBom = drOrgBoms[0];
-
-						//		supplierArticle += "<br><font color='red'>修:無對應</font>"; ;
-						//	}
-
-						//}
+							sSql = @"select distinct MAT_NO,MAT_NAME from [RD_SAMPLE].[dbo].[SAM_MAT_DEF] where UPPER(MAT_NO)=@MAT_NO";
+							Response.Write("<!--" + sSql + "-->");
+							cm.CommandText = sSql;
+							cm.Parameters.Clear();
+							cm.Parameters.AddWithValue("@MAT_NO", standardPlacement);
+							DataTable dtSAM_MAT_DEF = new DataTable();
+							using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+							{
+								da.Fill(dtSAM_MAT_DEF);
+							}
+							if (dtSAM_MAT_DEF.Rows.Count > 0)
+							{
+								//standardPlacement += " <br><font color='red' data-id='2'>MAT_NO :" + dtSAM_MAT_DEF.Rows[0]["MAT_NO"].ToString() + "</font>";
+							}
+							else
+							{
+								//20230130 有對應到的MAT_NO料號(不用顯示)。沒有找到MAT_NO料號，需顯示 MAT_NO:無對應
+								standardPlacement += " <br><font color='red' data-id='2'>MAT_NO:無對應</font>";
+							}
+						}
 
 						string parts = " data-PARTS_TYPE='" + PARTS_TYPE + "' data-PARTS_CODE='" + PARTS_CODE + "' data-PARTS_DESC='" + PARTS_DESC + "'  data-MAT_ID='" + MAT_ID + "' ";
 

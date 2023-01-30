@@ -223,7 +223,7 @@
 
             $('#rowCompareColor').hide();
 
-            if (saveCol == "SupplierArticle") {
+            if (saveCol == "StandardPlacement") {
 
                 PARTS_TYPE = $(td).attr('data-PARTS_TYPE');
                 PARTS_CODE = $(td).attr('data-PARTS_CODE');
@@ -367,7 +367,7 @@
             let MAT_ID = $('#dlMAT_ID').val();
             let isRecord = 0;
 
-            if (saveCol == 'StandardPlacement' || saveCol == 'Placement' || saveCol == 'SupplierArticle' || saveCol == 'Supplier' || saveCol == 'Name' || saveCol == 'Criticality') {
+            if (saveCol == 'Placement' || saveCol == 'SupplierArticle' || saveCol == 'Supplier' || saveCol == 'Name' || saveCol == 'Criticality') {
             //if (isSaveRecord) {
 
                 if (confirm('改的內容是否紀錄至詞庫')) {
@@ -405,10 +405,12 @@
 
                     if (res.data == 1) {
 
-                        if (saveCol == "SupplierArticle") {
+                        //if (saveCol == "SupplierArticle") {
 
-                            window.location.reload();
-                        }
+                        //    window.location.reload();
+                        //}
+                        window.location.reload();
+
 
                         //objTd.text(text);
 
