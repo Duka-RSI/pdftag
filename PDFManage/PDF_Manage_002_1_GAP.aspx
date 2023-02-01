@@ -223,7 +223,7 @@
 
             $('#rowCompareColor').hide();
 
-            if (saveCol == "StandardPlacement") {
+            if (saveCol == "SupplierArticle") {
 
                 PARTS_TYPE = $(td).attr('data-PARTS_TYPE');
                 PARTS_CODE = $(td).attr('data-PARTS_CODE');

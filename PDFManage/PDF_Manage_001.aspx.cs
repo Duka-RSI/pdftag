@@ -3302,7 +3302,7 @@ values
 											{
 												//@Row: Product %% Material Name %% SupplierArticleNumber %% Gauge/Ends %% Stitch %% CommonSize %% CommonQty %% Usage %% NIGHTFALLPURPLE(COLORO 136- 35- 07) - 000002795535 %% Comment %% 
 
-												if (sLine.Contains("%% Comment %%") && header.Replace(" ", "").ToLower() == "usage")
+												if (!sLine.Replace(" ", "").ToLower().Contains("onlyforproductcolors") && sLine.Contains("%% Comment %%") && header.Replace(" ", "").ToLower() == "usage")
 												{
 													isStartColor = true;
 												}
@@ -3391,16 +3391,30 @@ values
 									}
 									else
 									{
+										//太長換Table 找出原對應的Type
+
+										string sOrgType = sBomType;
+										string sQualityDetails = "";
+										string sSupplier = "";
+
+										var resProduct = arrRowDatas.FirstOrDefault(x => x.StandardPlacement == sProduct);
+										if (resProduct != null)
+										{
+											sOrgType = resProduct.Type;
+											sQualityDetails = resProduct.QualityDetails;
+											sSupplier = resProduct.Supplier;
+										}
+
 										arrRowDatas.Add(new GAP_BomDto()
 										{
-											Type = sBomType,
+											Type = sOrgType,
 											rowid = iRow,
 											StandardPlacement = sProduct,
 											SupplierArticle = arrParts[2].Trim(),
 											Usage = arrParts[7].Trim(),
-											QualityDetails = "",
-											Supplier = "",
-											lubcid= lubcid,
+											QualityDetails = sQualityDetails,
+											Supplier = sSupplier,
+											lubcid = lubcid,
 											B1 = iColorLength >= 1 ? arrParts[8].Trim() : "",
 											B2 = iColorLength >= 2 ? arrParts[9].Trim() : "",
 											B3 = iColorLength >= 3 ? arrParts[10].Trim() : "",

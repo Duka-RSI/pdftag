@@ -343,6 +343,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 								DataRow drOrgBom = drOrgBoms[0];
 
 								standardPlacement = Compare(drOrgBom["StandardPlacement"].ToString(), standardPlacement, FilterNote(arrNotes, lubid, "StandardPlacement"));
+								usage = Compare(drOrgBom["usage"].ToString(), usage, FilterNote(arrNotes, lubid, "usage"));
 								supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"));
 								supplier = Compare(drOrgBom["supplier"].ToString(), supplier, FilterNote(arrNotes, lubid, "supplier"));
 								QualityDetails = Compare(drOrgBom["QualityDetails"].ToString(), QualityDetails, FilterNote(arrNotes, lubid, "QualityDetails"));
@@ -359,7 +360,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 							Response.Write("<!--" + sSql + "-->");
 							cm.CommandText = sSql;
 							cm.Parameters.Clear();
-							cm.Parameters.AddWithValue("@MAT_NO", standardPlacement);
+							cm.Parameters.AddWithValue("@MAT_NO", supplierArticle);
 							DataTable dtSAM_MAT_DEF = new DataTable();
 							using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
 							{
@@ -367,12 +368,12 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 							}
 							if (dtSAM_MAT_DEF.Rows.Count > 0)
 							{
-								//standardPlacement += " <br><font color='red' data-id='2'>MAT_NO :" + dtSAM_MAT_DEF.Rows[0]["MAT_NO"].ToString() + "</font>";
+								//supplierArticle += " <br><font color='red' data-id='2'>MAT_NO :" + dtSAM_MAT_DEF.Rows[0]["MAT_NO"].ToString() + "</font>";
 							}
 							else
 							{
 								//20230130 有對應到的MAT_NO料號(不用顯示)。沒有找到MAT_NO料號，需顯示 MAT_NO:無對應
-								standardPlacement += " <br><font color='red' data-id='2'>MAT_NO:無對應</font>";
+								supplierArticle += " <br><font color='red' data-id='2'>MAT_NO:無對應</font>";
 							}
 						}
 
