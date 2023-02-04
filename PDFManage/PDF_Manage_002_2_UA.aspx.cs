@@ -1507,8 +1507,8 @@ order by a.pidate,a.pipid";
 						sb.Append(" <th scope='col'>Description</th>");
 						sb.Append(" <th scope='col'>Tol(-)</th>");
 						sb.Append(" <th scope='col'>Tol(+)</th>");
-
-						foreach (var size in curSourceSize)
+                        int iOtherCnt = 0;
+                        foreach (var size in curSourceSize)
 						{
 							if (isMatch)
 							{
@@ -1522,9 +1522,14 @@ order by a.pidate,a.pipid";
 								else
 									sb.Append(" <th scope='col' style='background-color:#00FFFF'>" + size + "</th>");
 							}
-						}
+                            iOtherCnt++;
+                        }
 
-						sb.Append("</tr>");
+                        sb.Append(" <th scope='col'></th>");
+                        sb.Append("</tr>");
+                        sb.Append("<tr>");
+                        sb.Append(" <th scope='col'  colspan='" + (4 + iOtherCnt) + "'>" + dtUA_SizeTableCompare_Header.Rows[h]["HeaderDesc"].ToString() + "</th>");
+                        sb.Append("</tr>");
 
 						DataRow[] drSizeTables = dt.Select("lusthid='" + lusthid + "'", "rowid asc");
 						//DataRow[] drCompareSizeTables = dtCompare.Select("lusthid in ('" + lusthid_compare + "')", "rowid asc");
