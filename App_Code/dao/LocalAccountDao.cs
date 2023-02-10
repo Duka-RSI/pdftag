@@ -15,7 +15,7 @@ public class LocalAccountDao
 
     public static LocalAccount getLocalAccount(string account, string password)
     {
-        string sqlCmd = "SELECT * FROM [Member].[dbo].[LocalAccount] WHERE account = @account AND password = @password";
+        string sqlCmd = "SELECT * FROM [PDFTAG].[dbo].[LocalAccount] WHERE account = @account AND password = @password";
 
         using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
         {
@@ -27,7 +27,7 @@ public class LocalAccountDao
     public static LocalAccount getLocalAccount(string account)
     {
         LocalAccount obj = null;
-        string sqlCmd = "SELECT * FROM [Member].[dbo].[LocalAccount] WHERE account=@account";
+        string sqlCmd = "SELECT * FROM [PDFTAG].[dbo].[LocalAccount] WHERE account=@account";
 
         using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
         {

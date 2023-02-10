@@ -280,17 +280,22 @@
 
             $("#<%=FileUpload1.ClientID%>").attr('accept', 'application/pdf');
             hideLoading();
+            $('#<%=dlgmcate.ClientID %>').prop('disabled', true);
         });
 
         function ddlpver_change() {
             let pver = $('#<%= ddlpver.ClientID %>').val();
             if (pver == "3") {
+                
                 $('#rowGap').show();
             } else {
                 $('#rowGap').val('1');
                 $('#rowGap').hide();
 
             }
+              $('#tbl').html('');
+            $('#<%=dlgmcate.ClientID %>').val(pver);
+
         }
 
         function onParsePDF() {
@@ -328,7 +333,7 @@
             $("#divFile").html('');
 
             $('#<%=hidgmid.ClientID %>').val('');
-            onQuery();
+            //onQuery();
 
             $('#addModalTitle').text('新增');
             $('#addModal').modal('show')

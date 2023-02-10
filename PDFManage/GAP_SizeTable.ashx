@@ -418,7 +418,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
 				sb.Append(" <th scope='col'>POM</th>");
 				sb.Append(" <th scope='col'>Description</th>");
-				sb.Append(" <th scope='col'>AddlComments</th>");
+				//sb.Append(" <th scope='col'>AddlComments</th>");
 				sb.Append(" <th scope='col'>Tol(-)</th>");
 				sb.Append(" <th scope='col'>Tol(+)</th>");
 				sb.Append(" <th scope='col'>Variation</th>");
@@ -485,7 +485,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
 					sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='POM' onclick='editSizeTable(this)'>" + POM + "</td>");
 					sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Name' onclick='editSizeTable(this)'>" + Description + "</td>");
-					sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Criticality' onclick='editSizeTable(this)'>" + AddlComments + "</td>");
+					//sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Criticality' onclick='editSizeTable(this)'>" + AddlComments + "</td>");
 					sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolA' onclick='editSizeTable(this)'>" + tolA + "</td>");
 					sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolB' onclick='editSizeTable(this)'>" + tolB + "</td>");
 					sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Variation' onclick='editSizeTable(this)'>" + Variation + "</td>");

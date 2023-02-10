@@ -59,6 +59,18 @@ public class LoginUser
 		}
 	}
 
+	public static int role2
+	{
+		get
+		{
+			return Convert.ToInt32(HttpContext.Current.Session["role2"]);
+		}
+		set
+		{
+			HttpContext.Current.Session["role2"] = value;
+		}
+	}
+
 	public static List<String> CUST_NO
 	{
 		get
@@ -81,6 +93,7 @@ public class LoginUser
 		LoginUser.PK = null;
 		LoginUser.Name = null;
 		LoginUser.role = 0;
+		LoginUser.role2 = 0;
 	}
 	public static bool validateUser(string account, string password)
 	{
@@ -94,10 +107,14 @@ public class LoginUser
 			if (accountUser.Role == 1)
 			{
 				LoginUser.role = ROLE_ADMIN;
+				LoginUser.role2 = ROLE_User;
 				LoginUser.CUST_NO = string.IsNullOrEmpty(accountUser.CUST_NO) ? new List<string>() : accountUser.CUST_NO.Split(',').ToList();
 			}
 			else
+			{
 				LoginUser.role = ROLE_User;
+				LoginUser.role2 = ROLE_User;
+			}
 
 			LoginUser.CUST_NO = string.IsNullOrEmpty(accountUser.CUST_NO) ? new List<string>() : accountUser.CUST_NO.Split(',').ToList();
 
@@ -111,6 +128,7 @@ public class LoginUser
 			LoginUser.PK = localAccount.account;
 			LoginUser.Name = localAccount.name;
 			LoginUser.role = ROLE_ADMIN; ;
+			LoginUser.role2 = ROLE_ADMIN;
 			LoginUser.CUST_NO = new List<string>() { "1", "2", "3" };
 
 			return true;

@@ -252,24 +252,26 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
 				foreach (var itemType in arrTypes)
 				{
-					sb.Append("<h4>" + itemType.type + "</h4>");
-					sb.Append("<table class='table table-hover'>");
-					sb.Append("<tr>");
+					StringBuilder sbHeader = new StringBuilder();
+
+					sbHeader.Append("<h4>" + itemType.type + "</h4>");
+					sbHeader.Append("<table class='table table-hover'>");
+					sbHeader.Append("<tr>");
 
 					if (gaptype == "2")
 					{
 
-						sb.Append(" <th scope='col'>Product</th>");
-						sb.Append(" <th scope='col'>Usage</th>");
-						sb.Append(" <th scope='col'>Supplier Article Number</th>");
-						sb.Append(" <th scope='col'>Quality Details</th>");
-						sb.Append(" <th scope='col'>Supplier[Allocate]</th>");
+						sbHeader.Append(" <th scope='col'>Product</th>");
+						sbHeader.Append(" <th scope='col'>Usage</th>");
+						sbHeader.Append(" <th scope='col'>Supplier Article Number</th>");
+						sbHeader.Append(" <th scope='col'>Quality Details</th>");
+						sbHeader.Append(" <th scope='col'>Supplier[Allocate]</th>");
 					}
 					else
 					{
-						sb.Append(" <th scope='col'>Standard Placement</th>");
-						sb.Append(" <th scope='col'>Placement</th>");
-						sb.Append(" <th scope='col'>Supplier / Supplier Article</th>");
+						sbHeader.Append(" <th scope='col'>Standard Placement</th>");
+						sbHeader.Append(" <th scope='col'>Placement</th>");
+						sbHeader.Append(" <th scope='col'>Supplier / Supplier Article</th>");
 					}
 
 					sSql = "select * \n";
@@ -295,7 +297,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 								string sA = drGAP_BOMGarmentcolor[0]["A" + i].ToString();
 								if (!string.IsNullOrEmpty(sA))
 								{
-									sb.Append(" <th scope='col'>" + sA + "</th>");
+									sbHeader.Append(" <th scope='col'>" + sA + "</th>");
 									arrColorHeader.Add(sA);
 									iColorCnt++;
 								}
@@ -307,8 +309,13 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 						}
 
 					}
-					sb.Append(" <th scope='col'></th>");
-					sb.Append("</tr>");
+					sbHeader.Append(" <th scope='col'></th>");
+					sbHeader.Append("</tr>");
+
+					if (iColorCnt == 0)
+						continue;
+
+					sb.Append(sbHeader);
 
 					DataRow[] drBoms = dt.Select("type='" + itemType.type + "' and lubcid='" + itemType.lubcid + "'", "org_lubid asc");
 					int idx = 0;
@@ -390,11 +397,11 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 						{
 							sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='QualityDetails' onclick='editBom(this)'>" + QualityDetails + "</td>");
 							sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='supplier' onclick='editBom(this)'>" + supplier + "</td>");
-				
-						}
-						
 
-						
+						}
+
+
+
 
 
 						for (int i = 1; i <= iColorCnt; i++)
@@ -610,10 +617,10 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 						sb.Append(" </td>");
 						sb.Append("</tr>");
 
-                        if (!string.IsNullOrEmpty(POMNote))
-                        {
+						if (!string.IsNullOrEmpty(POMNote))
+						{
 							sb.Append("<tr>");
-							sb.Append("<td colspan='"+(5+ iOtherCnt) + "'>   -> " + POMNote + "</td>");
+							sb.Append("<td colspan='" + (5 + iOtherCnt) + "'>   -> " + POMNote + "</td>");
 							sb.Append("</tr>");
 						}
 
@@ -657,7 +664,12 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 	public string Compare(string org, string newText, string note, bool IsMapping = true)
 	{
 		if (org == newText)
-			return org;
+		{
+			if (string.IsNullOrEmpty(note))
+				return org;
+			else
+				return org+ "<br><font color='blue'>中:" + note + "</font>";
+		}
 		else
 		{
 			if (IsMapping)

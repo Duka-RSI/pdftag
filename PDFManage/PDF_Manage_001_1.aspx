@@ -123,14 +123,14 @@
                 <div class="modal-body">
                     <table class="table">
                         <tr>
-                            <th>群組名稱:
+                            <th>群組名稱:<font color="red">*</font>
                             </th>
                             <td align="left">
                                 <asp:TextBox ID="gmname" runat="server" CssClass="form-control"></asp:TextBox>
                             </td>
                         </tr>
                         <tr>
-                            <th>群組類別:
+                            <th>群組類別:<font color="red">*</font>
                             </th>
                             <td align="left">
                                 <asp:DropDownList ID="dlgmcate" runat="server">
@@ -203,7 +203,20 @@
 
 
         }
+        function check() {
+				let gmname =$('#<%=gmname.ClientID %>').val();
+				let gmcate = $('#<%=dlgmcate.ClientID %>').val();
+				
+				if (!gmname) {
+					alert('群組名稱 不可空白');
+					return false;
+				}
 
+				if (!gmcate) {
+					alert('群組類別 必選');
+					return false;
+				}
+			}
 
 
         function Open(filePath) {

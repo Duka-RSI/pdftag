@@ -25,7 +25,7 @@ public partial class Login : System.Web.UI.Page
 
         try
         {
-
+            pwd = PublicFunction.Base64Encode(pwd);
             bLogin = LoginUser.validateUser(account, pwd);
 
             LogFile.Logger.Log("Login account="+ account+" ,isLogin="+ bLogin);
@@ -49,6 +49,7 @@ public partial class Login : System.Web.UI.Page
         }
         else
         {
+            LogFile.Logger.Log("Login Fail.account="+ account+" pw="+ pwd);
             script = "alert('登入失敗,帳號密碼失敗!');";
         }
 

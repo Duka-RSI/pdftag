@@ -201,7 +201,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
         SQLHelper sql = new SQLHelper();
         string sSql = "";
 
-        sSql += "update PDFTAG.dbo.Account set PASSWORD='1111'   \n";
+        sSql += "update PDFTAG.dbo.Account set PASSWORD=@PASSWORD  \n";
         sSql += " where aid=@aid     \n";
 
 
@@ -209,7 +209,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
         using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
         {
             cm.Parameters.AddWithValue("@aid", aid);
-
+            cm.Parameters.AddWithValue("@PASSWORD", PublicFunction.Base64Encode("1111"));
             cm.ExecuteNonQuery();
         }
     }
@@ -258,7 +258,7 @@ values
                 cm.Parameters.AddWithValue("@USER_FULLNAME", USER_FULLNAME.Text);
                 cm.Parameters.AddWithValue("@USER_AD", USER_AD.Text);
                 cm.Parameters.AddWithValue("@DEPARTMENT", DEPARTMENT.Text);
-                cm.Parameters.AddWithValue("@PASSWORD", "1111");
+                cm.Parameters.AddWithValue("@PASSWORD", PublicFunction.Base64Encode("1111"));
 
           
                 List<string> arrCUST_NO = new List<string>();
@@ -326,7 +326,7 @@ values
                 cm.Parameters.AddWithValue("@USER_FULLNAME", USER_FULLNAME.Text);
                 cm.Parameters.AddWithValue("@USER_AD", USER_AD.Text);
                 cm.Parameters.AddWithValue("@DEPARTMENT", DEPARTMENT.Text);
-                cm.Parameters.AddWithValue("@PASSWORD", "1111");
+                cm.Parameters.AddWithValue("@PASSWORD", PublicFunction.Base64Encode("1111"));
 
 
                 List<string> arrCUST_NO = new List<string>();
