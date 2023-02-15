@@ -240,7 +240,7 @@
                         </tr>
                         <tr>
                             <td align="left" colspan="2">群組類別:
-                                <asp:DropDownList ID="dlgmcate" runat="server">
+                                <asp:DropDownList ID="dlgmcate" runat="server" Enabled="false">
                                     <%-- <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
                                     <asp:ListItem Value="2" Text="UA"></asp:ListItem>
                                     <asp:ListItem Value="3" Text="GAP"></asp:ListItem>--%>
@@ -368,8 +368,19 @@
         }
 
         function onSave() {
-
+            let file = $('#ctl00_ContentPlaceHolder1_FileUpload1').val();
             let gmid = '';
+
+            if (!file) {
+                alert('必須要夾檔');
+                return false;
+            }
+            let lastDot = file.lastIndexOf('.');
+            let ext = file.substring(lastDot + 1);
+            if (ext.toLowerCase() !='pdf') {
+                alert('上傳檔案必須是pdf檔');
+                return false;
+            }
 
 
             $('.ckgmid').each(function () {

@@ -604,23 +604,25 @@ order by a.pidate,a.pipid";
 
 				foreach (var itemType in arrTypes)
 				{
-					if (!arrExistTypes.Contains(itemType.type))
-						sb.Append("<h4>" + itemType.type + "</h4>");
+					StringBuilder sbHeader = new StringBuilder();
+
+					//if (!arrExistTypes.Contains(itemType.type))
+					sbHeader.Append("<h4>" + itemType.type + "</h4>");
 
 					arrExistTypes.Add(itemType.type);
 
 
-					sb.Append("<table class='table table-hover'>");
-					sb.Append("<tr>");
+					sbHeader.Append("<table class='table table-hover'>");
+					sbHeader.Append("<tr>");
 					//sb.Append(" <th scope='col'>Standard Placement</th>");
 					//sb.Append(" <th scope='col'>Placement</th>");
 					//sb.Append(" <th scope='col'>Supplier / Supplier Article</th>"); ;
 
-					sb.Append(" <th scope='col'>Product</th>");
-					sb.Append(" <th scope='col'>Usage</th>");
-					sb.Append(" <th scope='col'>Supplier Article Number</th>");
-					sb.Append(" <th scope='col'>Quality Details</th>");
-					sb.Append(" <th scope='col'>Supplier[Allocate]</th>");
+					sbHeader.Append(" <th scope='col'>Product</th>");
+					sbHeader.Append(" <th scope='col'>Usage</th>");
+					sbHeader.Append(" <th scope='col'>Supplier Article Number</th>");
+					sbHeader.Append(" <th scope='col'>Quality Details</th>");
+					sbHeader.Append(" <th scope='col'>Supplier[Allocate]</th>");
 
 
 					List<bool> arrCompareHeaderResult = new List<bool>();
@@ -630,9 +632,6 @@ order by a.pidate,a.pipid";
 
 
 					#region lubcid
-
-					int iColorCnt = 0;
-					//int iColorMoreCnt = 0;
 
 					//20220419
 					//	來源文件 與 比對目的 都有的欄位 ，欄位底色顯示水藍色 #00FFFF
@@ -670,6 +669,7 @@ order by a.pidate,a.pipid";
 						da.Fill(dtGAP_BOMGarmentcolor);
 					}
 					arrGAP_BOMGarmentcolors = new List<string>();
+					int iColorCnt = 0;
 					foreach (DataRow drColor in dtGAP_BOMGarmentcolor.Rows)
 					{
 						for (int i = 1; i <= 10; i++)
@@ -684,15 +684,20 @@ order by a.pidate,a.pipid";
 							var isExistCompare = arrGAP_BOMGarmentcolorsCompare.Any(x => x == sA);
 
 							if (!isExistCompare)
-								sb.Append(" <th scope='col' style='background-color:#FF9224'>" + sA + "</th>");
+								sbHeader.Append(" <th scope='col' style='background-color:#FF9224'>" + sA + "</th>");
 							else
-								sb.Append(" <th scope='col' style='background-color:#00FFFF'>" + sA + "</th>");
+								sbHeader.Append(" <th scope='col' style='background-color:#00FFFF'>" + sA + "</th>");
 							arrGAP_BOMGarmentcolors.Add(sA);
+							iColorCnt++;
 						}
 					}
 
-					sb.Append("</tr>");
+					sbHeader.Append("</tr>");
 
+					if (iColorCnt == 0)//沒有色組的部分不用顯示
+						continue;
+
+					sb.Append(sbHeader);
 
 					DataRow[] drBoms = dt.Select("type='" + itemType.type + "' and lubcid='" + itemType.lubcid + "' ", "org_lubid asc");
 					DataRow[] drComareBoms = dtCompare.Select("type='" + itemType.type + "' ", "org_lubid asc");
@@ -1017,7 +1022,7 @@ order by a.pidate,a.pipid";
 
 					#endregion
 
-					//沒比對到的
+					#region 沒比對到的
 					var isNotComare = arrCompareData.Any(w => !w.isExistA);
 
 					Response.Write("<!--NotComare Count=" + arrCompareData.Where(w => !w.isExistA).Count() + "-->");
@@ -1066,11 +1071,16 @@ order by a.pidate,a.pipid";
 
 						sbNotExit.Append("</tr>");
 
-						var arrRowIds = arrCompareData.Where(w => !w.isExistA).Select(s => s.rowId).Distinct().OrderBy(o => o).ToList();
+						//var arrRowIds = arrCompareData.Where(w => !w.isExistA).Select(s => s.rowId).Distinct().OrderBy(o => o).ToList();
+						var arrProducts = arrCompareData.Where(w => !w.isExistA).Select(s => s.StandardPlacement_org).Distinct().OrderBy(o => o).ToList();
 
-						foreach (var rowId in arrRowIds)
+						//foreach (var rowId in arrRowIds)
+						foreach (var product in arrProducts)
 						{
-							var resItem = arrCompareData.FirstOrDefault(x => x.rowId == rowId);
+							//var resItem = arrCompareData.FirstOrDefault(x => x.rowId == rowId);
+							var arrItem = arrCompareData.Where(x => x.StandardPlacement_org == product).ToList();
+							var resItem = arrItem.First();
+							var arrItemRowIds = arrItem.Select(s => s.rowId).ToList();
 
 							sbNotExit.Append("<tr>");
 							sbNotExit.Append(" <td scope='col'>" + resItem.StandardPlacement_org + "</td>");
@@ -1089,7 +1099,8 @@ order by a.pidate,a.pipid";
 								{
 									//sbNotExit.Append(" <td scope='col'>X</td>");
 									//20230210 帶出目的資料
-									var resColor = arrCompareData.FirstOrDefault(x => x.rowId == rowId && x.ColorName == color);
+									//var resColor = arrCompareData.FirstOrDefault(x => x.rowId == rowId && x.ColorName == color);
+									var resColor = arrCompareData.FirstOrDefault(x => arrItemRowIds.Contains(x.rowId) && x.ColorName == color);
 									if (resColor == null)
 										sbNotExit.Append(" <td scope='col'>X</td>");
 									else
@@ -1108,6 +1119,7 @@ order by a.pidate,a.pipid";
 					}
 					//divHeaderNotCompare.InnerHtml = sbNotExit.ToString();
 					//Response.Write("<!--sbNotExit =" + sbNotExit.ToString() + "-->");
+					#endregion
 				}
 
 

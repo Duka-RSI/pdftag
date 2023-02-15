@@ -180,13 +180,20 @@
 			});
 
 			function check() {
-				let USER_AD =$('#<%=USER_AD.ClientID %>').val();
+				let USER_AD = $('#<%=USER_AD.ClientID %>').val();
 				let CUST_NO_1 = $('#<%=CUST_NO_1.ClientID %>').prop('checked');
 				let CUST_NO_2 = $('#<%=CUST_NO_2.ClientID %>').prop('checked');
 				let CUST_NO_3 = $('#<%=CUST_NO_3.ClientID %>').prop('checked');
 
 				if (!USER_AD) {
 					alert('帳號不可空白');
+					return false;
+				}
+
+				USER_AD = USER_AD.replace(/ /g, "");
+
+				if (!USER_AD) {
+					alert('帳號不能只有空白');
 					return false;
 				}
 
