@@ -1122,6 +1122,7 @@ order by a.pidate,a.pipid";
 
                         sbNotExit.Append("</table>");
 
+                        //目的沒比對的Product
                         if (arrNotExistProducts.Count > 0)
                         {
                             foreach (var product in arrNotExistProducts)
@@ -1143,7 +1144,7 @@ order by a.pidate,a.pipid";
 
                                 sbNotExit.Append("</tr>");
 
-                                var arrItem = arrCompareData.Where(x => x.StandardPlacement_org == product).ToList();
+                                var arrItem = arrCompareData.Where(x => !x.isExistA && x.StandardPlacement_org == product).ToList();
                                 var resItem = arrItem.First();
                                 var arrItemRowIds = arrItem.Select(s => s.rowId).ToList();
 
@@ -1157,20 +1158,11 @@ order by a.pidate,a.pipid";
 
                                 foreach (var color in arrGAP_BOMGarmentcolorsCompare)
                                 {
-                                    //var isExistCompare = arrGAP_BOMGarmentcolorsCompare.Any(x => x == color);
-                                    var isExistSource = arrGAP_BOMGarmentcolorsSource.Any(x => x == color);
-
-                                    if (!isExistSource)
-                                    {
-                                        //sbNotExit.Append(" <td scope='col'>X</td>");
-                                        //20230210 帶出目的資料
-                                        //var resColor = arrCompareData.FirstOrDefault(x => x.rowId == rowId && x.ColorName == color);
-                                        var resColor = arrCompareData.FirstOrDefault(x => arrItemRowIds.Contains(x.rowId) && x.ColorName == color);
-                                        if (resColor == null)
-                                            sbNotExit.Append(" <td scope='col'>X</td>");
-                                        else
-                                            sbNotExit.Append(" <td scope='col'>" + resColor.ColorVal + "</td>");
-                                    }
+                                    var resColor = arrCompareData.FirstOrDefault(x => !x.isExistA && x.StandardPlacement_org == product && x.ColorName == color);
+                                    if (resColor == null)
+                                        sbNotExit.Append(" <td scope='col'>X</td>");
+                                    else
+                                        sbNotExit.Append(" <td scope='col'>" + resColor.ColorVal + "</td>");
                                 }
                                 sbNotExit.Append("</tr>");
                                 sbNotExit.Append("</table>");
