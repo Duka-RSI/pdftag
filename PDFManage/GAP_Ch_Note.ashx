@@ -39,7 +39,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
         sSql = "select * \n";
         sSql += "from PDFTAG.dbo.GAP_Ch_Note  a             \n";
         sSql += "where 1=1 \n";
-        sSql += " and a.IdName =@IdName  and a.IdName =@IdName and a.ColName =@ColName \n";
+        sSql += " and a.IdName =@IdName  and a.id=@id and a.ColName =@ColName \n";
 
         using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
         {

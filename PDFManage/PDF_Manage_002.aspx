@@ -71,10 +71,10 @@
                 <td style="height: 450px; vertical-align: top;">
 
                     <table class="table table-hover">
-                        <tr>
+                       <%-- <tr>
                             <th scope="col" colspan="5">文件來源</th>
                             <th scope="col" colspan="3">編輯來源</th>
-                        </tr>
+                        </tr>--%>
                         <tr>
                             <th scope="col">編號</th>
                             <th scope="col">標題</th>
