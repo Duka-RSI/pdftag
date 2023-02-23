@@ -304,13 +304,49 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 	{
 		SQLHelper sql = new SQLHelper();
 		string sSql = "";
+        DataTable dtV = new DataTable();
+        sSql = "select pver from PDFTAG.dbo.P_inProcess where pipid = " + pipid;
+        using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
+        {
+            cm.CommandText = sSql;
+            cm.Parameters.Clear();
+            using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+            {
+                da.Fill(dtV);
+            }
+        }
 
-		sSql += "update PDFTAG.dbo.P_inProcess set isshow=1    \n";
-		sSql += " where pipid=@pipid     \n";
+        sSql = " update PDFTAG.dbo.P_inProcess set isshow = 1 where pipid = @pipid     \n";
+        //編輯的版本也一併更新
+        if (dtV.Rows[0][0].ToString() == "1")//LULU
+        {
+            sSql += @" update  P_inProcess set isShow = 1
+                where pipid = (
+                select e.pipid from Lu_Header o
+                inner join Lu_Header e on e.org_luhid = o.luhid
+                where o.pipid  = @pipid
+                )";
+        }
+        else if (dtV.Rows[0][0].ToString() == "2")//UA
+        {
+            sSql += @" update  P_inProcess set isShow = 1
+                where pipid = (
+                select e.pipid from UA_Header o
+                inner join UA_Header e on e.org_luhid = o.luhid
+                where o.pipid  = @pipid
+                )";
+        }
+        else if (dtV.Rows[0][0].ToString() == "3")//GAP
+        {
+            sSql += @" update  P_inProcess set isShow = 1
+                where pipid = (
+                select e.pipid from GAP_Header o
+                inner join GAP_Header e on e.org_luhid = o.luhid
+                where o.pipid  = @pipid
+                )";
+        }
 
-
-
-		using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
+        using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
 		{
 			cm.Parameters.AddWithValue("@pipid", pipid);
 
@@ -323,14 +359,8 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 		SQLHelper sql = new SQLHelper();
 		DataTable dt = new DataTable();
 		string sSql = "";
-
-
-
-
+        
 		StringBuilder sbLog = new StringBuilder();
-
-
-
 
 		List<Lu_LearnmgrItemDto> arrLu_LearnmgrItemDto = new List<Lu_LearnmgrItemDto>();
 
@@ -2054,10 +2084,15 @@ insert into PDFTAG.dbo.Lu_SizeTable
 
 						if (sLine.Contains("Design Number"))
 						{
-							gAP_HeaderDto.style = sLine.Replace("Design Number", "").Trim().TrimStart('D');
+							gAP_HeaderDto.style = sLine.Replace("Design Number", "").Trim();
 							isHeader = true;
 						}
-						if (isHeader)
+                        if (sLine.Contains("Legacy Style Numbers"))
+                        {
+                            if(sLine.Replace("Legacy Style Numbers", "").Trim().Length > 0)
+                                gAP_HeaderDto.style = sLine.Replace("Legacy Style Numbers", "").Trim() + "_" + gAP_HeaderDto.style;
+                        }
+                        if (isHeader)
 						{
 							if (sLine.Contains("Season"))
 							{
@@ -3705,8 +3740,10 @@ values
 				string new_season = "";
 				if (titleType == "1")
 				{
-					ptitle += "-" + season2;
-
+                    if (ptitle.IndexOf("_") > -1)
+                        ptitle = ptitle.Insert(ptitle.IndexOf("_"), string.Format("-{0}", season2));
+                    else
+                        ptitle += "-" + season2;
 				}
 
 				sSql = "update PDFTAG.dbo.P_inProcess    \n";

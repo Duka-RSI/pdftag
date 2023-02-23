@@ -1187,14 +1187,13 @@ order by a.pidate,a.pipid";
                 List<string> listSourceSizeTableHeader = new List<string>();       //來源的尺寸
                 List<string> listCompareSizeTableHeader = new List<string>();    //目的的尺寸
 
-                sSql = "select a.*,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15 \n";
-                sSql += "from PDFTAG.dbo.GAP_SizeTable a              \n";
-                sSql += "join  PDFTAG.dbo.GAP_SizeTable_Header b on a.lusthid=b.lusthid               \n";
-                sSql += " where 1=1   \n";
-                //sSql += " and a.luhid =@luhid   \n";
-                sSql += " and a.pipid =@pipid   \n";
-                sSql += " and a.lusthid in ('" + hid_Source_lusthid.Value.Replace(",", "','") + "')   \n";
-                sSql += " order by lusthid,rowid asc    \n";
+                sSql = @"select a.*,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15
+                    from PDFTAG.dbo.GAP_SizeTable a
+                    join  PDFTAG.dbo.GAP_SizeTable_Header b on a.lusthid=b.lusthid
+                    where 1=1
+                    and a.pipid =@pipid
+                    --and a.lusthid in ('" + hid_Source_lusthid.Value.Replace(",", "','") + @"')--直接全抓
+                    order by lusthid,rowid asc ";
                 Response.Write("<!--" + sSql + "-->");
                 cm.CommandText = sSql;
                 cm.Parameters.Clear();

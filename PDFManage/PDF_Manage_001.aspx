@@ -287,7 +287,7 @@
             let pver = $('#<%= ddlpver.ClientID %>').val();
             if (pver == "3") {
                 
-                $('#rowGap').show();
+                //$('#rowGap').show();
             } else {
                 $('#rowGap').val('1');
                 $('#rowGap').hide();

@@ -121,10 +121,14 @@
 									<table class="table">
 										<tr>
 											<th></th>
-											<th>COLOR_DESC	
-											</th>
-											<th>COLOR_DESC_CHN
-											</th>
+											<th>COLOR_GROUP	
+												</th>
+                                                <th>COLOR_DESC	
+												</th>
+                                                <th>CUST_COLOR_WAY	
+												</th>
+												<th>ERP_COLORID
+												</th>
 										</tr>
 										<tbody id="tblCOLOR_DESC"></tbody>
 									</table>
@@ -922,8 +926,10 @@
 					for (let i in res) {
 						html += "<tr>";
 						html += "<td><input type='radio' name='rbCOLOR_DESC' data-COLOR_DESC='" + res[i].COLOR_DESC + "' onchange='onRbCOLOR_DESC_change(this)' /></td>";
+						html += "<td>" + res[i].COLOR_GROUP + "</td>";
 						html += "<td>" + res[i].COLOR_DESC + "</td>";
-						html += "<td>" + res[i].COLOR_DESC_CHN + "</td>";
+						html += "<td>" + res[i].CUST_COLOR_WAY + "</td>";
+						html += "<td>" + res[i].ERP_COLORID + "</td>";
 						html += "</tr>";
 					}
 					$('#tblCOLOR_DESC').html(html);

@@ -36,9 +36,9 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
         COLOR_DESC = COLOR_DESC.Trim();
 
-        sSql = @"select distinct COLOR_DESC,COLOR_DESC_CHN
+        sSql = @"select distinct COLOR_GROUP,COLOR_DESC,CUST_COLOR_WAY,ERP_COLORID
 from [RD_SAMPLE].[dbo].[SAM_MAT_COLOR_DEF] a 
-where 1=1";
+where 1=1 AND ENABLE_FLAG = 'Y' ";
 
         if (!string.IsNullOrEmpty(COLOR_DESC))
         {
