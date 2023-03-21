@@ -434,7 +434,7 @@ order by a.pidate,a.pipid";
 
                 #region Lu_BOM
 
-                sSql = "select a.*,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,'0' as isExist \n";
+                sSql = "select a.*,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18,A19,A20,A21,A22,A23,A24,A25,A26,A27,A28,A29,A30,A31,A32,A33,A34,A35,A36,A37,A38,A39,A40,A41,A42,A43,A44,A45,A46,A47,A48,A49,A50,'0' as isExist \n";
                 sSql += "from PDFTAG.dbo.Lu_BOM a              \n";
                 sSql += "join  PDFTAG.dbo.Lu_BOMGarmentcolor b on a.lubcid=b.lubcid               \n";
                 sSql += " where 1=1   \n";
@@ -461,7 +461,7 @@ order by a.pidate,a.pipid";
                     da.Fill(dtCompare);
                 }
 
-                sSql = "select distinct A1,A2,A3,A4,A5,A6,A7,A8,A9,A10 \n";
+                sSql = "select distinct A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18,A19,A20,A21,A22,A23,A24,A25,A26,A27,A28,A29,A30,A31,A32,A33,A34,A35,A36,A37,A38,A39,A40,A41,A42,A43,A44,A45,A46,A47,A48,A49,A50 \n";
                 sSql += "from PDFTAG.dbo.Lu_BOMGarmentcolor a              \n";
                 sSql += " where a.luhid = @luhid   \n";
                 Response.Write("<!--" + sSql + "-->");
@@ -492,7 +492,7 @@ order by a.pidate,a.pipid";
 
                 foreach (DataRow drColor in dtLu_BOMGarmentcolor.Rows)
                 {
-                    for (int i = 1; i <= 10; i++)
+                    for (int i = 1; i <= 50; i++)
                     {
                         string sA = drColor["A" + i].ToString();
 
@@ -507,7 +507,7 @@ order by a.pidate,a.pipid";
                 }
                 foreach (DataRow drColor in dtLu_BOMGarmentcolor_Compare.Rows)
                 {
-                    for (int i = 1; i <= 10; i++)
+                    for (int i = 1; i <= 50; i++)
                     {
                         string sA = drColor["A" + i].ToString();
 
@@ -635,7 +635,7 @@ order by a.pidate,a.pipid";
                     arrLu_BOMGarmentcolors = new List<string>();
                     foreach (DataRow drColor in dtLu_BOMGarmentcolor.Rows)
                     {
-                        for (int i = 1; i <= 10; i++)
+                        for (int i = 1; i <= 50; i++)
                         {
                             string sA = drColor["A" + i].ToString();
 
@@ -665,7 +665,7 @@ order by a.pidate,a.pipid";
                     int iRowId = 1;
                     foreach (DataRow drBomMain in drComareBoms)
                     {
-                        for (int i = 1; i <= 10; i++)
+                        for (int i = 1; i <= 50; i++)
                         {
                             string sColorName = drBomMain["A" + i].ToString();
                             string sColorVal = drBomMain["B" + i].ToString();
@@ -815,7 +815,7 @@ order by a.pidate,a.pipid";
                             foreach (var color in arrLu_BOMGarmentcolors)
                             {
                                 bool isFind = false;
-                                for (int i = 1; i <= 10; i++)
+                                for (int i = 1; i <= 50; i++)
                                 {
                                     string colorName = drBoms[b]["A" + i].ToString();
                                     if (color == colorName)
@@ -959,7 +959,7 @@ order by a.pidate,a.pipid";
                         List<string> curBomStyleColor = new List<string>();
                         foreach (DataRow drColor in dtLu_BOMGarmentcolor.Rows)
                         {
-                            for (int i = 1; i <= 10; i++)
+                            for (int i = 1; i <=50; i++)
                             {
                                 string sA = drColor["A" + i].ToString();
 
@@ -998,7 +998,7 @@ order by a.pidate,a.pipid";
                         int iRowId = 1;
                         foreach (DataRow drBomMain in drComareBoms)
                         {
-                            for (int i = 1; i <= 10; i++)
+                            for (int i = 1; i <= 50; i++)
                             {
                                 string sColorName = drBomMain["A" + i].ToString();
                                 string sColorVal = drBomMain["B" + i].ToString();
@@ -1098,7 +1098,7 @@ order by a.pidate,a.pipid";
                     arrLu_BOMGarmentcolors = new List<string>();
                     foreach (DataRow drColor in dtLu_BOMGarmentcolor.Rows)
                     {
-                        for (int i = 1; i <= 10; i++)
+                        for (int i = 1; i <= 50; i++)
                         {
                             string sA = drColor["A" + i].ToString();
 
@@ -1130,7 +1130,7 @@ order by a.pidate,a.pipid";
                     int iRowId = 1;
                     foreach (DataRow drBomMain in drComareBoms)
                     {
-                        for (int i = 1; i <= 10; i++)
+                        for (int i = 1; i <=50; i++)
                         {
                             string sColorName = drBomMain["A" + i].ToString();
                             string sColorVal = drBomMain["B" + i].ToString();
@@ -1260,7 +1260,7 @@ order by a.pidate,a.pipid";
                         foreach (var color in arrLu_BOMGarmentcolors)
                         {
                             bool isFind = false;
-                            for (int i = 1; i <= 10; i++)
+                            for (int i = 1; i <= 50; i++)
                             {
                                 string colorName = drBoms[b]["A" + i].ToString();
                                 if (color == colorName)
