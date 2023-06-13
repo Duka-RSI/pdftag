@@ -1483,7 +1483,7 @@ values
             DateTime dtNow = DateTime.Now;
             string sFilePath = "";
 
-          
+
 
 
             sSql = "select count(*)+1 as cnt \n";
@@ -1577,13 +1577,13 @@ from PDFTAG.dbo.Lu_Header where pipid=@pipid; SELECT SCOPE_IDENTITY();";
                 long new_luhid = Convert.ToInt64(cm.ExecuteScalar().ToString());
 
                 sSql = @"insert into PDFTAG.dbo.Lu_BOMGarmentcolor 
-(luhid,A"+ string.Join(",A", arrColorNames) + @") 
- select '" + new_luhid + @"' as luhid,A"+ string.Join(",A", arrColorNames) + @"
+(luhid,A" + string.Join(",A", arrColorNames) + @") 
+ select '" + new_luhid + @"' as luhid,A" + string.Join(",A", arrColorNames) + @"
    from PDFTAG.dbo.Lu_BOMGarmentcolor where luhid=@luhid;
 
 insert into PDFTAG.dbo.Lu_BOM 
-(luhid,type,rowid,StandardPlacement,Placement,SupplierArticle,Supplier,B"+ string.Join(",B", arrColorNames) + @",org_lubid,lubcid) 
- select '" + new_luhid + @"' as luhid,type,rowid,StandardPlacement,Placement,SupplierArticle,Supplier,B"+ string.Join(",B", arrColorNames) + @",lubid as org_lubid,lubcid
+(luhid,type,rowid,StandardPlacement,Placement,SupplierArticle,Supplier,B" + string.Join(",B", arrColorNames) + @",org_lubid,lubcid) 
+ select '" + new_luhid + @"' as luhid,type,rowid,StandardPlacement,Placement,SupplierArticle,Supplier,B" + string.Join(",B", arrColorNames) + @",lubid as org_lubid,lubcid
   from PDFTAG.dbo.Lu_BOM where luhid=@luhid;
 
 insert into PDFTAG.dbo.Lu_SizeTable 
@@ -5047,59 +5047,72 @@ where b.pipid=@pipid;
         Document pdfDocument = new Document(sPdfPath);
 
         StringBuilder sb = new StringBuilder();
+        int iPage = 0;
         foreach (var page in pdfDocument.Pages)
         {
-            Aspose.Pdf.Text.TableAbsorber absorber = new Aspose.Pdf.Text.TableAbsorber();
-            absorber.Visit(page);
-            foreach (AbsorbedTable table in absorber.TableList)
+            try
             {
-                Console.WriteLine("Table");
-                foreach (AbsorbedRow row in table.RowList)
+                iPage++;
+                Aspose.Pdf.Text.TableAbsorber absorber = new Aspose.Pdf.Text.TableAbsorber();
+                absorber.Visit(page);
+                foreach (AbsorbedTable table in absorber.TableList)
                 {
-
-                    sb.Append("@Row: ");
-
-                    bool isHeader = false;
-                    if (row.CellList.Any(a => a.TextFragments.Any(t => t.Text.Contains("Season:"))))
-                        isHeader = true;
-
-                    foreach (AbsorbedCell cell in row.CellList)
+                    Console.WriteLine("Table");
+                    foreach (AbsorbedRow row in table.RowList)
                     {
-                        string cellText = "";
-                        bool getSamplStep = false;
-                        bool getSamplSize = false;
-                        foreach (TextFragment fragment in cell.TextFragments)
+
+                        sb.Append("@Row: ");
+
+                        bool isHeader = false;
+                        if (row.CellList.Any(a => a.TextFragments.Any(t => t.Text.Contains("Season:"))))
+                            isHeader = true;
+
+                        foreach (AbsorbedCell cell in row.CellList)
                         {
-                            if (fragment.BaselinePosition.YIndent <= 11)
+                            string cellText = "";
+                            bool getSamplStep = false;
+                            bool getSamplSize = false;
+                            foreach (TextFragment fragment in cell.TextFragments)
                             {
-                                //Remove "Modified Date:Aug 11, 2020.."
-                                continue;
+                                if (fragment.BaselinePosition.YIndent <= 11)
+                                {
+                                    //Remove "Modified Date:Aug 11, 2020.."
+                                    continue;
+                                }
+
+                                foreach (TextSegment seg in fragment.Segments)
+                                {
+                                    //if(seg.Text== "Standard")
+                                    //{
+
+                                    //}
+
+                                    cellText += (isHeader ? (seg.Text.EndsWith(":") ? "&" : "") : "") + seg.Text + " ";
+                                    if (getSamplStep) { listSampleStep.Add(seg.Text); getSamplStep = false; }
+                                    else if (getSamplSize) { listSampleSize.Add(seg.Text); getSamplSize = false; }
+                                    if (seg.Text == "Sample") { getSamplStep = true; }
+                                    else if (seg.Text == "Sample Size") { getSamplSize = true; }
+                                }
+                                //sb.Append(seg.Text + " | ");
+                                //Console.Write($"{sb.ToString()}|");                              
                             }
-
-                            foreach (TextSegment seg in fragment.Segments)
-                            {
-                                //if(seg.Text== "Standard")
-                                //{
-
-                                //}
-
-                                cellText += (isHeader ? (seg.Text.EndsWith(":") ? "&" : "") : "") + seg.Text + " ";
-                                if (getSamplStep) { listSampleStep.Add(seg.Text); getSamplStep = false; }
-                                else if (getSamplSize) { listSampleSize.Add(seg.Text); getSamplSize = false; }
-                                if (seg.Text == "Sample") { getSamplStep = true; }
-                                else if (seg.Text == "Sample Size") { getSamplSize = true; }
-                            }
-                            //sb.Append(seg.Text + " | ");
-                            //Console.Write($"{sb.ToString()}|");                              
+                            //if (cellText.StartsWith("Modified D")) cellText = "";
+                            sb.Append(cellText + " | ");
                         }
-                        //if (cellText.StartsWith("Modified D")) cellText = "";
-                        sb.Append(cellText + " | ");
+
+                        Console.WriteLine();
                     }
 
-                    Console.WriteLine();
+                    sb.AppendLine("----");
                 }
 
-                sb.AppendLine("----");
+
+            }
+            catch (Exception ex)
+            {
+                //throw ex;
+                LogFile.Logger.Log("[ConvertPDFToText] sPdfPath="+ sPdfPath + " iPage=" + iPage + " Exception=" + ex.ToString());
+                Response.Write("<!--[ConvertPDFToText] iPage=" + iPage + " Exception=" + ex.ToString()+"-->");
             }
         }
 
