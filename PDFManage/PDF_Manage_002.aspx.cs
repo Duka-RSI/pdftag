@@ -72,32 +72,25 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 			dlTitle.Items.Insert(0, new System.Web.UI.WebControls.ListItem("全部", ""));
 
 
+            foreach (string sCust in LoginUser.CUST_NO)
+            {
+                sSql = @"select * from CUSTOMER_MAPPING where PVER = " + sCust;
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                DataTable dtCust = new DataTable();
+                using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                {
+                    da.Fill(dtCust);
+                }
+                foreach (DataRow drCust in dtCust.Rows)
+                {
+                    dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem(drCust["CUSTOMER"].ToString(), sCust));
+                    ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem(drCust["CUSTOMER"].ToString(), sCust));
+                }
+            }
+        }
 
-
-
-		}
-
-
-		if (LoginUser.CUST_NO.Contains("1"))
-		{
-			dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
-			ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
-			//dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
-		}
-		if (LoginUser.CUST_NO.Contains("2"))
-		{
-			dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
-			ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
-			//dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
-		}
-		if (LoginUser.CUST_NO.Contains("3"))
-		{
-			dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
-			ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
-			//dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
-		}
-
-		if (dlVersion.Items.Count > 0)
+        if (dlVersion.Items.Count > 0)
 		{
 			dlVersion_SelectedIndexChanged(null, null);
 		}
@@ -116,11 +109,22 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 		string ptitle = dlTitle.SelectedItem.Value;
 		try
 		{
-			sSql += "select b.pipid,b.ptitle,b.pidate,b.piuploadfile,b.pver,b.creator,a.hdid,a.hisversion,a.editdate \n";
-			sSql += "from PDFTAG.dbo.HistoryData a              \n";
-			sSql += " join PDFTAG.dbo.P_inProcess b on a.hdid=b.hdid and b.isshow=0            \n";
-			sSql += " where 1=1 and a.isshow=0  \n";
-			sSql += " and a.pipid in (select pipid from PDFTAG.dbo.P_inProcess where isshow=0)   \n"; //濾掉已刪除的主檔
+			sSql += @"select b.pipid,b.ptitle,b.pidate,b.piuploadfile,b.pver,b.creator,a.hdid,a.hisversion,a.editdate 
+                ,case when b.pver = 1 then LuH.generateddate
+		            when b.pver = 2 then UAH.generateddate
+		            when b.pver = 3 then GAPH.generateddate
+                    when b.pver > 3 then H.generateddate
+		            end as generateddate
+                ,cust.CUSTOMER
+                from PDFTAG.dbo.HistoryData a
+                join PDFTAG.dbo.P_inProcess b on a.hdid=b.hdid and b.isshow=0
+                inner join CUSTOMER_MAPPING cust on b.pver = cust.pver 
+                left join Lu_Header LuH on LuH.pipid = b.pipid
+                left join UA_Header UAH on UAH.pipid = b.pipid
+                left join GAP_Header GAPH on GAPH.pipid = b.pipid
+                left join Header_H H on H.pipid = b.pipid
+                where 1=1 and a.isshow=0
+                and a.pipid in (select pipid from PDFTAG.dbo.P_inProcess where isshow=0)"; //濾掉已刪除的主檔
 
 			if (!string.IsNullOrEmpty(ptitle))
 				sSql += " and (b.ptitle = '" + ptitle + "'  ) \n";

@@ -16,6 +16,7 @@ public class UA_BomDto
     public string Usage { get; set; }
     public string Supplier { get; set; }
     public string lusthid { get; set; }
+    public string QTY { get; set; }
     public string B1 { get; set; }
     public string B2 { get; set; }
     public string B3 { get; set; }

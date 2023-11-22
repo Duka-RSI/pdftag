@@ -78,7 +78,7 @@
                         <tr>
                             <th scope="col">編號</th>
                             <th scope="col">標題</th>
-                            <th scope="col">版本</th>
+                            <th scope="col">BOM Date</th>
                             <th scope="col">上傳日期</th>
                             <th scope="col">上傳PDF檔名</th>
                             <th scope="col">版本</th>
@@ -96,7 +96,7 @@
                                         <%# Eval("ptitle")%>
                                     </td>
                                     <td>
-                                        <%# Eval("hisversion")%>
+                                        <%# Eval("generateddate")%>
                                     </td>
                                     <td>
                                         <%# Eval("pidate")%>
@@ -105,7 +105,8 @@
                                         <font size='2'><a href="#" onclick="Open('<%# Eval("piuploadfile")%>')"><%# System.IO.Path.GetFileName((string)Eval("piuploadfile"))%></a></font>
                                     </td>
                                     <td>
-                                        <%# (int)Eval("pver")==1?"Lulu": (int)Eval("pver")==2?"UA": (int)Eval("pver")==3?"GAP":""%>
+                                        <%--<%# (int)Eval("pver")==1?"Lulu": (int)Eval("pver")==2?"UA": (int)Eval("pver")==3?"GAP": (int)Eval("pver")==4?"ON RUNNING":""%>--%>
+                                        <%# Eval("CUSTOMER")%>
                                     </td>
                                     <td>
                                         <%# Eval("creator")%>
@@ -120,9 +121,9 @@
                                         <asp:LinkButton ID="LinkButton2" CommandName="del" CommandArgument='<%# Eval("hdid")%>'
                                             runat="server" OnClientClick="return confirm('是否要刪除 ?');"><input type="button" value="刪除" class="btn btn-danger"></asp:LinkButton>
 
-                                        <a href="PDF_Manage_002_1<%# (int)Eval("pver")==1?"":(int)Eval("pver")==2?"_UA": (int)Eval("pver")==3?"_GAP":""%>.aspx?hdid=<%# Eval("hdid")%>">
+                                        <a href="PDF_Manage_002_1<%# (int)Eval("pver")==1?"":(int)Eval("pver")==2?"_UA": (int)Eval("pver")==3?"_GAP": (int)Eval("pver")>3?"_All":""%>.aspx?hdid=<%# Eval("hdid")%>&pver=<%# Eval("pver")%>">
                                             <input type="button" value="進入編輯" class="btn btn-secondary"></a>
-                                        <a href="PDF_Manage_002_2<%# (int)Eval("pver")==1?"":(int)Eval("pver")==2?"_UA": (int)Eval("pver")==3?"_GAP":""%>.aspx?hdid=<%# Eval("hdid")%>">
+                                        <a href="PDF_Manage_002_2<%# (int)Eval("pver")==1?"":(int)Eval("pver")==2?"_UA": (int)Eval("pver")==3?"_GAP": (int)Eval("pver")>3?"_All":""%>.aspx?hdid=<%# Eval("hdid")%>&pver=<%# Eval("pver")%>">
                                             <input type="button" value="比對版本" class="btn btn-warning"></a>
                                     </td>
                                 </tr>

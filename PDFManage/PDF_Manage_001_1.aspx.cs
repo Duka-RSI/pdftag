@@ -33,25 +33,53 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
         string sSql = "";
 
+        foreach (string sCust in LoginUser.CUST_NO)
+        {
+            DataTable dtCust = new DataTable();
+            sSql = @"select * from CUSTOMER_MAPPING where PVER = " + sCust;
+            using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
+            {
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                {
+                    da.Fill(dtCust);
+                }
+            }
+            foreach (DataRow drCust in dtCust.Rows)
+            {
+                dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem(drCust["CUSTOMER"].ToString(), sCust));
+            }
+        }
 
-        if (LoginUser.CUST_NO.Contains("1"))
-        {
-            //dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
-            //ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
-            dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
-        }
-        if (LoginUser.CUST_NO.Contains("2"))
-        {
-            //dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
-            //ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
-            dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
-        }
-        if (LoginUser.CUST_NO.Contains("3"))
-        {
-            //dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
-            //ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
-            dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
-        }
+        //if (LoginUser.CUST_NO.Contains("1"))
+        //{
+        //    //dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
+        //    //ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
+        //    dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
+        //}
+        //if (LoginUser.CUST_NO.Contains("2"))
+        //{
+        //    //dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
+        //    //ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
+        //    dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
+        //}
+        //if (LoginUser.CUST_NO.Contains("3"))
+        //{
+        //    //dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
+        //    //ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
+        //    dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
+        //}
+        //if (LoginUser.CUST_NO.Contains("4"))
+        //{
+        //    //dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
+        //    //ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
+        //    dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("ON RUNNING", "4"));
+        //}
+        //if (LoginUser.CUST_NO.Contains("5"))
+        //{
+        //    dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("GYMSHARK", "5"));
+        //}
     }
 
 
@@ -67,9 +95,10 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
         try
         {
-            sSql += "select a.* \n";
-            sSql += "from PDFTAG.dbo.GroupManage a              \n";
-            sSql += " where 1=1 and a.isshow=0  \n";
+            sSql += @"select a.*, cust.CUSTOMER
+                from PDFTAG.dbo.GroupManage a
+                inner join CUSTOMER_MAPPING cust on cust.pver = a.gmcate
+                where 1=1 and a.isshow=0  ";
 
             sSql += " and a.gmcate in ('" + string.Join("','", LoginUser.CUST_NO) + "') \n";
 

@@ -23,7 +23,27 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
     private void setDl()
     {
+        SQLHelper sql = new SQLHelper();
+        string sSql = "";
+        DataTable dt = new DataTable();
+        int i = 1;
 
+        sSql = "select DISTINCT(DEPARTMENT) from CUSTOMER_MAPPING ";
+
+        using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
+        {
+            dt = new DataTable();
+            using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+            {
+                da.Fill(dt);
+            }
+        }
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            DEPARTMENT.Items.Add(new System.Web.UI.WebControls.ListItem(dr["DEPARTMENT"].ToString(), i.ToString()));
+            i++;
+        }
     }
 
     private void DataBind()
@@ -36,15 +56,20 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
         
         try
         {
-            sSql += "select a.*,'' as strCUST_NO \n";
-            sSql += "from PDFTAG.dbo.Account a              \n";
-            sSql += " where 1=1  and a.isShow=0 \n";
-
-
+            sSql += @"select a.*,
+                SUBSTRING(case when a.Role = 1
+		            THEN (select CUSTOMER + ',' from CUSTOMER_MAPPING FOR XML PATH(''))
+		            else (select b.CUSTOMER + ',' from CUSTOMER_MAPPING b WHERE b.DEPARTMENT = a.DEPARTMENT FOR XML PATH(''))
+		            end,1,len(case when a.Role = 1
+		            THEN (select CUSTOMER + ',' from CUSTOMER_MAPPING FOR XML PATH(''))
+		            else (select b.CUSTOMER + ',' from CUSTOMER_MAPPING b WHERE b.DEPARTMENT = a.DEPARTMENT FOR XML PATH(''))
+		            end)-1)  AS CUST
+                from PDFTAG.dbo.Account a
+                where 1=1  and a.isShow=0 ";
+            
             if (!string.IsNullOrEmpty(txt))
                 sSql += " and (a.USER_NAME like '%" + txt + "%' or a.USER_FULLNAME like '%" + txt + "%'  ) \n";
-
-
+            
             sSql += " ORDER BY USER_NAME asc  \n";
 
             Response.Write("<!--" + sSql + "-->");
@@ -55,20 +80,6 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                 {
                     da.Fill(dt);
                 }
-
-                foreach(DataRow dr in dt.Rows)
-                {
-                    string[] arrCUST_NO = dr["CUST_NO"].ToString().Split(',');
-                    List<string> arrStrCUST_NO = new List<string>();
-
-                    if (arrCUST_NO.Contains("1")) arrStrCUST_NO.Add("LuLu");
-                    if (arrCUST_NO.Contains("2")) arrStrCUST_NO.Add("UA");
-                    if(arrCUST_NO.Contains("3")) arrStrCUST_NO.Add("GAP");
-
-                    dr["strCUST_NO"] = string.Join(",", arrStrCUST_NO);
-                }
-
-
             }
 
             this.LinkPageFirst1.Visible = true;
@@ -257,17 +268,10 @@ values
                 cm.Parameters.AddWithValue("@USER_NAME", USER_NAME.Text);
                 cm.Parameters.AddWithValue("@USER_FULLNAME", USER_FULLNAME.Text);
                 cm.Parameters.AddWithValue("@USER_AD", USER_AD.Text);
-                cm.Parameters.AddWithValue("@DEPARTMENT", DEPARTMENT.Text);
+                cm.Parameters.AddWithValue("@DEPARTMENT", DEPARTMENT.SelectedItem.Text);
                 cm.Parameters.AddWithValue("@PASSWORD", PublicFunction.Base64Encode("1111"));
-
-          
-                List<string> arrCUST_NO = new List<string>();
-                if (CUST_NO_1.Checked)
-                    arrCUST_NO.Add("1");
-                if (CUST_NO_2.Checked)
-                    arrCUST_NO.Add("2");
-                if (CUST_NO_3.Checked)
-                    arrCUST_NO.Add("3");
+                
+                List<string> arrCUST_NO = getDepartmentCust();
 
                 cm.Parameters.AddWithValue("@CUST_NO", string.Join(",", arrCUST_NO));
                 cm.Parameters.AddWithValue("@Role", dlRole.SelectedItem.Value);
@@ -325,17 +329,10 @@ values
                 cm.Parameters.AddWithValue("@USER_NAME", USER_NAME.Text);
                 cm.Parameters.AddWithValue("@USER_FULLNAME", USER_FULLNAME.Text);
                 cm.Parameters.AddWithValue("@USER_AD", USER_AD.Text);
-                cm.Parameters.AddWithValue("@DEPARTMENT", DEPARTMENT.Text);
+                cm.Parameters.AddWithValue("@DEPARTMENT", DEPARTMENT.SelectedItem.Text);
                 cm.Parameters.AddWithValue("@PASSWORD", PublicFunction.Base64Encode("1111"));
-
-
-                List<string> arrCUST_NO = new List<string>();
-                if (CUST_NO_1.Checked)
-                    arrCUST_NO.Add("1");
-                if (CUST_NO_2.Checked)
-                    arrCUST_NO.Add("2");
-                if (CUST_NO_3.Checked)
-                    arrCUST_NO.Add("3");
+                
+                List<string> arrCUST_NO = getDepartmentCust();
 
                 cm.Parameters.AddWithValue("@CUST_NO", string.Join(",", arrCUST_NO));
                 cm.Parameters.AddWithValue("@Role", dlRole.SelectedItem.Value);
@@ -361,5 +358,28 @@ values
         DataBind();
     }
 
+    private List<string> getDepartmentCust()
+    {
+        List<string> arrCUST_NO = new List<string>();
+        SQLHelper sql = new SQLHelper();
+        string sSql = "";
+        DataTable dt = new DataTable();
 
+        sSql = "select * from CUSTOMER_MAPPING where DEPARTMENT = '" + DEPARTMENT.SelectedItem.Text + "' ";
+
+        using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
+        {
+            using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+            {
+                da.Fill(dt);
+            }
+        }
+
+        foreach (DataRow dr in dt.Rows)
+        {
+            arrCUST_NO.Add(dr["PVER"].ToString());
+        }
+        
+        return arrCUST_NO;
+    }
 }

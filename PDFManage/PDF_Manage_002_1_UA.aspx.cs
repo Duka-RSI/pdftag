@@ -284,10 +284,11 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 					//sb.Append(" <th scope='col'>Standard Placement</th>");
 					sb.Append(" <th scope='col'>" + itemType.type + "</th>");
 					sb.Append(" <th scope='col'>Usage</th>");
-					//sb.Append(" <th scope='col'>Supplier Article</th>");
-					//sb.Append(" <th scope='col'>Supplier</th>");
+					sb.Append(" <th scope='col'>QTY</th>");
+                    //sb.Append(" <th scope='col'>Supplier Article</th>");
+                    //sb.Append(" <th scope='col'>Supplier</th>");
 
-					sSql = "select * \n";
+                    sSql = "select * \n";
 					sSql += "from PDFTAG.dbo.UA_BOMGarmentcolor a              \n";
 					sSql += " where a.lubcid = '" + itemType.lubcid + "'   \n";
 					Response.Write("<!--" + sSql + "-->");
@@ -337,9 +338,10 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 						string standardPlacement = drBom["StandardPlacement"].ToString();
 						string usage = drBom["Usage"].ToString();
 						string supplierArticle = drBom["SupplierArticle"].ToString();
-						string supplierArticle2 = "";
+                        string supplierArticle2 = "";
+                        string QTY = drBom["QTY"].ToString();
 
-						if (type == "Fabric")
+                        if (type == "Fabric")
 							supplierArticle2 = drBom["W4"].ToString();
 						else
 							supplierArticle2 = drBom["W1"].ToString();
@@ -367,6 +369,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 								supplierArticle= drOrgBom["supplierArticle"].ToString();
 								standardPlacement = Compare(drOrgBom["StandardPlacement"].ToString(), standardPlacement, FilterNote(arrNotes, lubid, "StandardPlacement"));
 								usage = Compare(drOrgBom["usage"].ToString(), usage, FilterNote(arrNotes, lubid, "usage"));
+								QTY = Compare(drOrgBom["QTY"].ToString(), QTY, FilterNote(arrNotes, lubid, "QTY"));
 
 								string org_supplierArticle2 = "";
 								if (drOrgBom["type"].ToString() == "Fabric")
@@ -489,6 +492,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 						//sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='StandardPlacement' onclick='editBom(this)'>" + standardPlacement + "</td>");
 						sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' " + parts + " data-col='SupplierArticle' onclick='editBom(this)'>" + supplierArticle + "</td>");
 						sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' " + parts + " data-col='Usage' onclick='editBom(this)'>" + usage + "</td>");
+						sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' " + parts + " data-col='QTY' onclick='editBom(this)'>" + QTY + "</td>");
 						//sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='Supplier' onclick='editBom(this)'>" + supplier + "</td>");
 
 						for (int i = 1; i <= iColorCnt; i++)

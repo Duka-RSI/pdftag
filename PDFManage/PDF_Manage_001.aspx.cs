@@ -16,6 +16,10 @@ using System.Text.RegularExpressions;
 using ImageResizer.Configuration.Xml;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.Util;
 
 public partial class Passport_Passport_A000 : System.Web.UI.Page
 {
@@ -24,6 +28,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
     List<string> listSampleStep = new List<string>();
     List<string> listSampleSize = new List<string>();
     bool isChina = false;
+    CommonFunction _comFunction=new CommonFunction();
     protected void Page_Load(object sender, EventArgs e)
     {
         parse = Request["parse"];
@@ -86,28 +91,24 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
             //ddlGroup2.Items.Insert(0, new System.Web.UI.WebControls.ListItem("請選擇", ""));
 
 
+            foreach (string sCust in LoginUser.CUST_NO)
+            {
+                sSql = @"select * from CUSTOMER_MAPPING where PVER = " + sCust;
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                DataTable dtCust = new DataTable();
+                using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                {
+                    da.Fill(dtCust);
+                }
+                foreach (DataRow drCust in dtCust.Rows)
+                {
+                    dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem(drCust["CUSTOMER"].ToString(), sCust));
+                    ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem(drCust["CUSTOMER"].ToString(), sCust));
+                    dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem(drCust["CUSTOMER"].ToString(), sCust));
+                }
+            }
         }
-
-
-        if (LoginUser.CUST_NO.Contains("1"))
-        {
-            dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
-            ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
-            dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("Lulu", "1"));
-        }
-        if (LoginUser.CUST_NO.Contains("2"))
-        {
-            dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
-            ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
-            dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("UA", "2"));
-        }
-        if (LoginUser.CUST_NO.Contains("3"))
-        {
-            dlVersion.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
-            ddlpver.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
-            dlgmcate.Items.Add(new System.Web.UI.WebControls.ListItem("GAP", "3"));
-        }
-
         if (dlVersion.Items.Count > 0)
         {
             dlVersion_SelectedIndexChanged(null, null);
@@ -128,8 +129,9 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
         try
         {
-            sSql += "select a.*,b.season,b.style,b.generateddate,c.gmname \n";
-            sSql += "from PDFTAG.dbo.P_inProcess a              \n";
+            sSql += @"select a.*,b.season,b.style,b.generateddate,c.gmname, cust.CUSTOMER
+                from PDFTAG.dbo.P_inProcess a 
+                inner join CUSTOMER_MAPPING cust on a.pver = cust.pver ";
 
             if (version == "1")
                 sSql += " left join PDFTAG.dbo.Lu_Header b on a.pipid=b.pipid and b.isshow=0             \n";
@@ -137,6 +139,8 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                 sSql += " left join PDFTAG.dbo.UA_Header b on a.pipid=b.pipid and b.isshow=0             \n";
             else if (version == "3")
                 sSql += " left join PDFTAG.dbo.GAP_Header b on a.pipid=b.pipid and b.isshow=0             \n";
+            else
+                sSql += " left join PDFTAG.dbo.HEADER_H b on a.pipid=b.pipid and b.isshow=0             \n";
 
             sSql += " left join PDFTAG.dbo.GroupManage c on a.gmid=c.gmid and c.isshow=0             \n";
             sSql += " where 1=1 and a.isshow=0 and a.hdid=0 \n"; //hdid > 0 為修改的版本
@@ -224,6 +228,13 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
     }
 
     #region 分頁控制1
+    protected void btnInput_Click(object sender, EventArgs e)
+    {
+        string pipid = HiddenField1.Value;
+
+        ParseExcel_All(pipid);
+        DataBind();
+    }
     protected void LinkPageFirst1_Click(object sender, EventArgs e)
     {
         this.LabelNowPage1.Text = "1";
@@ -302,6 +313,16 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
             Add_PDF_Manage_002_UA(e.CommandArgument.ToString());
             DataBind();
         }
+        if ("parsePDF_All" == e.CommandName)
+        {
+            ParsePDF_All(e.CommandArgument.ToString());
+            DataBind();
+        }
+        if ("parseExcel_All" == e.CommandName)
+        {
+            ParseExcel_All(e.CommandArgument.ToString());
+            DataBind();
+        }
     }
 
     private void Delete(string pipid)
@@ -349,6 +370,20 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                 where o.pipid  = @pipid
                 )";
         }
+        else
+        {
+            sSql += @" update  P_inProcess set isShow = 1
+                where pipid = (
+                select e.pipid from HEADER_H o
+                inner join HEADER_H e on e.ORGID = o.ID
+                where o.pipid  = @pipid
+                );
+                update HEADER_H set isShow = 1 where pipid = @pipid;
+                update HEADER_H set isShow = 1 where pipid = (
+                select e.pipid from HEADER_H o
+                inner join HEADER_H e on e.ORGID = o.ID
+                where o.pipid  = @pipid);";            
+        }
 
         using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
         {
@@ -363,7 +398,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
         SQLHelper sql = new SQLHelper();
         DataTable dt = new DataTable();
         string sSql = "";
-
+        
         StringBuilder sbLog = new StringBuilder();
 
         List<Lu_LearnmgrItemDto> arrLu_LearnmgrItemDto = new List<Lu_LearnmgrItemDto>();
@@ -439,7 +474,6 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
             List<string> arrColorNames = new List<string>();
             for (int a = 1; a <= 50; a++)
                 arrColorNames.Add(a.ToString());
-
             using (StreamReader data = new StreamReader(sSaveTxtPath))
             {
                 while (!data.EndOfStream)
@@ -594,7 +628,8 @@ values
                                         else if (arrHeader[h].Replace(" ", "") == "Placement") colPlacement = h;
                                         else if (arrHeader[h].Replace(" ", "") == "SupplierArticle#") colSupplierArticle = h;
                                         else if (arrHeader[h].Replace(" ", "") == "Supplier") colSupplier = h;
-                                        else if (Regex.IsMatch(arrHeader[h].Replace(" ", ""), @"^[0-9]{4,}") && Regex.IsMatch(arrHeader[h].Replace(" ", ""), @"[a-zA-Z]{1,}$"))
+                                        //else if (Regex.IsMatch(arrHeader[h].Replace(" ", ""), @"^[0-9]{4,}") && Regex.IsMatch(arrHeader[h].Replace(" ", ""), @"[a-zA-Z]{1,}$"))
+                                        else if (Regex.IsMatch(arrHeader[h].Replace(" ", ""), @"^[0-9]{4,}"))
                                         {
                                             string colorName = arrHeader[h].Replace(" ", "");
                                             //如果色組只有四碼，前面補0到6碼，只有0001-BLK及0002-WHT維持4碼
@@ -644,12 +679,12 @@ values
                                     //sbLog.AppendLine("type = " + type + " " + sRowLine);
                                     string[] arrRowValue = sRowLine.Split(new string[] { "|" }, StringSplitOptions.None);
 
-                                    //@Row: See QA Man ual  |  
-                                    //@Row:  | G A R M E N T  | <--StandardPlacement是空的
-                                    if (arrRow[i].Trim().StartsWith("|"))
-                                    {
-                                        arrRowValue = arrRow[i].Trim().TrimEnd('|').Split(new string[] { "|" }, StringSplitOptions.None);
-                                    }
+                                    ////@Row: See QA Man ual  |  
+                                    ////@Row:  | G A R M E N T  | <--StandardPlacement是空的
+                                    //if (arrRow[i].Trim().StartsWith("|"))
+                                    //{
+                                    //    arrRowValue = arrRow[i].Trim().TrimEnd('|').Split(new string[] { "|" }, StringSplitOptions.None);
+                                    //}
 
                                     if (arrRowValue.Length == 1)
                                     {
@@ -676,22 +711,39 @@ values
                                     string Supplier = arrRowValue[colSupplier].Trim();
                                     int iDataLength = arrRowValue.Length;
 
-
                                     if (string.IsNullOrWhiteSpace(StandardPlacement)
                                         && string.IsNullOrWhiteSpace(Placement)
                                         && string.IsNullOrWhiteSpace(SupplierArticle)
                                         && string.IsNullOrWhiteSpace(Supplier))
                                         continue;
-
+                                    if (arrRowValue.Count() <= dicColor.Keys.ElementAt(0)) continue;//
                                     Dictionary<string, string> dictBOM = new Dictionary<string, string>();
-
                                     for (int countB = 1; countB <= 50; countB++)
                                     {
                                         try
                                         {
                                             if (countB <= dicColor.Count())
                                             {
-                                                dictBOM.Add(string.Format("B{0}", countB.ToString()), arrRowValue[dicColor.Keys.ElementAt(countB - 1)].Trim());
+                                                string matColor = arrRowValue[dicColor.Keys.ElementAt(countB - 1)].Trim();
+                                                string matColorNew = string.Empty;
+                                                bool spaceOrNot = false;
+                                                for (int j = 0; j < matColor.Length; j++)//針對每個字元去做判斷
+                                                {
+                                                    if (matColor[j].ToString() == " ")//先拿掉空格，要去判斷下一個字是否大寫
+                                                    {
+                                                        if ((j - 1 > 0 && matColor[j - 1] == '/') || (j + 1 < matColor.Length && matColor[j + 1] == '/')) continue;  //若是斜線前後，直接拿掉空格
+                                                        spaceOrNot = true;
+                                                        continue;
+                                                    }
+                                                    if (spaceOrNot && matColor[j] >= 'a' && matColor[j] <= 'z')//若是小寫拿掉空格
+                                                    {
+
+                                                    }
+                                                    else if (spaceOrNot) matColorNew += " ";    //其餘加回空格
+                                                    matColorNew += matColor[j];
+                                                    spaceOrNot = false;
+                                                }
+                                                dictBOM.Add(string.Format("B{0}", countB.ToString()), matColorNew);
                                             }
                                             else
                                             {
@@ -704,7 +756,6 @@ values
                                             //throw new Exception("arrRowValue.length="+ arrRowValue.Length+ " countB="+ countB+ " dicColor.Key=" + dicColor.Keys.ElementAt(countB - 1) + "="+ JsonConvert.SerializeObject(dicColor)+ " sRowLine="+ sRowLine);
                                         }
                                     }
-
 
                                     #region 比對詞彙
 
@@ -1483,7 +1534,7 @@ values
             DateTime dtNow = DateTime.Now;
             string sFilePath = "";
 
-
+          
 
 
             sSql = "select count(*)+1 as cnt \n";
@@ -1577,13 +1628,13 @@ from PDFTAG.dbo.Lu_Header where pipid=@pipid; SELECT SCOPE_IDENTITY();";
                 long new_luhid = Convert.ToInt64(cm.ExecuteScalar().ToString());
 
                 sSql = @"insert into PDFTAG.dbo.Lu_BOMGarmentcolor 
-(luhid,A" + string.Join(",A", arrColorNames) + @") 
- select '" + new_luhid + @"' as luhid,A" + string.Join(",A", arrColorNames) + @"
+(luhid,A"+ string.Join(",A", arrColorNames) + @") 
+ select '" + new_luhid + @"' as luhid,A"+ string.Join(",A", arrColorNames) + @"
    from PDFTAG.dbo.Lu_BOMGarmentcolor where luhid=@luhid;
 
 insert into PDFTAG.dbo.Lu_BOM 
-(luhid,type,rowid,StandardPlacement,Placement,SupplierArticle,Supplier,B" + string.Join(",B", arrColorNames) + @",org_lubid,lubcid) 
- select '" + new_luhid + @"' as luhid,type,rowid,StandardPlacement,Placement,SupplierArticle,Supplier,B" + string.Join(",B", arrColorNames) + @",lubid as org_lubid,lubcid
+(luhid,type,rowid,StandardPlacement,Placement,SupplierArticle,Supplier,B"+ string.Join(",B", arrColorNames) + @",org_lubid,lubcid) 
+ select '" + new_luhid + @"' as luhid,type,rowid,StandardPlacement,Placement,SupplierArticle,Supplier,B"+ string.Join(",B", arrColorNames) + @",lubid as org_lubid,lubcid
   from PDFTAG.dbo.Lu_BOM where luhid=@luhid;
 
 insert into PDFTAG.dbo.Lu_SizeTable 
@@ -2104,7 +2155,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
             bool isHeaderMCLastMod = false;
             int iRow = 1;
             int iLineRow = 0;
-
+            string[] stringSeparators = new string[] { "  " };
             GAP_HeaderDto gAP_HeaderDto = new GAP_HeaderDto();
 
             if (gaptype == "2")
@@ -2117,18 +2168,28 @@ insert into PDFTAG.dbo.Lu_SizeTable
                     {
 
                         sLine = data.ReadLine();
+                        if (sLine == null) break;
+                        string[] arrHeaders = sLine.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Where(w => !string.IsNullOrWhiteSpace(w)).ToArray();
                         iLineRow++;
 
 
                         if (sLine.Contains("Design Number"))
                         {
-                            gAP_HeaderDto.style = sLine.Replace("Design Number", "").Trim();
+                            if(arrHeaders.Count() > 2)
+                                gAP_HeaderDto.style = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Design Number")) + 1];
+                            else
+                                gAP_HeaderDto.style = sLine.Replace("Design Number", "").Trim();
                             isHeader = true;
                         }
                         if (sLine.Contains("Legacy Style Numbers"))
                         {
-                            if (sLine.Replace("Legacy Style Numbers", "").Trim().Length > 0)
-                                gAP_HeaderDto.style = sLine.Replace("Legacy Style Numbers", "").Trim() + "_" + gAP_HeaderDto.style;
+                            if (arrHeaders.Count() > 2)
+                                gAP_HeaderDto.style = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Legacy Style Numbers")) + 1] + "_" + gAP_HeaderDto.style;
+                            else
+                            {
+                                if (sLine.Replace("Legacy Style Numbers", "").Trim().Length > 0)
+                                    gAP_HeaderDto.style = sLine.Replace("Legacy Style Numbers", "").Trim() + "_" + gAP_HeaderDto.style;
+                            }
                         }
                         if (isHeader)
                         {
@@ -2173,7 +2234,12 @@ insert into PDFTAG.dbo.Lu_SizeTable
                             }
                             else if (sLine.Contains("Description"))
                             {
-                                string sDescription = sLine.Replace("Description", "").Trim();
+                                string sDescription = "";
+                                if (arrHeaders.Count() > 2)
+                                    sDescription = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Description")) + 1];
+                                else
+                                    sDescription = sLine.Replace("Description", "").Trim();
+
                                 sLine = data.ReadLine();
 
                                 if (!sLine.Contains("BOM Numbern"))
@@ -2184,19 +2250,33 @@ insert into PDFTAG.dbo.Lu_SizeTable
                             else if (sLine.Contains("Status"))
                             {
                                 if (string.IsNullOrEmpty(gAP_HeaderDto.stylestatus))
-                                    gAP_HeaderDto.stylestatus = sLine.Replace("Status", "").Trim();
+                                {
+                                    if (arrHeaders.Count() > 2)
+                                        gAP_HeaderDto.stylestatus = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Status")) + 1];
+                                    else
+                                        gAP_HeaderDto.stylestatus = sLine.Replace("Status", "").Trim();
+                                }
                             }
                             else if (sLine.Contains("Brand/Division"))
                             {
-                                gAP_HeaderDto.brand = sLine.Replace("Brand/Division", "").Trim();
+                                if (arrHeaders.Count() > 2)
+                                    gAP_HeaderDto.brand = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Brand/Division")) + 1];
+                                else
+                                    gAP_HeaderDto.brand = sLine.Replace("Brand/Division", "").Trim();
                             }
                             else if (sLine.Contains("Collection"))
                             {
-                                gAP_HeaderDto.sclass = sLine.Replace("Collection", "").Trim();
+                                if (arrHeaders.Count() > 2)
+                                    gAP_HeaderDto.sclass = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Collection")) + 1];
+                                else
+                                    gAP_HeaderDto.sclass = sLine.Replace("Collection", "").Trim();
                             }
                             else if (sLine.Contains("Revision Modiﬁed"))
                             {
-                                gAP_HeaderDto.generateddate = sLine.Replace("Revision Modiﬁed", "").Trim();
+                                if (arrHeaders.Count() > 2)
+                                    gAP_HeaderDto.generateddate = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Revision Modiﬁed")) + 1];
+                                else
+                                    gAP_HeaderDto.generateddate = sLine.Replace("Revision Modiﬁed", "").Trim();
                                 isHeaderDone = true;
                             }
                         }
@@ -3358,7 +3438,7 @@ values
                                     bool isStartColor = false;
                                     foreach (var header in arrHeaders)
                                     {
-                                        if (isStartColor && header.Trim() != "Comment")
+                                        if (isStartColor && header.Trim() != "Comment" && header.Trim() != "")
                                         {
                                             arrBomColorHeaders.Add(header);
                                             continue;
@@ -3387,6 +3467,7 @@ values
 
                                     #region GAP_BOMGarmentcolor
 
+                                    if (arrBomColorHeaders.Count() == 0) continue;//若第二頁沒有色組，則不新增
                                     sSql = @"insert into PDFTAG.dbo.GAP_BOMGarmentcolor  
 (pipid,luhid,A1,A2,A3,A4,A5,A6,A7,A8,A9,A10) 
 values 
@@ -3433,7 +3514,7 @@ values
                                     continue;
 
                                 int iColorLength = arrBomColorHeaders.Count;
-
+                                if (iColorLength == 0) continue;
                                 try
                                 {
 
@@ -3444,7 +3525,7 @@ values
                                             Type = sBomType,
                                             rowid = iRow,
                                             StandardPlacement = sProduct,
-                                            SupplierArticle = arrParts[2].Trim(),
+                                            SupplierArticle = arrParts[2].Trim().Replace(" ", string.Empty),
                                             Usage = arrParts[7].Trim(),
                                             QualityDetails = arrParts[10].Trim(),
                                             Supplier = arrParts[11].Trim(),
@@ -3653,7 +3734,11 @@ values
                                 {
 
                                     string sPomNote = sLine.Trim().Replace("@Row:", "").Replace("%%", "").Replace("", "").Trim();
-                                    arrP_SizeTableDtos[arrP_SizeTableDtos.Count - 1].POMNote = sPomNote;
+                                    if (arrP_SizeTableDtos.Count == 0)//跨頁第一筆是Note的情況
+                                    {
+                                        sSql = "update GAP_SizeTable set POMNote = '" + sPomNote + "' where lustid = (select top 1 lustid from GAP_SizeTable order by lustid desc)";
+                                    }
+                                    else arrP_SizeTableDtos[arrP_SizeTableDtos.Count - 1].POMNote = sPomNote;
 
                                     //LogFile.Logger.Log(" iLineRow=" + iLineRow + " sPomNote="+ sPomNote + " sLine=" + sLine);
                                 }
@@ -4053,9 +4138,16 @@ insert into PDFTAG.dbo.GAP_SizeTable
                             //@Row: Status: Prototype1363621 - BaseSeason: FW22Lifecycle: CarryoverUA Tech 6in Novelty 2 PackRegional Fit: US %% 
                             string sTempLine = sLine.Replace("@Row:", "").Replace("Season:", "@Row").Replace("Lifecycle:", "@Row");
                             string season = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Trim();
-                            string year = season.Substring(season.Length - 2, 2);
-                            season = year + season.Replace(year, "");
-
+                            if (season == "")
+                            {
+                                season = dt.Rows[0]["ptitle"].ToString();
+                                season = season.Substring(season.Length - 4, 4);
+                            }
+                            else
+                            {
+                                string year = season.Substring(season.Length - 2, 2);
+                                season = year + season.Replace(year, "");
+                            }
                             ua_HeaderDto.season = season;
                         }
                     }
@@ -4066,7 +4158,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                             //@Row: Status: Prototype1363621 - BaseSeason: FW22Lifecycle: CarryoverUA Tech 6in Novelty 2 PackRegional Fit: US %% 
                             //@Row: Status: Pre-Production1361426 - MCSSeason: SS22Lifecycle: CarryoverUA Training Vent 2.0 SSRegional Fit: US %%
                             //@Row: Status: Production1282508Season: FW23Lifecycle: CarryoverO-Series 6in Boxerjock 2pkRegional Fit: US %% 
-                            string sTempLine = sLine.Replace("@Row:", "").Replace("Status: Prototype", "@Row").Replace("Status: Pre-Production", "@Row").Replace("Status: Production", "@Row").Replace("Season:", "@Row");
+                            string sTempLine = sLine.Replace("@Row:", "").Replace("Status: Prototype", "@Row").Replace("Status: Pre-Production", "@Row").Replace("Status: Production", "@Row").Replace("Status: Virtual", "@Row").Replace("Status: Development", "@Row").Replace("Season:", "@Row");
                             string style = sTempLine.Split(new string[] { "@Row" }, StringSplitOptions.None)[1].Split('-')[0].Trim();
                             if (sTempLine.Contains("Regional Fit: Asia")) isChina = true;
 
@@ -4406,6 +4498,7 @@ values
                                         rowid = iRow,
                                         SupplierArticle = arrParts[0].Replace("@Row:", "").Trim(),
                                         Usage = arrParts[2].Replace("@Row:", "").Trim(),
+                                        QTY = arrParts[3].Replace("@Row:", "").Trim(),
                                         colorSet = colorSet,
 
                                         B1 = iLength >= 5 ? arrParts[4].Trim() : "",
@@ -4481,9 +4574,9 @@ values
                                 {
 
                                     sSql = @"insert into  PDFTAG.dbo.UA_BOM
-                                                                (pipid,luhid,lubcid,type,rowid,Usage,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,isEdit,COLOR_SET) 
+                                                                (pipid,luhid,lubcid,type,rowid,Usage,SupplierArticle,Supplier,QTY,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,isEdit,COLOR_SET) 
                                                                 values 
-                                                                (@pipid,@luhid,@lubcid,@type,@rowid,@Usage,@SupplierArticle,@Supplier,@B1,@B2,@B3,@B4,@B5,@B6,@B7,@B8,@B9,@B10,@isEdit,@COLOR_SET);";
+                                                                (@pipid,@luhid,@lubcid,@type,@rowid,@Usage,@SupplierArticle,@Supplier,@QTY,@B1,@B2,@B3,@B4,@B5,@B6,@B7,@B8,@B9,@B10,@isEdit,@COLOR_SET);";
 
                                     cm.CommandText = sSql;
                                     cm.Parameters.Clear();
@@ -4495,6 +4588,7 @@ values
                                     cm.Parameters.AddWithValue("@SupplierArticle", item.SupplierArticle);
                                     cm.Parameters.AddWithValue("@Usage", item.Usage);
                                     cm.Parameters.AddWithValue("@Supplier", "");
+                                    cm.Parameters.AddWithValue("@QTY", item.QTY);
 
 
                                     cm.Parameters.AddWithValue("@B1", item.B1);
@@ -4899,8 +4993,8 @@ from PDFTAG.dbo.UA_Header where pipid=@pipid; SELECT SCOPE_IDENTITY();";
    from PDFTAG.dbo.UA_BOMGarmentcolor where pipid=@pipid;
 
 insert into PDFTAG.dbo.UA_BOM 
-(pipid,luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,org_lubid,lubcid,isEdit,COLOR_SET) 
- select '" + new_pipid + @"'as pipid,'" + new_luhid + @"' as luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,lubid as org_lubid,lubcid,0 as isEdit,COLOR_SET
+(pipid,luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,QTY,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,org_lubid,lubcid,isEdit,COLOR_SET) 
+ select '" + new_pipid + @"'as pipid,'" + new_luhid + @"' as luhid,type,rowid,StandardPlacement,Usage,SupplierArticle,Supplier,QTY,B1,B2,B3,B4,B5,B6,B7,B8,B9,B10,lubid as org_lubid,lubcid,0 as isEdit,COLOR_SET
   from PDFTAG.dbo.UA_BOM where pipid=@pipid;
 
 insert into PDFTAG.dbo.UA_SizeTable 
@@ -4943,6 +5037,1226 @@ where b.pipid=@pipid;
     }
 
     #endregion
+
+    #region PDF_ALL
+
+    private void ParsePDF_All(string pipid)
+    {
+        SQLHelper sql = new SQLHelper();
+        DataTable dt = new DataTable();
+        string sSql = "";
+        string realStyle = "";
+        StringBuilder sbLog = new StringBuilder();
+
+        //List<Lu_LearnmgrItemDto> arrLu_LearnmgrItemDto = new List<Lu_LearnmgrItemDto>();
+
+        //using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
+        //{
+        //    sSql = "select * from PDftag.dbo.Lu_LearnmgrItem  \n";
+
+        //    arrLu_LearnmgrItemDto = cn.Query<Lu_LearnmgrItemDto>(sSql, new { }).ToList();
+        //}
+        
+        using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
+        {
+
+            sSql = "select * from PDFTAG.dbo.P_inProcess where pipid='" + pipid + "' \n";
+
+            cm.CommandText = sSql;
+            cm.Parameters.Clear();
+            using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+            {
+                da.Fill(dt);
+            }
+
+            string sNow = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+
+            string titleType = dt.Rows[0]["titleType"].ToString();
+            string sPDFPath = Server.MapPath("~/PDFManage/" + dt.Rows[0]["piuploadfile"].ToString());
+            string sSaveTxtPath = Server.MapPath("~/PDFManage/" + dt.Rows[0]["piuploadfile"].ToString().Replace(".pdf", ".txt")); ;
+
+            #region Parse Text for ON RUNNING
+            //            if (dlVersion.SelectedItem.Value == "4")
+            //            {
+            //                if (parse == "1" || !System.IO.File.Exists(sSaveTxtPath))
+            //                ConvertPDFToText3(sPDFPath, sSaveTxtPath);
+
+            //                if (!System.IO.File.Exists(sSaveTxtPath))
+            //                {
+            //                    script = "alert('轉換失敗')";
+            //                    return;
+            //                }
+
+            //                string sLine = "";
+            //                bool isMaterialColorReport = false;
+            //                //bool isLu_BOMGarmentcolor = true;
+            //                bool isSizeTable = false;
+            //                int iRow = 1;
+            //                //int iRowid = 1;
+            //                int sRow = 1;
+            //                int sizeTablePage = 0;
+            //                long onHid = 0;
+            //                long onSMid = 0;
+            //                long onSHid = 0;
+            //                long onSSid = 0;
+            //                //string type = "";
+            //                string sample = "";
+            //                //string sampleStep = "";
+            //                //int countHeader = -1;
+            //                //int colStandardPlacement = -1;
+            //                //int colPlacement = -1;
+            //                //int colSupplierArticle = -1;
+            //                //int colSupplier = -1;
+            //                //List<string> sizeList = new List<string>();
+            //                Dictionary<int, string> dicColor = new Dictionary<int, string>();
+            //                Dictionary<int, string> dicHeader = new Dictionary<int, string>();
+            //                Dictionary<int, string> dicSizeHeader = new Dictionary<int, string>();
+            //                Dictionary<long, string> dicSizeID = new Dictionary<long, string>();
+            //                //List<string> arrColorNames = new List<string>();
+            //                //for (int a = 1; a <= 50; a++)
+            //                //    arrColorNames.Add(a.ToString());
+
+            //                #region Header
+            //                string sSeason = "";
+            //                string sStyle = "";
+            //                string sStyleName = "";
+            //                string sVerticals = "";
+            //                string sGeneratedDate = "";
+            //                Dictionary<string, string> dicHeadD = new Dictionary<string, string>();
+            //                // Initialize license object
+            //                Aspose.Pdf.License lic = new Aspose.Pdf.License();
+            //                try
+            //                {
+            //                    // Set license
+            //                    lic.SetLicense(Server.MapPath("~/PDFManage/Aspose.Pdf.lic"));
+            //                }
+            //                catch (Exception)
+            //                {
+            //                    // something went wrong
+            //                    throw;
+            //                }
+
+            //                Document pdf = new Document(sPDFPath);
+            //                String extractedText = "";
+            //                bool getNextText = false, isGotSeason = false, isGotStyleName = false, isGotStyleNumber = false, isGotVerticals = false;
+
+            //                TextAbsorber textAbsorber = new TextAbsorber();
+            //                pdf.Pages.Accept(textAbsorber);
+            //                extractedText = textAbsorber.Text;
+
+            //                StringReader strReader = new StringReader(extractedText);
+            //                string[] stringSeparators = new string[] { "  " };
+            //                List<string> arrCNumbers = new List<string>();
+            //                while (true)
+            //                {
+            //                    if (isGotSeason && isGotStyleName && isGotStyleNumber && isGotVerticals) break;
+            //                    sLine = strReader.ReadLine();
+            //                    if (sLine.Contains("Season"))
+            //                    {
+            //                        string[] arrHeaders = sLine.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Where(w => !string.IsNullOrWhiteSpace(w)).ToArray();
+            //                        sSeason = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Season")) + 1].Substring(2, 4);
+            //                        isGotSeason = true;
+            //                    }
+            //                    if (sLine.Contains("Style Name"))
+            //                    {
+            //                        string[] arrHeaders = sLine.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Where(w => !string.IsNullOrWhiteSpace(w)).ToArray();
+            //                        sStyleName = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Style Name")) + 1];
+            //                        dicHeadD.Add("Style Name", sStyleName);
+            //                        isGotStyleName = true;
+            //                    }
+            //                    if (sLine.Contains("Style Number"))
+            //                    {
+            //                        string[] arrHeaders = sLine.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Where(w => !string.IsNullOrWhiteSpace(w)).ToArray();
+            //                        sStyle = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Style Number")) + 1];
+            //                        isGotStyleNumber = true;
+            //                    }
+            //                    if (sLine.Contains("Verticals"))
+            //                    {
+            //                        string[] arrHeaders = sLine.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Where(w => !string.IsNullOrWhiteSpace(w)).ToArray();
+            //                        sVerticals = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Verticals")) + 1];
+            //                        dicHeadD.Add("Verticals", sVerticals);
+            //                        isGotVerticals = true;
+            //                    }
+            //                    if (sLine.Contains("Greenwich Mean Time"))
+            //                    {
+            //                        string[] arrHeaders = sLine.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Where(w => !string.IsNullOrWhiteSpace(w)).ToArray();
+            //                        sGeneratedDate = Array.Find(arrHeaders, x => x.Contains("Greenwich Mean Time"));
+            //                        sGeneratedDate = sGeneratedDate.Substring(0, sGeneratedDate.IndexOf("at") - 1);
+            //                    }
+            //                }
+
+            //                //HEADER_H
+            //                sSql = @"INSERT INTO HEADER_H
+            //(PIPID,SEASON,STYLE,GENERATEDDATE,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE)
+            //VALUES
+            //(@PIPID,@SEASON,@STYLE,@GENERATEDDATE,@CREATOR,@CREATEDDATE,@MODIFIEDBY,@MODIFIEDDATE);SELECT SCOPE_IDENTITY();";
+
+            //                cm.CommandText = sSql;
+            //                cm.Parameters.Clear();
+
+            //                cm.Parameters.AddWithValue("@PIPID", pipid);
+            //                cm.Parameters.AddWithValue("@SEASON", sSeason);
+            //                cm.Parameters.AddWithValue("@STYLE", sStyle);
+            //                cm.Parameters.AddWithValue("@GENERATEDDATE", sGeneratedDate);
+            //                cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+            //                cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+            //                cm.Parameters.AddWithValue("@MODIFIEDBY", LoginUser.PK);
+            //                cm.Parameters.AddWithValue("@MODIFIEDDATE", sNow);
+            //                onHid = Convert.ToInt64(cm.ExecuteScalar().ToString());
+            //                //cm.ExecuteNonQuery();
+
+            //                //HEADER_D  
+            //                foreach (KeyValuePair<string, string> dicItem in dicHeadD)
+            //                {
+            //                    sSql = @"INSERT INTO HEADER_D
+            //(PIPID,H_ID,COLNAME,VALUE,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE)
+            //VALUES
+            //(@PIPID,@H_ID,@COLNAME,@VALUE,@CREATOR,@CREATEDDATE,@MODIFIEDBY,@MODIFIEDDATE);";
+
+            //                    cm.CommandText = sSql;
+            //                    cm.Parameters.Clear();
+
+            //                    cm.Parameters.AddWithValue("@PIPID", pipid);
+            //                    cm.Parameters.AddWithValue("@H_ID", onHid);
+            //                    cm.Parameters.AddWithValue("@COLNAME", dicItem.Key);
+            //                    cm.Parameters.AddWithValue("@VALUE", dicItem.Value);
+            //                    cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+            //                    cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+            //                    cm.Parameters.AddWithValue("@MODIFIEDBY", LoginUser.PK);
+            //                    cm.Parameters.AddWithValue("@MODIFIEDDATE", sNow);
+            //                    cm.ExecuteNonQuery();
+            //                }
+
+            //                //SIZETABLE_M
+            //                sSql = @"INSERT INTO SIZETABLE_M
+            //(PIPID,UNIT,CREATOR,CREATEDDATE)
+            //VALUES
+            //(@PIPID,@UNIT,@CREATOR,@CREATEDDATE);SELECT SCOPE_IDENTITY();";
+            //                cm.CommandText = sSql;
+            //                cm.Parameters.Clear();
+
+            //                cm.Parameters.AddWithValue("@PIPID", pipid);
+            //                cm.Parameters.AddWithValue("@UNIT", dlunit.SelectedItem.Value);
+            //                cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+            //                cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+            //                onSMid = Convert.ToInt64(cm.ExecuteScalar().ToString());
+            //                #endregion
+
+
+            //                using (StreamReader data = new StreamReader(sSaveTxtPath))
+            //                {
+            //                    while (!data.EndOfStream)
+            //                    {
+            //                        sLine = data.ReadLine();
+
+            //                        if (iRow == 1)
+            //                        {
+
+            //                        }
+            //                        else
+            //                        {
+            //                            if (sLine.Contains("@Row: Image | Product"))
+            //                                isMaterialColorReport = true;
+            //                            else if (sLine.Contains("@Row: Dim %% Description"))
+            //                            {
+            //                                isSizeTable = true;
+            //                                sRow = 1;
+            //                                sizeTablePage++;
+            //                            }
+            //                            //else if (sLine.Contains("@Row: Dim %% Linked"))//或許之後會抓樣衣尺寸表，可能可用這判斷
+            //                            //{
+            //                            //    countHeader++;//找到樣衣尺寸
+            //                            //}
+            //                            if (sLine.Contains("@Row: Displaying"))
+            //                            {
+            //                                isMaterialColorReport = false;
+            //                                isSizeTable = false;
+            //                            }
+
+
+            //                            if (isMaterialColorReport)
+            //                            {
+            //                                #region MaterialColorReport
+
+
+
+            //                                #endregion
+            //                            }
+            //                            else if (isSizeTable)
+            //                            {
+            //                                #region SizeTable
+
+            //                                string[] arrRow = sLine.Split(new string[] { "@Row: " }, StringSplitOptions.None);
+            //                                string[] rowItem = arrRow[1].Split(new string[] { " %% " }, StringSplitOptions.None);
+
+            //                                if (sRow == 1 && sizeTablePage == 1)//抓表頭及成衣尺寸
+            //                                {
+
+            //                                    for (int i = 0; i < rowItem.Count(); i++)
+            //                                    {
+            //                                        switch (rowItem[i].ToString().Replace(" ", "").ToUpper())
+            //                                        {
+            //                                            case "DIM":
+            //                                                dicHeader.Add(i, "DIM");
+            //                                                break;
+            //                                            case "DESCRIPTION":
+            //                                                dicHeader.Add(i, "DESCRIPTION");
+            //                                                break;
+            //                                            case "TOL(-)":
+            //                                                dicHeader.Add(i, "TOL(-)");
+            //                                                break;
+            //                                            case "TOL(+)":
+            //                                                dicHeader.Add(i, "TOL(+)");
+            //                                                break;
+            //                                            case "COMMENT":
+            //                                                dicHeader.Add(i, "COMMENT");
+            //                                                break;
+            //                                            case "UNLINKPOM?":
+            //                                                break;
+            //                                            default:
+            //                                                if (rowItem[i].ToString().Contains("EU"))
+            //                                                {
+            //                                                    dicSizeHeader.Add(i, rowItem[i].ToString().Substring(2).Trim());
+            //                                                }
+            //                                                break;
+            //                                        }
+            //                                    }
+            //                                    foreach (KeyValuePair<int, string> dicItem in dicSizeHeader)
+            //                                    {
+            //                                        sSql = @"INSERT INTO SIZETABLE_S
+            //(PIPID,M_ID,SAMPLE,SIZE_,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE)
+            //VALUES
+            //(@PIPID,@M_ID,@SAMPLE,@SIZE_,@CREATOR,@CREATEDDATE,@MODIFIEDBY,@MODIFIEDDATE);SELECT SCOPE_IDENTITY();";
+            //                                        cm.CommandText = sSql;
+            //                                        cm.Parameters.Clear();
+
+            //                                        cm.Parameters.AddWithValue("@PIPID", pipid);
+            //                                        cm.Parameters.AddWithValue("@M_ID", onSMid);
+            //                                        cm.Parameters.AddWithValue("@SAMPLE", sample);
+            //                                        cm.Parameters.AddWithValue("@SIZE_", dicItem.Value);
+            //                                        cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+            //                                        cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+            //                                        cm.Parameters.AddWithValue("@MODIFIEDBY", LoginUser.PK);
+            //                                        cm.Parameters.AddWithValue("@MODIFIEDDATE", sNow);
+            //                                        onSSid = Convert.ToInt64(cm.ExecuteScalar().ToString());
+            //                                        dicSizeID.Add(onSSid, dicItem.Value);
+            //                                    }
+
+            //                                }
+            //                                else//各部位長度
+            //                                {
+            //                                    if (sLine.Contains("@Row: Dim %% Description"))//排除跨頁的表頭
+            //                                    {
+            //                                        continue;
+            //                                    }
+            //                                    if (rowItem.Count() > 2)
+            //                                    {
+            //                                        //insert ON_SIZETABLE_H
+            //                                        sSql = @"INSERT INTO SIZETABLE_H
+            //(PIPID,M_ID,CODE,DESCRIPTION,TOL_NEGTIVE,TOL_PLUS,COL1,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE)
+            //VALUES
+            //(@PIPID,@M_ID,@CODE,@DESCRIPTION,@TOL_NEGTIVE,@TOL_PLUS,@COL1,@CREATOR,@CREATEDDATE,@MODIFIEDBY,@MODIFIEDDATE);SELECT SCOPE_IDENTITY();";
+            //                                        cm.CommandText = sSql;
+            //                                        cm.Parameters.Clear();
+            //                                        foreach (KeyValuePair<int, string> dicItem in dicHeader)
+            //                                        {
+            //                                            switch (dicItem.Value)
+            //                                            {
+            //                                                case "DIM":
+            //                                                    cm.Parameters.AddWithValue("@CODE", rowItem[dicItem.Key]);
+            //                                                    break;
+            //                                                case "DESCRIPTION":
+            //                                                    cm.Parameters.AddWithValue("@DESCRIPTION", rowItem[dicItem.Key]);
+            //                                                    break;
+            //                                                case "TOL(-)":
+            //                                                    cm.Parameters.AddWithValue("@TOL_NEGTIVE", rowItem[dicItem.Key]);
+            //                                                    break;
+            //                                                case "TOL(+)":
+            //                                                    cm.Parameters.AddWithValue("@TOL_PLUS", rowItem[dicItem.Key]);
+            //                                                    break;
+            //                                                case "COMMENT":
+            //                                                    cm.Parameters.AddWithValue("@COL1", rowItem[dicItem.Key]);
+            //                                                    break;
+            //                                                case "UNLINKPOM?":
+            //                                                default:
+            //                                                    break;
+            //                                            }
+            //                                        }
+            //                                        cm.Parameters.AddWithValue("@PIPID", pipid);
+            //                                        cm.Parameters.AddWithValue("@M_ID", onSMid);
+            //                                        cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+            //                                        cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+            //                                        cm.Parameters.AddWithValue("@MODIFIEDBY", LoginUser.PK);
+            //                                        cm.Parameters.AddWithValue("@MODIFIEDDATE", sNow);
+            //                                        onSHid = Convert.ToInt64(cm.ExecuteScalar().ToString());
+
+            //                                        //insert ON_SIZETABLE_D
+            //                                        foreach (KeyValuePair<long, string> dicItem in dicSizeID)
+            //                                        {
+            //                                            sSql = @"INSERT INTO SIZETABLE_D
+            //(PIPID,M_ID,H_ID,S_ID,VALUE,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE)
+            //VALUES
+            //(@PIPID,@M_ID,@H_ID,@S_ID,@VALUE,@CREATOR,@CREATEDDATE,@MODIFIEDBY,@MODIFIEDDATE)";
+            //                                            cm.CommandText = sSql;
+            //                                            cm.Parameters.Clear();
+            //                                            //Console.WriteLine(rowItem[dicItem.Key].ToString().Trim());
+            //                                            cm.Parameters.AddWithValue("@S_ID", dicItem.Key);
+            //                                            cm.Parameters.AddWithValue("@VALUE", rowItem[dicSizeHeader.FirstOrDefault(x => x.Value == dicItem.Value).Key]);
+            //                                            cm.Parameters.AddWithValue("@PIPID", pipid);
+            //                                            cm.Parameters.AddWithValue("@M_ID", onSMid);
+            //                                            cm.Parameters.AddWithValue("@H_ID", onSHid);
+            //                                            cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+            //                                            cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+            //                                            cm.Parameters.AddWithValue("@MODIFIEDBY", LoginUser.PK);
+            //                                            cm.Parameters.AddWithValue("@MODIFIEDDATE", sNow);
+            //                                            cm.ExecuteNonQuery();
+            //                                        }
+            //                                    }
+            //                                }
+            //                                sRow++;
+            //                                #endregion
+            //                            }
+            //                        }
+            //                        iRow++;
+            //                    }
+            //                }
+
+            //                //LogFile.Logger.Log(sbLog.ToString());
+            //            }
+            #endregion
+
+            #region Parse Text
+            //dlVersion.SelectedItem.Value == "4"  -> ON RUNNING
+            //dlVersion.SelectedItem.Value == "9"  -> ARC
+            //dlVersion.SelectedItem.Value == "10"  -> ARITZIA
+            bool isOnRunning = dlVersion.SelectedItem.Value == "4";
+            bool isArc = dlVersion.SelectedItem.Value == "9";
+            bool isAritzia = dlVersion.SelectedItem.Value == "10";
+            bool is511 = dlVersion.SelectedItem.Value == "8";
+            //if (dlVersion.SelectedItem.Value == "10")
+            {
+                bool isMaterialColorReport = false;
+                bool isSizeTable = false;
+                string sLine = "";
+                int sRow = 1;
+                int sizeTablePage = 0;
+                long hid = 0;
+                long sMid = 0;
+                long sHid = 0;
+                long sSid = 0;
+                string sample = "";
+                Dictionary<int, string> dicColor = new Dictionary<int, string>();
+                Dictionary<int, string> dicHeader = new Dictionary<int, string>();
+                Dictionary<int, string> dicSizeHeader = new Dictionary<int, string>();
+                Dictionary<long, string> dicSizeID = new Dictionary<long, string>();
+
+                // Initialize license object
+                Aspose.Pdf.License license = new Aspose.Pdf.License();
+                try
+                {
+                    // Set license
+                    license.SetLicense(Server.MapPath("~/PDFManage/Aspose.Pdf.lic"));
+                }
+                catch (Exception)
+                {
+                    // something went wrong
+                    throw;
+                }
+
+                Document pdfDocument = new Document(sPDFPath);
+
+                StringBuilder sbFinal = new StringBuilder();
+                StringBuilder sb = new StringBuilder();
+                foreach (var page in pdfDocument.Pages)
+                {
+                    isMaterialColorReport = false;
+                    isSizeTable = false;
+                    Aspose.Pdf.Text.TableAbsorber absorber = new Aspose.Pdf.Text.TableAbsorber();
+                    absorber.Visit(page);
+
+                    var textAbsorberPure = new TextAbsorber
+                    {
+                        ExtractionOptions = { FormattingMode = TextExtractionOptions.TextFormattingMode.Pure }
+                    };
+                    page.Accept(textAbsorberPure);
+                    var ext = textAbsorberPure.Text;
+
+                    if (page.Number == 1)
+                    {
+                        #region Header
+
+                        string sSeason = "";
+                        string sStyle = "";
+                        string sStyleName = "";
+                        string sVerticals = "";
+                        string sBrand = "";
+                        string sGeneratedDate = "";
+                        Dictionary<string, string> dicHeadD = new Dictionary<string, string>();
+
+                        bool isGotSeason = false, isGotStyleName = false, isGotStyleNumber = false, isGotVerticals = false, isGotBrand = false;
+
+                        TextAbsorber textAbsorber = new TextAbsorber();
+
+                        StringReader strReader = new StringReader(ext);
+                        string[] stringSeparators = new string[] { "  " };
+                        List<string> arrCNumbers = new List<string>();
+                        //while (true)
+                        while ((isOnRunning && !(isGotSeason && isGotStyleName && isGotStyleNumber && isGotVerticals))
+                            || (isAritzia && !(isGotSeason && isGotStyleName && isGotStyleNumber && isGotBrand))
+                            || (isArc && !(isGotSeason && isGotStyleName && isGotStyleNumber))
+                            || (is511 && !(isGotSeason && isGotStyleName && isGotStyleNumber)))
+                        {
+                            sLine = strReader.ReadLine();
+                            if (sLine == null) break;
+                            string[] arrHeaders = sLine.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Where(w => !string.IsNullOrWhiteSpace(w)).ToArray();
+                            #region ON RUNNING
+                            if (isOnRunning)
+                            {
+                                if (isGotSeason && isGotStyleName && isGotStyleNumber && isGotVerticals) break;
+                                if (sLine.Contains("Season"))
+                                {
+                                    sSeason = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Season")) + 1].Substring(2, 4);
+                                    switch (sSeason.Substring(2))
+                                    {
+                                        case "SP":
+                                            sSeason = sSeason.Replace("SP", "SS");
+                                            break;
+                                        case "FA":
+                                            sSeason = sSeason.Replace("FA", "FW");
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    isGotSeason = true;
+                                }
+                                if (sLine.Contains("Style Name"))
+                                {
+                                    sStyleName = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Style Name")) + 1];
+                                    dicHeadD.Add("Style Name", sStyleName);
+                                    isGotStyleName = true;
+                                }
+                                if (sLine.Contains("Style Number"))
+                                {
+                                    sStyle = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Style Number")) + 1];
+                                    isGotStyleNumber = true;
+                                }
+                                if (sLine.Contains("Verticals"))
+                                {
+                                    sVerticals = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Verticals")) + 1];
+                                    dicHeadD.Add("Verticals", sVerticals);
+                                    isGotVerticals = true;
+                                }
+                                if (sLine.Contains("Greenwich Mean Time") || sLine.Contains("Paciﬁc Daylight Time"))
+                                {
+                                    sGeneratedDate = Array.Find(arrHeaders, x => x.Contains("Greenwich Mean Time") || x.Contains("Paciﬁc Daylight Time"));
+                                    sGeneratedDate = sGeneratedDate.Substring(0, sGeneratedDate.IndexOf("at") - 1);
+                                }
+                            }
+                            #endregion
+                            #region ARITZIA
+                            else if (isAritzia)
+                            {
+                                if (isGotSeason && isGotStyleName && isGotStyleNumber && isGotBrand) break;
+                                if (sLine.Contains("Style Name"))
+                                {
+                                    sLine = sLine.Replace("Style Name", "").Trim();
+                                    sStyleName = sLine;
+                                    dicHeadD.Add("Style Name", sStyleName);
+                                    isGotStyleName = true;
+                                }
+                                if (sLine.Contains("Style #"))
+                                {
+                                    sLine = sLine.Replace("Style #", "").Replace(" ", "");
+                                    realStyle = sLine;
+                                    sStyle = sLine.Substring(0, sLine.Length - 5);
+                                    isGotStyleNumber = true;
+                                    sSeason = sLine.Substring(sLine.Length - 4);
+                                    string year = sSeason.Substring(2, 2);
+                                    string season = sSeason.Substring(0, 2);
+                                    sSeason = year + season;
+                                    isGotSeason = true;
+                                }
+                                if (sLine.Contains("Brand"))
+                                {
+                                    sBrand = sLine.Replace("Brand", "").Trim();
+                                    dicHeadD.Add("Brand", sBrand);
+                                    isGotBrand = true;
+                                }
+                                if (sLine.Contains("Greenwich Mean Time") || sLine.Contains("Paciﬁc Daylight Time"))
+                                {
+                                    sGeneratedDate = Array.Find(arrHeaders, x => x.Contains("Paciﬁc Daylight Time") || x.Contains("Paciﬁc Daylight Time"));
+                                    sGeneratedDate = sGeneratedDate.Substring(0, sGeneratedDate.IndexOf("at") - 1);
+                                }
+                            }
+                            #endregion
+                            #region  ARC
+                            else if (isArc)
+                            {
+                                if (sLine.Contains("Season"))
+                                {
+                                    sSeason = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Season")) + 1];
+                                    string year = sSeason.Substring(2, 2);
+                                    string season = sSeason.Substring(0, 2);
+                                    sSeason = year + season;
+                                    isGotSeason = true;
+                                }
+                                if (new Regex("X[0-9]{9}").IsMatch(sLine))
+                                {
+                                    sStyle = new Regex("X[0-9]{9}").Match(sLine).ToString();
+                                    //sStyle = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains(" / X"))];
+                                    //sStyle = sStyle.Substring(sStyle.IndexOf(" / X") + 3, 10);
+                                    isGotStyleNumber = true;
+                                }
+                                if (sLine.Contains("Description"))
+                                {
+                                    sStyleName = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Description")) + 1];
+                                    dicHeadD.Add("Description", sStyleName);
+                                    isGotStyleName = true;
+                                }
+                                if (sLine.Contains("Greenwich Mean Time") || sLine.Contains("Paciﬁc Daylight Time"))
+                                {
+                                    sGeneratedDate = Array.Find(arrHeaders, x => x.Contains("Greenwich Mean Time") || x.Contains("Paciﬁc Daylight Time"));
+                                    sGeneratedDate = sGeneratedDate.Substring(0, sGeneratedDate.IndexOf("at") - 1);
+                                }
+                            }
+                            #endregion
+                            #region  511
+                            else if (is511)
+                            {
+                                if (sLine.Contains("Season"))
+                                {
+                                    sSeason = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Season")) + 1];
+                                    string year = sSeason.Substring(2, 2);
+                                    string season = sSeason.Substring(0, 2);
+                                    switch (season)
+                                    {
+                                        case "SP":
+                                            season = season.Replace("SP", "SS");
+                                            break;
+                                        case "FL":
+                                            season = season.Replace("FL", "FW");
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    sSeason = year + season;
+                                    isGotSeason = true;
+                                }
+                                if (sLine.Contains("Product Code"))
+                                {
+                                    sStyle = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("Product Code")) + 1];
+                                    isGotStyleNumber = true;
+                                }
+                                if (sLine.Contains("System Product Name"))
+                                {
+                                    sStyleName = arrHeaders[Array.FindIndex(arrHeaders, x => x.Contains("System Product Name")) + 1];
+                                    dicHeadD.Add("System Product Name", sStyleName);
+                                    isGotStyleName = true;
+                                }
+                                if (sLine.Contains("Greenwich Mean Time") || sLine.Contains("Paciﬁc Daylight Time"))
+                                {
+                                    sGeneratedDate = Array.Find(arrHeaders, x => x.Contains("Greenwich Mean Time") || x.Contains("Paciﬁc Daylight Time"));
+                                    sGeneratedDate = sGeneratedDate.Substring(0, sGeneratedDate.IndexOf("at") - 1);
+                                }
+                            }
+                            #endregion
+                        }
+
+                        //HEADER_H
+                        sSql = @"INSERT INTO HEADER_H
+(PIPID,SEASON,STYLE,GENERATEDDATE,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE)
+VALUES
+(@PIPID,@SEASON,@STYLE,@GENERATEDDATE,@CREATOR,@CREATEDDATE,@MODIFIEDBY,@MODIFIEDDATE);SELECT SCOPE_IDENTITY();";
+
+                        cm.CommandText = sSql;
+                        cm.Parameters.Clear();
+
+                        cm.Parameters.AddWithValue("@PIPID", pipid);
+                        cm.Parameters.AddWithValue("@SEASON", sSeason);
+                        cm.Parameters.AddWithValue("@STYLE", sStyle);
+                        cm.Parameters.AddWithValue("@GENERATEDDATE", sGeneratedDate);
+                        cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+                        cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+                        cm.Parameters.AddWithValue("@MODIFIEDBY", LoginUser.PK);
+                        cm.Parameters.AddWithValue("@MODIFIEDDATE", sNow);
+                        hid = Convert.ToInt64(cm.ExecuteScalar().ToString());
+                        //cm.ExecuteNonQuery();
+
+                        //HEADER_D  
+                        foreach (KeyValuePair<string, string> dicItem in dicHeadD)
+                        {
+                            sSql = @"INSERT INTO HEADER_D
+(PIPID,H_ID,COLNAME,VALUE,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE)
+VALUES
+(@PIPID,@H_ID,@COLNAME,@VALUE,@CREATOR,@CREATEDDATE,@MODIFIEDBY,@MODIFIEDDATE);";
+
+                            cm.CommandText = sSql;
+                            cm.Parameters.Clear();
+
+                            cm.Parameters.AddWithValue("@PIPID", pipid);
+                            cm.Parameters.AddWithValue("@H_ID", hid);
+                            cm.Parameters.AddWithValue("@COLNAME", dicItem.Key);
+                            cm.Parameters.AddWithValue("@VALUE", dicItem.Value);
+                            cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+                            cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+                            cm.Parameters.AddWithValue("@MODIFIEDBY", LoginUser.PK);
+                            cm.Parameters.AddWithValue("@MODIFIEDDATE", sNow);
+                            cm.ExecuteNonQuery();
+                        }
+
+                        //SIZETABLE_M
+                        sSql = @"INSERT INTO SIZETABLE_M
+(PIPID,UNIT,CREATOR,CREATEDDATE)
+VALUES
+(@PIPID,@UNIT,@CREATOR,@CREATEDDATE);SELECT SCOPE_IDENTITY();";
+                        cm.CommandText = sSql;
+                        cm.Parameters.Clear();
+
+                        cm.Parameters.AddWithValue("@PIPID", pipid);
+                        cm.Parameters.AddWithValue("@UNIT", dlunit.SelectedItem.Value);
+                        cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+                        cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+                        sMid = Convert.ToInt64(cm.ExecuteScalar().ToString());
+                        #endregion
+                    }
+                    
+                    if (isOnRunning)
+                    {
+                        if (ext.Contains("Placements"))
+                        {
+                            isMaterialColorReport = true;
+                        }
+                        if (ext.Contains("Dimensions"))
+                        {
+                            isSizeTable = true;
+                        }
+                    }
+                    else if (isAritzia)
+                    {
+                        if (ext.Contains("Multi- level Placements") || ext.Contains("Style BOM"))
+                        {
+                            isMaterialColorReport = true;
+                        }
+                        if (ext.Contains("POMs") && !(ext.Contains("Size Chart Review") || ext.Contains("POM Comments") || ext.Contains("Target") || ext.Contains("Meas.")))
+                        {
+                            isSizeTable = true;
+                        }
+                    }
+                    else if (isArc)
+                    {
+                        if (ext.Contains("Multi- level Placements"))
+                        {
+                            isMaterialColorReport = true;
+                        }
+                        if (ext.Contains("Points of Measure") && !ext.Contains("Size Chart Review"))
+                        {
+                            isSizeTable = true;
+                        }
+                    }
+                    else if (is511)
+                    {
+                        if (ext.Contains("Multi- level Placements"))
+                        {
+                            isMaterialColorReport = true;
+                        }
+                        if (ext.Contains("POM's") && !ext.Contains("Size Chart Review"))
+                        {
+                            isSizeTable = true;
+                        }
+                    }
+
+                    if (!isSizeTable && !isMaterialColorReport) continue;
+                    
+                    //只將BOM及尺寸表寫入TXT檔
+                    foreach (AbsorbedTable table in absorber.TableList)
+                    {
+                        Console.WriteLine("Table");
+                        foreach (AbsorbedRow row in table.RowList)
+                        {
+                            sb = new StringBuilder();
+                            sb.Append("@Row: ");
+                            
+                            foreach (AbsorbedCell cell in row.CellList)
+                            {
+                                string cellText = "";
+                                foreach (TextFragment fragment in cell.TextFragments)
+                                {
+                                    foreach (TextSegment seg in fragment.Segments)
+                                    {
+                                        cellText += seg.Text;
+                                    }
+                                }
+                                sb.Append(cellText + " %% ");
+                            }
+                            sbFinal.AppendLine(sb.ToString());
+                        }
+                        sb.AppendLine("----");
+                    }
+                }
+
+                System.IO.File.WriteAllText(sSaveTxtPath, sbFinal.ToString());
+
+                //read text
+                using (StreamReader data = new StreamReader(sSaveTxtPath))
+                {
+                    while (!data.EndOfStream)
+                    {
+                        sLine = data.ReadLine();
+
+                        if (isOnRunning)
+                        {
+                            if (sLine.Contains("@Row: Image %% Product"))
+                                isMaterialColorReport = true;
+                            else if (sLine.Contains("@Row: Dim %% Description"))
+                            {
+                                isSizeTable = true;
+                                sRow = 1;
+                                sizeTablePage++;
+                            }
+                        }
+                        else if (isAritzia)
+                        {
+                            if (sLine.Contains("@Row: Product %% Placement"))
+                                isMaterialColorReport = true;
+                            else if (sLine.Contains("@Row: POM Code %% POM Description"))
+                            {
+                                isSizeTable = true;
+                                sRow = 1;
+                                sizeTablePage++;
+                            }
+                        }
+                        else if (isArc)
+                        {
+                            if (sLine.Contains("@Row: Placement %% Description"))
+                                isMaterialColorReport = true;
+                            else if (sLine.Contains("@Row: POM %% Description"))
+                            {
+                                isSizeTable = true;
+                                sRow = 1;
+                                sizeTablePage++;
+                            }
+                        }
+                        else if (is511)
+                        {
+                            if (sLine.Contains("@Row: Product %% Image"))
+                                isMaterialColorReport = true;
+                            else if (sLine.Contains("@Row: POMCode %% Dim %% Description"))
+                            {
+                                isSizeTable = true;
+                                sRow = 1;
+                                sizeTablePage++;
+                            }
+                        }
+                        //else if (sLine.Contains("@Row: Dim %% Linked"))//或許之後會抓樣衣尺寸表，可能可用這判斷
+                        //{
+                        //    countHeader++;//找到樣衣尺寸
+                        //}
+                        if (sLine.Contains("@Row: Displaying"))
+                        {
+                            isMaterialColorReport = false;
+                            isSizeTable = false;
+                        }
+
+
+                        if (isMaterialColorReport)
+                        {
+                            #region MaterialColorReport
+
+
+
+                            #endregion
+                        }
+                        else if (isSizeTable)
+                        {
+                            #region SizeTable
+
+                            string[] arrRow = sLine.Split(new string[] { "@Row: " }, StringSplitOptions.None);
+                            string[] rowItem = arrRow[1].Split(new string[] { " %% " }, StringSplitOptions.None);
+
+                            if (sRow == 1 && sizeTablePage == 1)//抓表頭及成衣尺寸
+                            {
+                                for (int i = 0; i < rowItem.Count(); i++)
+                                {
+                                    switch (rowItem[i].ToString().Replace(" ", "").ToUpper())
+                                    {
+                                        case "DIM":
+                                            if(is511)
+                                                dicHeader.Add(i, "COL2");
+                                            else 
+                                                dicHeader.Add(i, "CODE");
+                                            break;
+                                        case "POMCODE":
+                                        case "POM":
+                                            dicHeader.Add(i, "CODE");
+                                            break;
+                                        case "DESCRIPTION":
+                                        case "POMDESCRIPTION":
+                                            dicHeader.Add(i, "DESCRIPTION");
+                                            break;
+                                        case "TOL(-)":
+                                            dicHeader.Add(i, "TOL(-)");
+                                            break;
+                                        case "TOL(+)":
+                                            dicHeader.Add(i, "TOL(+)");
+                                            break;
+                                        case "COMMENT":
+                                        case "LENGTH":
+                                            dicHeader.Add(i, "COL1");
+                                            break;
+                                        case "PATTERNM’MENT":
+                                            dicHeader.Add(i, "COL2");
+                                            break;
+                                        case "UNLINKPOM?":
+                                            break;
+                                        default:
+                                            if (isOnRunning && rowItem[i].ToString().Contains("EU"))
+                                            {
+                                                dicSizeHeader.Add(i, rowItem[i].ToString().Substring(2).Trim());
+                                            }
+                                            else if (!string.IsNullOrEmpty(rowItem[i].ToString()) && new Regex("^[0-9XSML]*$").IsMatch(rowItem[i].ToString()))//isAritzia、isArc、is511
+                                            {
+                                                dicSizeHeader.Add(i, rowItem[i].ToString().Trim());
+                                            }
+                                            break;
+                                    }
+                                }
+                                foreach (KeyValuePair<int, string> dicItem in dicSizeHeader)
+                                {
+                                    sSql = @"INSERT INTO SIZETABLE_S
+(PIPID,M_ID,SAMPLE,SIZE_,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE)
+VALUES
+(@PIPID,@M_ID,@SAMPLE,@SIZE_,@CREATOR,@CREATEDDATE,@MODIFIEDBY,@MODIFIEDDATE);SELECT SCOPE_IDENTITY();";
+                                    cm.CommandText = sSql;
+                                    cm.Parameters.Clear();
+
+                                    cm.Parameters.AddWithValue("@PIPID", pipid);
+                                    cm.Parameters.AddWithValue("@M_ID", sMid);
+                                    cm.Parameters.AddWithValue("@SAMPLE", sample);
+                                    cm.Parameters.AddWithValue("@SIZE_", dicItem.Value);
+                                    cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+                                    cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+                                    cm.Parameters.AddWithValue("@MODIFIEDBY", LoginUser.PK);
+                                    cm.Parameters.AddWithValue("@MODIFIEDDATE", sNow);
+                                    sSid = Convert.ToInt64(cm.ExecuteScalar().ToString());
+                                    dicSizeID.Add(sSid, dicItem.Value);
+                                }
+
+                            }
+                            else//各部位長度
+                            {
+                                if (isOnRunning && sLine.Contains("@Row: Dim %% Description"))//排除跨頁的表頭
+                                {
+                                    continue;
+                                }
+                                else if (isAritzia && sLine.Contains("@Row: POM Code %% POM Description"))//排除跨頁的表頭
+                                {
+                                    continue;
+                                }
+                                else if (isArc && sLine.Contains("@Row: POM %% Description"))//排除跨頁的表頭
+                                {
+                                    continue;
+                                }
+                                else if (is511 && sLine.Contains("@Row: POMCode %% Dim %% Description"))//排除跨頁的表頭
+                                {
+                                    continue;
+                                }
+                                if (rowItem.Count() > 2)
+                                {
+                                    //insert SIZETABLE_H
+                                    sSql = @"INSERT INTO SIZETABLE_H
+(PIPID,M_ID,CODE,DESCRIPTION,TOL_NEGTIVE,TOL_PLUS";
+                                    if (isOnRunning ) sSql += ",COL1";
+                                    else if (isArc || is511) sSql += ",COL1,COL2";
+                                    sSql += @",CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE)
+VALUES
+(@PIPID,@M_ID,@CODE,@DESCRIPTION,@TOL_NEGTIVE,@TOL_PLUS";
+                                    if (isOnRunning) sSql += ",@COL1";
+                                    else if (isArc || is511) sSql += ",@COL1,@COL2";
+                                    sSql +=",@CREATOR,@CREATEDDATE,@MODIFIEDBY,@MODIFIEDDATE);SELECT SCOPE_IDENTITY();";
+                                    cm.CommandText = sSql;
+                                    cm.Parameters.Clear();
+                                    foreach (KeyValuePair<int, string> dicItem in dicHeader)
+                                    {
+                                        switch (dicItem.Value)
+                                        {
+                                            case "CODE":
+                                                cm.Parameters.AddWithValue("@CODE", rowItem[dicItem.Key]);
+                                                break;
+                                            case "DESCRIPTION":
+                                                cm.Parameters.AddWithValue("@DESCRIPTION", rowItem[dicItem.Key]);
+                                                break;
+                                            case "TOL(-)":
+                                                cm.Parameters.AddWithValue("@TOL_NEGTIVE", rowItem[dicItem.Key]);
+                                                break;
+                                            case "TOL(+)":
+                                                cm.Parameters.AddWithValue("@TOL_PLUS", rowItem[dicItem.Key]);
+                                                break;
+                                            case "COL1":
+                                                cm.Parameters.AddWithValue("@COL1", rowItem[dicItem.Key]);
+                                                break;
+                                            case "COL2":
+                                                cm.Parameters.AddWithValue("@COL2", rowItem[dicItem.Key]);
+                                                break;
+                                            case "COL3":
+                                                cm.Parameters.AddWithValue("@COL3", rowItem[dicItem.Key]);
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                    cm.Parameters.AddWithValue("@PIPID", pipid);
+                                    cm.Parameters.AddWithValue("@M_ID", sMid);
+                                    cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+                                    cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+                                    cm.Parameters.AddWithValue("@MODIFIEDBY", LoginUser.PK);
+                                    cm.Parameters.AddWithValue("@MODIFIEDDATE", sNow);
+                                    sHid = Convert.ToInt64(cm.ExecuteScalar().ToString());
+
+                                    //insert SIZETABLE_D
+                                    foreach (KeyValuePair<long, string> dicItem in dicSizeID)
+                                    {
+                                        sSql = @"INSERT INTO SIZETABLE_D
+(PIPID,M_ID,H_ID,S_ID,VALUE,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE)
+VALUES
+(@PIPID,@M_ID,@H_ID,@S_ID,@VALUE,@CREATOR,@CREATEDDATE,@MODIFIEDBY,@MODIFIEDDATE)";
+                                        cm.CommandText = sSql;
+                                        cm.Parameters.Clear();
+                                        cm.Parameters.AddWithValue("@S_ID", dicItem.Key);
+                                        cm.Parameters.AddWithValue("@VALUE", rowItem[dicSizeHeader.FirstOrDefault(x => x.Value == dicItem.Value).Key]);
+                                        cm.Parameters.AddWithValue("@PIPID", pipid);
+                                        cm.Parameters.AddWithValue("@M_ID", sMid);
+                                        cm.Parameters.AddWithValue("@H_ID", sHid);
+                                        cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+                                        cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+                                        cm.Parameters.AddWithValue("@MODIFIEDBY", LoginUser.PK);
+                                        cm.Parameters.AddWithValue("@MODIFIEDDATE", sNow);
+                                        cm.ExecuteNonQuery();
+                                    }
+                                }
+                            }
+                            sRow++;
+                            #endregion
+                        }
+                        
+                    }
+                }
+
+            }
+            #endregion
+
+            #region set ptitle
+            sSql = "select a.*,b.season,b.style,b.generateddate,c.gmname \n";
+            sSql += "from PDFTAG.dbo.P_inProcess a              \n";
+            sSql += " left join PDFTAG.dbo.Header_H b on a.pipid=b.pipid and b.isshow=0             \n";
+            sSql += " left join PDFTAG.dbo.GroupManage c on a.gmid=c.gmid and c.isshow=0             \n";
+            sSql += " where 1=1 and a.isshow=0 and a.pipid='" + pipid + "' \n";
+
+            cm.CommandText = sSql;
+            cm.Parameters.Clear();
+            dt = new DataTable();
+            using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+            {
+                da.Fill(dt);
+            }
+
+            string ptitle = dt.Rows[0]["style"].ToString();
+            string season2 = dt.Rows[0]["season"].ToString();
+            if (isAritzia) ptitle = realStyle;
+            else ptitle = ptitle + "-" + season2;
+
+            sSql = "update PDFTAG.dbo.P_inProcess    \n";
+            sSql += " set mdate=@mdate \n";
+            if (titleType == "1")
+            {
+                sSql += " ,ptitle=@ptitle \n";
+            }
+            sSql += "where pipid=@pipid \n";
+            cm.CommandText = sSql;
+            cm.Parameters.Clear();
+            cm.Parameters.AddWithValue("@pipid", pipid);
+            cm.Parameters.AddWithValue("@mdate", sNow);
+            cm.Parameters.AddWithValue("@ptitle", ptitle);
+            cm.ExecuteNonQuery();
+            
+            #endregion
+
+            string new_pipid = Add_PDF_Manage(pipid);
+            
+            script = "alert('執行完成!')";
+        }
+    }
+
+    /// <summary>
+    /// 點[執行]後，原始資料塞進DB後，產生編輯的文件
+    /// </summary>
+    /// <param name="pipid"></param>
+    /// <param name="_cust"></param>
+    protected string Add_PDF_Manage(string pipid)
+    {
+        SQLHelper sql = new SQLHelper();
+        DataTable dt = new DataTable();
+        string sSql = "";
+        string new_pipid = "";
+        
+        List<string> arrColorNames = new List<string>();
+        
+        try
+        {
+            hidpipid.Value = pipid;
+            DateTime dtNow = DateTime.Now;
+            string sFilePath = "";
+
+            sSql = "select count(*)+1 as cnt \n";
+            sSql += "from PDFTAG.dbo.HistoryData a              \n";
+            sSql += " where pipid=@pipid \n";
+
+            using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
+            {
+                cm.Parameters.AddWithValue("@pipid", hidpipid.Value);
+
+                using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                {
+                    da.Fill(dt);
+                }
+
+                string hisversion = dt.Rows[0]["cnt"].ToString();
+
+                if (hisversion.Length == 1)
+                    hisversion = "00" + hisversion;
+                else if (hisversion.Length == 2)
+                    hisversion = "0" + hisversion;
+
+                hisversion = dtNow.ToString("yyyyMMdd") + "-" + hisversion;
+
+
+                sSql = @"insert into PDFTAG.dbo.HistoryData 
+(pipid,hisversion,editdate,creator,isShow) 
+values 
+(@pipid,@hisversion,@editdate,@creator,@isShow);SELECT SCOPE_IDENTITY();";
+
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                cm.Parameters.AddWithValue("@pipid", hidpipid.Value);
+                cm.Parameters.AddWithValue("@hisversion", hisversion);
+                cm.Parameters.AddWithValue("@editdate", dtNow);
+                cm.Parameters.AddWithValue("@creator", LoginUser.PK);
+                cm.Parameters.AddWithValue("@isShow", "0");
+
+                long hdid = Convert.ToInt64(cm.ExecuteScalar().ToString());
+
+
+                sSql = @"insert into PDFTAG.dbo.P_inProcess 
+(ptitle,pidate,piuploadfile,pver,creator,createordate,isShow,hdid,gmid,unit) 
+select ptitle,pidate,piuploadfile,pver,creator,createordate,isShow,'" + hdid + @"' as hdid,gmid,unit
+ from PDFTAG.dbo.P_inProcess where pipid=@pipid";
+
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                cm.Parameters.AddWithValue("@pipid", hidpipid.Value);
+                cm.ExecuteNonQuery();
+
+                sSql = "select pipid \n";
+                sSql += "from PDFTAG.dbo.P_inProcess a              \n";
+                sSql += " where hdid=@hdid \n";
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                cm.Parameters.AddWithValue("@hdid", hdid);
+                dt = new DataTable();
+                using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                {
+                    da.Fill(dt);
+                }
+
+                new_pipid = dt.Rows[0]["pipid"].ToString();
+                
+                #region ONRUNNING
+                sSql = "select ID from PDFTAG.dbo.HEADER_H a where pipid=@pipid ";
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                cm.Parameters.AddWithValue("@pipid", hidpipid.Value);
+                dt = new DataTable();
+                using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                {
+                    da.Fill(dt);
+                }
+
+                string onhid = dt.Rows[0]["ID"].ToString();
+
+
+                sSql = @"insert into PDFTAG.dbo.HEADER_H 
+(PIPID,SEASON,STYLE,GENERATEDDATE,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE,ORGID)
+    select '" + new_pipid + @"'as PIPID, SEASON, STYLE, GENERATEDDATE, CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE, ID as ORGID
+from PDFTAG.dbo.HEADER_H where pipid=@pipid; SELECT SCOPE_IDENTITY();";
+
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                cm.Parameters.AddWithValue("@pipid", hidpipid.Value);
+                long new_hid = Convert.ToInt64(cm.ExecuteScalar().ToString());
+
+                sSql = @"insert into PDFTAG.dbo.HEADER_D
+(PIPID,H_ID,COLNAME,VALUE,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE,ORGID)
+    select '" + new_pipid + "'as PIPID, '" + new_hid + @"' as H_ID, COLNAME, VALUE, CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE, ID as ORGID
+from PDFTAG.dbo.HEADER_D where pipid=@pipid; ";
+
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                cm.Parameters.AddWithValue("@pipid", hidpipid.Value);
+                cm.ExecuteNonQuery();
+                //long new_Did = Convert.ToInt64(cm.ExecuteScalar().ToString());
+
+                sSql = @"INSERT INTO SIZETABLE_M
+(PIPID,UNIT,CREATOR,CREATEDDATE,ORGID)
+    select '" + new_pipid + @"' as PIPID,UNIT,CREATOR,CREATEDDATE, ID as ORGID
+    from PDFTAG.dbo.SIZETABLE_M where pipid=@pipid;SELECT SCOPE_IDENTITY();";
+
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                cm.Parameters.AddWithValue("@pipid", hidpipid.Value);
+                long new_SMid = Convert.ToInt64(cm.ExecuteScalar().ToString());
+
+                sSql = @"INSERT INTO SIZETABLE_S
+(PIPID,M_ID,SAMPLE,SIZE_,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE,ORGID)
+select '" + new_pipid+ "' as PIPID, '" + new_SMid + @"' as M_ID,SAMPLE,SIZE_,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE, ID as ORGID
+    from PDFTAG.dbo.SIZETABLE_S where pipid=@pipid;
+
+INSERT INTO SIZETABLE_H
+(PIPID,M_ID,CODE,DESCRIPTION,TOL_NEGTIVE,TOL_PLUS,COL1,COL2,COL3,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE,ORGID,EnableFlag)
+select  '" + new_pipid + "' as PIPID, '" + new_SMid + @"' as M_ID,CODE,DESCRIPTION,TOL_NEGTIVE,TOL_PLUS,COL1,COL2,COL3,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE, ID as ORGID,EnableFlag
+from PDFTAG.dbo.SIZETABLE_H where pipid=@pipid;
+";
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                cm.Parameters.AddWithValue("@pipid", hidpipid.Value);
+                cm.ExecuteNonQuery();
+                    
+                sSql = @"INSERT INTO SIZETABLE_D
+(PIPID,M_ID,H_ID,S_ID,VALUE,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE,ORGID)
+select  '" + new_pipid + @"' as PIPID,'" + new_SMid + @"' as M_ID,
+(select ID from SIZETABLE_H where ORGID = SIZETABLE_D.H_ID) as H_ID,
+(select ID from SIZETABLE_S where ORGID = SIZETABLE_D.S_ID) as S_ID,
+VALUE,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE, ID as ORGID
+from SIZETABLE_D where pipid=@pipid";
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                cm.Parameters.AddWithValue("@pipid", hidpipid.Value);
+                cm.ExecuteNonQuery();
+                #endregion
+                
+            }
+
+
+        }
+        catch (Exception err)
+        {
+            Response.Write("btnAdd_Click:" + err.ToString());
+        }
+
+
+        return new_pipid;
+    }
+
+    #endregion
+
     public string ConvertToStrDouble(string sVal)
     {
         return sVal;
@@ -5060,7 +6374,6 @@ where b.pipid=@pipid;
                     Console.WriteLine("Table");
                     foreach (AbsorbedRow row in table.RowList)
                     {
-
                         sb.Append("@Row: ");
 
                         bool isHeader = false;
@@ -5099,20 +6412,16 @@ where b.pipid=@pipid;
                             //if (cellText.StartsWith("Modified D")) cellText = "";
                             sb.Append(cellText + " | ");
                         }
-
                         Console.WriteLine();
                     }
-
                     sb.AppendLine("----");
                 }
-
-
             }
             catch (Exception ex)
             {
                 //throw ex;
-                LogFile.Logger.Log("[ConvertPDFToText] sPdfPath="+ sPdfPath + " iPage=" + iPage + " Exception=" + ex.ToString());
-                Response.Write("<!--[ConvertPDFToText] iPage=" + iPage + " Exception=" + ex.ToString()+"-->");
+                LogFile.Logger.Log("[ConvertPDFToText] sPdfPath=" + sPdfPath + " iPage=" + iPage + " Exception=" + ex.ToString());
+                Response.Write("<!--[ConvertPDFToText] iPage=" + iPage + " Exception=" + ex.ToString() + "-->");
             }
         }
 
@@ -5393,21 +6702,22 @@ values
             DateTime dtNow = DateTime.Now;
             string sFilePath = "";
 
-            if (FileUpload1.HasFile)
-            {
-                HttpPostedFile postedFile = Request.Files[0];
-                if (postedFile.ContentLength > 0)
-                {
-                    sFilePath = sDir2 + "/" + dtNow.ToString("yyyyMMddHHmmssfff");
+            //編輯不看檔案
+            //if (FileUpload1.HasFile)
+            //{
+            //    HttpPostedFile postedFile = Request.Files[0];
+            //    if (postedFile.ContentLength > 0)
+            //    {
+            //        sFilePath = sDir2 + "/" + dtNow.ToString("yyyyMMddHHmmssfff");
 
-                    if (!Directory.Exists(Server.MapPath(sFilePath)))
-                        Directory.CreateDirectory(Server.MapPath(sFilePath));
+            //        if (!Directory.Exists(Server.MapPath(sFilePath)))
+            //            Directory.CreateDirectory(Server.MapPath(sFilePath));
 
-                    sFilePath += "/" + postedFile.FileName;
-                    postedFile.SaveAs(Server.MapPath(sFilePath));
-                }
+            //        sFilePath += "/" + postedFile.FileName;
+            //        postedFile.SaveAs(Server.MapPath(sFilePath));
+            //    }
 
-            }
+            //}
 
             sSql = "update PDFTAG.dbo.P_inProcess    \n";
             sSql += " set titleType=@titleType,ptitle=@ptitle,pver=@pver,Gaptype=@Gaptype,gmid=@gmid,unit=@unit \n";
@@ -5562,4 +6872,769 @@ values
         }
     }
 
+
+    private void ParseExcel_All(string pipid)
+    {
+        SQLHelper sql = new SQLHelper();
+        DataTable dt = new DataTable();
+        string sSql = "";
+        script = "";
+
+        using (SqlCommand cm = new SqlCommand(sSql, sql.getDbcn()))
+        {
+            sSql = "select * from PDFTAG.dbo.P_inProcess where pipid='" + pipid + "' \n";
+
+            cm.CommandText = sSql;
+            cm.Parameters.Clear();
+            using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+            {
+                da.Fill(dt);
+            }
+        }
+
+        string titleType = dt.Rows[0]["titleType"].ToString();
+        string sExcelPath = Server.MapPath("~/PDFManage/" + dt.Rows[0]["piuploadfile"].ToString());
+        string pverStr = dt.Rows[0]["pver"].ToString();
+
+        List<DataConfigTable> getConfigSetting = _comFunction.getDataConfigTableByPverDataType(pverStr, "ParseExcel_All");
+        //取尺碼表的Sheet 關鍵字
+        string sizeSheetNameKeyWord = getConfigSetting.Where(x => x.DataName == "sizeSheetNameKeyWord").ToList().Count > 0 ? getConfigSetting.Where(x => x.DataName == "sizeSheetNameKeyWord").FirstOrDefault().DataValue : "";
+
+        //當紀錄上一個pipid資料, 就要清空
+        if (HiddenField1.Value != pipid)
+        {
+            txtStyle.Text = ""; txtSeason.Text = ""; txtBOMDate.Text = "";
+        }
+        #region 檢查必要欄位 : Style, Season, BOMDate
+        string sStyle = txtStyle.Text, sSeason = txtSeason.Text, sGeneratedDate = txtBOMDate.Text;
+        if (string.IsNullOrEmpty(sStyle) || string.IsNullOrEmpty(sSeason) || string.IsNullOrEmpty(sGeneratedDate) || sGeneratedDate == DateTime.MinValue.ToString("yyyy/MM/dd"))
+        {
+            //取Style, Season, BOMDate值
+            Dictionary<string, string> vaildFieldDict = getVaildFieldExcel(sExcelPath, pverStr, sizeSheetNameKeyWord);
+            if (!string.IsNullOrEmpty(script))
+                return;
+
+            foreach (var item in vaildFieldDict)
+            {
+                switch (item.Key)
+                {
+                    case "style":
+                        sStyle = item.Value;
+                        break;
+                    case "season":
+                        string seasonStr = item.Value;
+                        string seasonNum = Regex.Replace(seasonStr, @"[^0-9]+", String.Empty);
+                        string seasonLetter = Regex.Replace(seasonStr, @"[^a-zA-Z]+", String.Empty);
+                        sSeason = seasonNum + seasonLetter;
+                        //針對英文字母，轉換季節代碼  ex:S23 => 23SS , F23 => 23FW
+                        List<DataConfigTable> getSeasonReplaceConfigSetting = _comFunction.getDataConfigTableByPverDataType(pverStr, "seasonReplaceWord");
+                        if (getSeasonReplaceConfigSetting.Count>0)
+                        {
+                            if (sSeason.Length < 4)
+                            {
+                                foreach (DataConfigTable seasonReplaceWordItem in getSeasonReplaceConfigSetting)
+                                {
+                                    if (seasonReplaceWordItem.DataName.ToLower() == seasonLetter.ToLower())
+                                        sSeason = seasonNum + seasonReplaceWordItem.DataValue;
+                                }
+                            }
+                        }
+                        break;
+                    case "BOMDate":
+                        sGeneratedDate = item.Value;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+       
+        //當Season, Style, GeneratedDate 有一個沒有,就要跳出來
+        if (string.IsNullOrEmpty(sStyle) || string.IsNullOrEmpty(sSeason) || string.IsNullOrEmpty(sGeneratedDate) || sGeneratedDate == DateTime.MinValue.ToString("yyyy/MM/dd"))
+        {
+            txtStyle.Enabled = string.IsNullOrEmpty(sStyle);
+            txtSeason.Enabled = string.IsNullOrEmpty(sSeason);
+            txtBOMDate.Enabled = (string.IsNullOrEmpty(sGeneratedDate) || sGeneratedDate == DateTime.MinValue.ToString("yyyy/MM/dd"));
+
+            txtStyle.Text = sStyle; txtSeason.Text = sSeason; txtBOMDate.Text = sGeneratedDate; HiddenField1.Value = pipid;
+            ScriptManager.RegisterStartupScript(this, GetType(), "Javascript", "javascript:showInput(); ", true);
+            return;
+        }
+        #endregion
+
+        //將資料轉換成DataTable
+        DataTable dtReadExcel = LoadExcelAsDataTable(sExcelPath, pverStr , sStyle, sSeason, sGeneratedDate, sizeSheetNameKeyWord);
+        if (!string.IsNullOrEmpty(script))
+            return;
+        //沒有資料
+        if (dtReadExcel.Rows.Count <= 0 || dtReadExcel.Columns.Count == 3)
+        {
+            script = "alert(沒有" + sizeSheetNameKeyWord + "資料!!!')";
+            return;
+        }    
+        //insert Table 
+        DataTableInsertSql(pipid, titleType, dtReadExcel, pverStr);
+
+    }
+
+    /// <summary>
+    /// DataTable 塞入 HEADER_H, HEADER_D, SIZETABLE_M, SIZETABLE_S, SIZETABLE_H, SIZETABLE_D 
+    /// 再update ptitle 
+    /// </summary>
+    /// <param name="pipid"></param>
+    /// <param name="titleType"></param>
+    /// <param name="dtReadExcel"></param>
+    /// <param name="_pver"></param>
+    public void DataTableInsertSql( string pipid, string titleType, DataTable dtReadExcel, string _pver)
+    {
+        #region 參數設定 BY 客戶 
+        List<DataConfigTable> getConfigSetting = _comFunction.getDataConfigTableByPverDataType(_pver, "DataTableInsertSql");
+
+        //Size結束的表頭欄位名稱
+        string endSizeWord = getConfigSetting.Where(x => x.DataName == "endSizeWord").ToList().Count > 0 ? getConfigSetting.Where(x => x.DataName == "endSizeWord").FirstOrDefault().DataValue : "";
+        //insert SIZETABLE_H. COL1 的表頭欄位名稱
+        string COL1Word = getConfigSetting.Where(x => x.DataName == "COL1Word").ToList().Count > 0 ? getConfigSetting.Where(x => x.DataName == "COL1Word").FirstOrDefault().DataValue : "";
+        //略過insert至 SIZETABLE_H
+        string skipRowWordList = getConfigSetting.Where(x => x.DataName == "skipRowWordList").ToList().Count > 0 ? getConfigSetting.Where(x => x.DataName == "skipRowWordList").FirstOrDefault().DataValue : "";
+        List<string> skipRowWord = new List<string>();
+        foreach (var item in skipRowWordList.Split(';'))
+        {
+            skipRowWord.Add(item);
+        }
+
+        //insert SIZETABLE_H.TOL_NEGTIVE &&  SIZETABLE_H.TOL_PLUS 的表頭欄位名稱
+        string TOLWordList = getConfigSetting.Where(x => x.DataName == "TOLWordList").ToList().Count > 0 ? getConfigSetting.Where(x => x.DataName == "TOLWordList").FirstOrDefault().DataValue : "";
+        string TOLWord = "";
+        foreach (DataColumn item in dtReadExcel.Columns)
+        {
+            if (TOLWordList.Split(';').Contains(item.ColumnName))
+                TOLWord = item.ColumnName;
+        }
+
+        //表格內，尺碼開始索引
+        string startSizeIndexStr = getConfigSetting.Where(x => x.DataName == "startSizeIndex").ToList().Count > 0 ? getConfigSetting.Where(x => x.DataName == "startSizeIndex").FirstOrDefault().DataValue : "";
+        int startSizeIndex = string.IsNullOrEmpty(startSizeIndexStr) ? 0 : Convert.ToInt32(startSizeIndexStr);
+
+        //insert SIZETABLE_H.CODE  的表頭欄位名稱
+        string codeIndexStr = getConfigSetting.Where(x => x.DataName == "codeIndex").ToList().Count > 0 ? getConfigSetting.Where(x => x.DataName == "codeIndex").FirstOrDefault().DataValue : "";
+        int codeIndex = string.IsNullOrEmpty(codeIndexStr) ? 0 : Convert.ToInt32(codeIndexStr);
+
+        //insert SIZETABLE_H.DESCRIPTION 的表頭欄位名稱
+        string descriptIndexStr = getConfigSetting.Where(x => x.DataName == "descriptIndex").ToList().Count > 0 ? getConfigSetting.Where(x => x.DataName == "descriptIndex").FirstOrDefault().DataValue : "";
+        int descriptIndex = string.IsNullOrEmpty(descriptIndexStr) ? 0 : Convert.ToInt32(descriptIndexStr); ;
+
+
+        //因Cotopaxi有兩個版本, 其中一版,只有描述, 沒有Code =>所以將Code跟Description都塞一樣
+        if (dtReadExcel.Columns[codeIndex].ColumnName == "Point of Measure")
+            descriptIndex = 0;
+        #endregion
+
+        SQLHelper sql = new SQLHelper();
+        DataTable dt = new DataTable();
+        string sSql = "";
+
+        string seasonStr = dtReadExcel.Rows[0]["season"].ToString();
+        string seasonNum = Regex.Replace(seasonStr, @"[^0-9]+", String.Empty);
+        string seasonLetter = Regex.Replace(seasonStr, @"[^a-zA-Z]+", String.Empty);
+        string sSeason = seasonNum + seasonLetter;
+    
+        string sStyle = dtReadExcel.Rows[0]["style"].ToString();
+        string sDate = dtReadExcel.Rows[0]["generateddate"].ToString();
+        string sGeneratedDate = sDate != "nonDate"? sDate : "";
+        string sNow = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+        long onHid = 0; long onSMid = 0; long onSSid = 0; long onSHid = 0;
+        string sample = "";  //20231109 目前未用到 ,直接塞空
+        List<long> disable_SizeH = new List<long>();
+        #region insert Table => HEADER_H, HEADER_D, SIZETABLE_M, SIZETABLE_S, SIZETABLE_H, SIZETABLE_D =>  set ptitle
+        using (SqlConnection connection = new SqlConnection(sql._Conn))
+        {
+            connection.Open();
+            SqlCommand cm = connection.CreateCommand();
+            SqlTransaction transaction;
+            // Start a local transaction.
+            transaction = connection.BeginTransaction();
+            cm.Connection = connection;
+            cm.Transaction = transaction;
+
+            try
+            {
+                //HEADER_H
+                sSql = @"INSERT INTO HEADER_H
+(PIPID,SEASON,STYLE,GENERATEDDATE,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE)
+VALUES
+(@PIPID,@SEASON,@STYLE,@GENERATEDDATE,@CREATOR,@CREATEDDATE,@MODIFIEDBY,@MODIFIEDDATE) ;SELECT SCOPE_IDENTITY();";
+
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+
+
+                cm.Parameters.AddWithValue("@PIPID", pipid);
+                cm.Parameters.AddWithValue("@SEASON", sSeason);
+                cm.Parameters.AddWithValue("@STYLE", sStyle);
+                cm.Parameters.AddWithValue("@GENERATEDDATE", sGeneratedDate);
+                cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+                cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+                cm.Parameters.AddWithValue("@MODIFIEDBY", LoginUser.PK);
+                cm.Parameters.AddWithValue("@MODIFIEDDATE", sNow);
+                onHid = Convert.ToInt64(cm.ExecuteScalar().ToString());
+
+                //HEADER_D=> GmyShark未用到
+                //            //HEADER_D  
+                //            foreach (KeyValuePair<string, string> dicItem in dicHeadD)
+                //            {
+                //                sSql = @"INSERT INTO HEADER_D
+                //(PIPID,H_ID,COLNAME,VALUE,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE)
+                //VALUES
+                //(@PIPID,@H_ID,@COLNAME,@VALUE,@CREATOR,@CREATEDDATE,@MODIFIEDBY,@MODIFIEDDATE);";
+
+                //                cm.CommandText = sSql;
+                //                cm.Parameters.Clear();
+
+                //                cm.Parameters.AddWithValue("@PIPID", pipid);
+                //                cm.Parameters.AddWithValue("@H_ID", onHid);
+                //                cm.Parameters.AddWithValue("@COLNAME", dicItem.Key);
+                //                cm.Parameters.AddWithValue("@VALUE", dicItem.Value);
+                //                cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+                //                cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+                //                cm.Parameters.AddWithValue("@MODIFIEDBY", LoginUser.PK);
+                //                cm.Parameters.AddWithValue("@MODIFIEDDATE", sNow);
+                //                cm.ExecuteNonQuery();
+                //            }
+
+
+                //SIZETABLE_M
+                sSql = @"INSERT INTO SIZETABLE_M
+(PIPID,UNIT,CREATOR,CREATEDDATE)
+VALUES
+(@PIPID,@UNIT,@CREATOR,@CREATEDDATE);SELECT SCOPE_IDENTITY();";
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+
+                cm.Parameters.AddWithValue("@PIPID", pipid);
+                cm.Parameters.AddWithValue("@UNIT", dlunit.SelectedItem.Value);
+                cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+                cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+                onSMid = Convert.ToInt64(cm.ExecuteScalar().ToString());
+
+                Dictionary<long, string> dicSizeID = new Dictionary<long, string>();
+                //開始抓Size
+                for (int i = startSizeIndex; i < dtReadExcel.Columns.Count; i++)
+                {
+                    //結束size
+                    if (dtReadExcel.Columns[i].ColumnName == endSizeWord || dtReadExcel.Columns[i].ColumnName.Contains("Column"))
+                        break;
+
+                    string sizeTxt = dtReadExcel.Columns[i].ColumnName;
+                    sSql = @"INSERT INTO SIZETABLE_S
+(PIPID,M_ID,SAMPLE,SIZE_,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE)
+VALUES
+(@PIPID,@M_ID,@SAMPLE,@SIZE_,@CREATOR,@CREATEDDATE,@MODIFIEDBY,@MODIFIEDDATE);SELECT SCOPE_IDENTITY();";
+                    cm.CommandText = sSql;
+                    cm.Parameters.Clear();
+
+                    cm.Parameters.AddWithValue("@PIPID", pipid);
+                    cm.Parameters.AddWithValue("@M_ID", onSMid);
+                    cm.Parameters.AddWithValue("@SAMPLE", sample);
+                    cm.Parameters.AddWithValue("@SIZE_", sizeTxt);
+                    cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+                    cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+                    cm.Parameters.AddWithValue("@MODIFIEDBY", LoginUser.PK);
+                    cm.Parameters.AddWithValue("@MODIFIEDDATE", sNow);
+                    onSSid = Convert.ToInt64(cm.ExecuteScalar().ToString());
+                    dicSizeID.Add(onSSid, sizeTxt);
+                }
+
+                foreach (DataRow rowItem in dtReadExcel.Rows)
+                {
+                    //排除Code, Description不符合條件  不塞入Table
+                    if ((rowItem[codeIndex].ToString() == "0" && rowItem[descriptIndex].ToString() == "0") || string.IsNullOrEmpty(rowItem[descriptIndex].ToString()))
+                        continue;
+                    if (skipRowWord.Contains(rowItem[codeIndex].ToString().Replace(" ", "").ToLower()) || skipRowWord.Contains(rowItem[descriptIndex].ToString().Replace(" ", "").ToLower()))
+                        continue;
+
+                    //insert ON_SIZETABLE_H
+                    sSql = @"INSERT INTO SIZETABLE_H
+(PIPID,M_ID,CODE,DESCRIPTION,TOL_NEGTIVE,TOL_PLUS,";
+                    if (!string.IsNullOrEmpty(COL1Word))
+                        sSql += "COL1,";
+                    sSql += @"CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE) VALUES
+(@PIPID,@M_ID,@CODE,@DESCRIPTION,@TOL_NEGTIVE,@TOL_PLUS,";
+                    if (!string.IsNullOrEmpty(COL1Word))
+                        sSql += "@COL1,";
+                    sSql += @"@CREATOR,@CREATEDDATE,@MODIFIEDBY,@MODIFIEDDATE);SELECT SCOPE_IDENTITY();";
+                    cm.CommandText = sSql;
+                    cm.Parameters.Clear();
+
+                    cm.Parameters.AddWithValue("@CODE", rowItem[codeIndex]);
+                    cm.Parameters.AddWithValue("@DESCRIPTION", rowItem[descriptIndex]);
+
+                    string tolValue = rowItem[TOLWord].ToString();
+                    //coptopaxi拆解 => ex:+1/-0.5
+                    if (tolValue.Contains("/") && tolValue.Contains("+") && tolValue.Contains("-"))  //ex: +1/-0.5
+                    {
+                        string plusString = tolValue.Substring(1, tolValue.IndexOf("/") - 1);
+                        string negtiveString = tolValue.Substring(tolValue.IndexOf("/") + 1, tolValue.Length - tolValue.IndexOf("/") - 1);
+                        cm.Parameters.AddWithValue("@TOL_NEGTIVE", negtiveString);
+                        cm.Parameters.AddWithValue("@TOL_PLUS", plusString);
+                    }
+                    else
+                    {
+                        //coptopaxi有時值有cm, 將移除cm
+                        if (tolValue.ToLower().Contains("cm"))
+                            tolValue = tolValue.Replace("cm", "");
+
+                        cm.Parameters.AddWithValue("@TOL_NEGTIVE", string.IsNullOrEmpty(tolValue) ? tolValue : "-" + tolValue);
+                        cm.Parameters.AddWithValue("@TOL_PLUS", tolValue);
+                    }
+
+                    if (!string.IsNullOrEmpty(COL1Word))
+                        cm.Parameters.AddWithValue("@COL1", rowItem[COL1Word]);
+
+                    cm.Parameters.AddWithValue("@PIPID", pipid);
+                    cm.Parameters.AddWithValue("@M_ID", onSMid);
+                    cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+                    cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+                    cm.Parameters.AddWithValue("@MODIFIEDBY", LoginUser.PK);
+                    cm.Parameters.AddWithValue("@MODIFIEDDATE", sNow);
+                    onSHid = Convert.ToInt64(cm.ExecuteScalar().ToString());
+
+                    //insert SIZETABLE_D
+                    foreach (KeyValuePair<long, string> dicItem in dicSizeID)
+                    {
+                        string sizeValue = rowItem[dicItem.Value].ToString();
+                        sSql = @"INSERT INTO SIZETABLE_D
+                (PIPID,M_ID,H_ID,S_ID,VALUE,CREATOR,CREATEDDATE,MODIFIEDBY,MODIFIEDDATE)
+                VALUES
+                (@PIPID,@M_ID,@H_ID,@S_ID,@VALUE,@CREATOR,@CREATEDDATE,@MODIFIEDBY,@MODIFIEDDATE)";
+                        cm.CommandText = sSql;
+                        cm.Parameters.Clear();
+                        cm.Parameters.AddWithValue("@S_ID", dicItem.Key);
+                        cm.Parameters.AddWithValue("@VALUE", sizeValue);
+                        cm.Parameters.AddWithValue("@PIPID", pipid);
+                        cm.Parameters.AddWithValue("@M_ID", onSMid);
+                        cm.Parameters.AddWithValue("@H_ID", onSHid);
+                        cm.Parameters.AddWithValue("@CREATOR", LoginUser.PK);
+                        cm.Parameters.AddWithValue("@CREATEDDATE", sNow);
+                        cm.Parameters.AddWithValue("@MODIFIEDBY", LoginUser.PK);
+                        cm.Parameters.AddWithValue("@MODIFIEDDATE", sNow);
+                        cm.ExecuteNonQuery();
+
+                        //當有sizeValue 有一個小於0就要Flag=> enble=0
+                        if ((string.IsNullOrEmpty(sizeValue) || Convert.ToDecimal(sizeValue) <= 0) && !disable_SizeH.Contains(onSHid))
+                            disable_SizeH.Add(onSHid);
+                    }
+
+                }
+
+                //update SizeTable_H=> enble=0
+                if (disable_SizeH.Count > 0)
+                {
+                    string H_IDStr = "";
+                    foreach (long disItem in disable_SizeH)
+                        H_IDStr += disItem.ToString() + ",";
+
+                    sSql = @"update PDFTAG.dbo.SIZETABLE_H   set enableFlag=0  where ID in (" + H_IDStr.Substring(0, H_IDStr.Length - 1) + ")";
+                    cm.CommandText = sSql;
+                    cm.ExecuteNonQuery();
+                }
+
+
+                #region set ptitle
+                sSql = "select a.*,b.season,b.style,b.generateddate,c.gmname \n";
+                sSql += "from PDFTAG.dbo.P_inProcess a              \n";
+                sSql += " left join PDFTAG.dbo.Header_H b on a.pipid=b.pipid and b.isshow=0             \n";
+                sSql += " left join PDFTAG.dbo.GroupManage c on a.gmid=c.gmid and c.isshow=0             \n";
+                sSql += " where 1=1 and a.isshow=0 and a.pipid='" + pipid + "' \n";
+
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                dt = new DataTable();
+                using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                {
+                    da.Fill(dt);
+                }
+
+                string ptitle = dt.Rows[0]["style"].ToString();
+                string season2 = dt.Rows[0]["season"].ToString();
+                ptitle = ptitle + "-" + season2;
+
+                sSql = "update PDFTAG.dbo.P_inProcess    \n";
+                sSql += " set mdate=@mdate \n";
+                if (titleType == "1")
+                {
+                    sSql += " ,ptitle=@ptitle \n";
+                }
+                sSql += "where pipid=@pipid \n";
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                cm.Parameters.AddWithValue("@pipid", pipid);
+                cm.Parameters.AddWithValue("@mdate", sNow);
+                cm.Parameters.AddWithValue("@ptitle", ptitle);
+                cm.ExecuteNonQuery();
+
+            #endregion
+            transaction.Commit();
+
+            //新增dbo.HistoryData, P_inProcess 並 複製  ,HEADER_H, HEADER_D, SIZETABLE_M, SIZETABLE_S, SIZETABLE_H, SIZETABLE_D
+            string new_pipid = Add_PDF_Manage(pipid);
+                script = "alert('執行完成!')";
+        }
+            catch (Exception ex)
+        {
+                script = "alert('執行失敗!')";
+                transaction.Rollback();
+                return ;
+            }
+    }
+        #endregion
+
+
+    }
+
+    /// <summary>
+    /// 合併儲存格時，取最後Column索引
+    /// </summary>
+    /// <param name="styleSheet"></param>
+    /// <param name="rowInd"></param>
+    /// <param name="startColInd"></param>
+    /// <param name="lastColInd"></param>
+    /// <returns></returns>
+    public  int IsMergedCellFinanlColumnIndex(ISheet styleSheet, int rowInd, int startColInd, int lastColInd)
+    {
+        int cellStr = 0;
+        for (int i = startColInd; i < lastColInd; i++)
+        {
+            if (styleSheet.GetRow(rowInd).GetCell(i).CellType != CellType.Blank)
+            {
+                cellStr = i;
+                break;
+            }
+        }
+        return cellStr;
+    }
+    public  string getCellDateFromException(ICell celldate)
+    {
+        string generatedDateStr = "";
+        if (celldate != null)
+        {
+            try
+            {
+                generatedDateStr = celldate.DateCellValue.ToString("yyyy/MM/dd");
+            }
+            catch (NullReferenceException)
+            {
+                generatedDateStr = DateTime.FromOADate(celldate.NumericCellValue).ToString("yyyy/MM/dd");
+            }
+        } 
+        return generatedDateStr;
+    }
+
+    /// <summary>
+    /// 透過參數設定By Pver，將Excel轉成DataTable
+    /// </summary>
+    /// <param name="xlsFilename"></param>
+    /// <param name="_pver"></param>
+    /// <param name="_styleCode"></param>
+    /// <param name="_Season"></param>
+    /// <param name="_generatedDate"></param>
+    /// <param name="sizeSheetNameKeyWord"></param>
+    /// <returns></returns>
+    public DataTable LoadExcelAsDataTable(String xlsFilename, string _pver , string _styleCode, string _Season, string _generatedDate, string sizeSheetNameKeyWord)
+    {
+        #region 參數設定 BY 客戶 
+        List<DataConfigTable> getConfigSetting = _comFunction.getDataConfigTableByPverDataType(_pver, "LoadExcelAsDataTable");
+        //取尺碼起始Row的關鍵字
+        string sizeStartRowKeyWordList = getConfigSetting.Where(x => x.DataName == "sizeStartRowKeyWordList").ToList().Count > 0 ? getConfigSetting.Where(x => x.DataName == "sizeStartRowKeyWordList").FirstOrDefault().DataValue : "";
+        //取尺碼表結束的關鍵字
+        string sizeEndRowKeyWord = getConfigSetting.Where(x => x.DataName == "sizeEndRowKeyWord").ToList().Count > 0 ? getConfigSetting.Where(x => x.DataName == "sizeEndRowKeyWord").FirstOrDefault().DataValue : "";
+        #endregion
+
+        // 回傳的Table
+        DataTable table = new DataTable();
+        FileInfo fi = new FileInfo(xlsFilename);
+        IFormulaEvaluator formulaEvaluator;
+
+        //取得Size Mapping表
+        List<DataConfigTable> sizeMapping = _comFunction.getDataConfigTableByPverDataType(_pver, "SizeMapping");
+
+        using (FileStream fstream = new FileStream(fi.FullName, FileMode.Open))
+        {
+            IWorkbook wb;
+            wb = new XSSFWorkbook(fstream); // excel2007
+            formulaEvaluator = new XSSFFormulaEvaluator(wb); // Important!! 取公式值的時候會用到
+
+            try
+            {
+                #region 取要的Size Sheet 
+                bool sizeEndFlag = false;
+                int startRowNumber = 0;
+                int sheetCount = wb.NumberOfSheets;
+                for (int sheetNumber = 0; sheetNumber < sheetCount; sheetNumber++)
+                {
+                    ISheet sizeSheet = wb.GetSheetAt(sheetNumber);
+                    if (sizeSheet.SheetName.ToLower().Contains(sizeSheetNameKeyWord.ToLower()))
+                    {
+                        //Row Start 
+                        for (int rowNumber = 0; rowNumber < sizeSheet.LastRowNum; rowNumber++)
+                        {
+                            IRow currentRowNumber = sizeSheet.GetRow(rowNumber);
+                            for (int colNumber = 0; colNumber < currentRowNumber.LastCellNum; colNumber++)
+                            {
+                                ICell cell = currentRowNumber.GetCell(colNumber);
+                                if (cell != null)
+                                {
+                                    //Row Start =>開始抓Size 的RowNum                         
+                                    if (cell.CellType == CellType.String )
+                                    {
+                                        foreach (string sizeStartRowKeyWord in sizeStartRowKeyWordList.Split(';'))
+                                        {
+                                            if (cell.StringCellValue.Contains(sizeStartRowKeyWord))
+                                            {
+                                                startRowNumber = rowNumber;
+                                                break;
+                                            }                                               
+                                        }
+                                                                            
+                                    }                         
+                                }
+                                if (startRowNumber > 0)
+                                    break;
+                            }
+                            if (startRowNumber > 0)
+                                break;
+                        }
+                        // 取值做Header
+                        IRow headerRow = sizeSheet.GetRow(startRowNumber);
+                        int cellCount = headerRow.LastCellNum; // 取欄位數
+                        for (int i = headerRow.FirstCellNum; i < cellCount; i++)
+                        {
+                            string headerStr = headerRow.GetCell(i).StringCellValue;
+                            if (sizeMapping.Where(x => x.DataName == headerStr).ToList().Count > 0)
+                            {
+                                string sizeMappingValue = sizeMapping.Where(x => x.DataName == headerStr).FirstOrDefault().DataValue;
+                                table.Columns.Add(new DataColumn(!string.IsNullOrEmpty(sizeMappingValue) ? sizeMappingValue : headerStr));
+                            }
+                            else
+                                table.Columns.Add(new DataColumn(headerStr));
+
+                        }
+                        table.Columns.Add(new DataColumn("style"));
+                        table.Columns.Add(new DataColumn("season"));
+                        table.Columns.Add(new DataColumn("generateddate"));
+                        // 取值塞入Detail
+                        for (int rowNum = (startRowNumber + 1); rowNum <= sizeSheet.LastRowNum; rowNum++)
+                        {
+                            IRow row = sizeSheet.GetRow(rowNum);
+                            if (row == null) continue;
+                            DataRow dataRow = table.NewRow();
+                            dataRow["style"] = _styleCode;
+                            dataRow["season"] = _Season;
+                            dataRow["generateddate"] = _generatedDate;
+                            int dataColNum = 0;
+                            //依先前取得的欄位數逐一設定欄位內容
+                            for (int colNum = row.FirstCellNum; colNum < cellCount; colNum++)
+                            {
+                                ICell cell = row.GetCell(colNum);
+                                if (cell != null)
+                                {
+                                    dataRow[dataColNum] = readCellValue(cell, formulaEvaluator);
+                                    
+                                    //如果有結束KeyWord就跳出
+                                    if (!string.IsNullOrEmpty(sizeEndRowKeyWord))
+                                    {
+                                        if (dataRow[dataColNum].ToString().Contains(sizeEndRowKeyWord))
+                                        {
+                                            sizeEndFlag = true;
+                                            break;
+                                        }
+                                    }
+                                    //break;
+                                    dataColNum++;
+                                }     
+                            }
+                            table.Rows.Add(dataRow);
+                            if (sizeEndFlag)
+                                break;
+                        }
+                        break;
+                    }
+                }
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                script = "alert('執行失敗!!!  " + System.Reflection.MethodBase.GetCurrentMethod() + ex.Message + "')";
+                return table;
+                //throw;
+            }
+        }
+
+        return table;
+    }
+
+    /// <summary>
+    /// 檢查必要欄位 Style, Season, 日期值
+    /// </summary>
+    /// <param name="xlsFilename"></param>
+    /// <param name="pver"></param>
+    /// <param name="sizeSheetNameKeyWord"></param>
+    /// <returns></returns>
+    private Dictionary<string, string> getVaildFieldExcel(String xlsFilename,string pver, string sizeSheetNameKeyWord)
+    {
+        #region 參數設定By Pver
+        List<DataConfigTable> getConfigSetting = _comFunction.getDataConfigTableByPverDataType(pver, "vaildFieldExcel");
+        string styleSheetNameKeyWord = getConfigSetting.Where(x => x.DataName == "styleSheetNameKeyWord").ToList().Count > 0 ? getConfigSetting.Where(x => x.DataName == "styleSheetNameKeyWord").FirstOrDefault().DataValue : "";
+        string styleWordList = getConfigSetting.Where(x => x.DataName == "styleWordList").ToList().Count > 0 ? getConfigSetting.Where(x => x.DataName == "styleWordList").FirstOrDefault().DataValue : "";
+        string seasonWord = getConfigSetting.Where(x => x.DataName == "seasonWord").ToList().Count > 0 ? getConfigSetting.Where(x => x.DataName == "seasonWord").FirstOrDefault().DataValue : "";
+        string generateDateWord = getConfigSetting.Where(x => x.DataName == "generateDateWord").ToList().Count > 0 ? getConfigSetting.Where(x => x.DataName == "generateDateWord").FirstOrDefault().DataValue : "";
+        #endregion
+        Dictionary<string, string> result = new Dictionary<string, string>();
+        string styleCodeStr = "", SeasonStr = "", generatedDateStr = "";
+        FileInfo fi = new FileInfo(xlsFilename);
+        IFormulaEvaluator formulaEvaluator;
+
+        List<string> sheetKeyWordList = new List<string>();
+        sheetKeyWordList.Add(sizeSheetNameKeyWord);   //先從Size Sheet找
+        sheetKeyWordList.Add(styleSheetNameKeyWord);  //沒有再從StyleSheet找
+
+        using (FileStream fstream = new FileStream(fi.FullName, FileMode.Open))
+        {
+            IWorkbook wb;
+            wb = new XSSFWorkbook(fstream); // excel2007
+            formulaEvaluator = new XSSFFormulaEvaluator(wb); // Important!! 取公式值的時候會用到
+
+            try
+            {
+                int sheetCount = wb.NumberOfSheets;
+                foreach (string keyWord in sheetKeyWordList)
+                {
+                    if (string.IsNullOrEmpty(styleCodeStr) || string.IsNullOrEmpty(SeasonStr) ||  string.IsNullOrEmpty(generatedDateStr) || generatedDateStr == DateTime.MinValue.ToString("yyyy/MM/dd"))
+                    {
+                        #region  取要的 Sheet 
+                        for (int sheetNumber = 0; sheetNumber < sheetCount; sheetNumber++)
+                        {
+                            ISheet getSheet = wb.GetSheetAt(sheetNumber);
+                            if (getSheet.SheetName.ToLower().Contains(keyWord.ToLower()))
+                            {
+                                for (int rowNumber = 0; rowNumber < getSheet.LastRowNum; rowNumber++)
+                                {
+                                    IRow currentRowNumber = getSheet.GetRow(rowNumber);
+                                    if (currentRowNumber == null)
+                                        continue;
+                                    for (int colNumber = 0; colNumber < currentRowNumber.LastCellNum; colNumber++)
+                                    {
+                                        ICell cell = currentRowNumber.GetCell(colNumber);
+                                        if (cell != null && cell.CellType == CellType.String)
+                                        {
+                                            //取得日期值
+                                            if ( (string.IsNullOrEmpty(generatedDateStr) || generatedDateStr == DateTime.MinValue.ToString("yyyy/MM/dd")) && cell.StringCellValue.ToLower().Replace(" ", "").Replace(":", "").Contains(generateDateWord))
+                                            {
+                                                generatedDateStr = getKeyWordValue(getSheet, cell, formulaEvaluator, currentRowNumber.LastCellNum, "date");
+                                                break;
+                                            }
+
+                                            //取得Style值
+                                            if (string.IsNullOrEmpty(styleCodeStr) &&  styleWordList.Contains(cell.StringCellValue.ToLower().Replace(" ", "").Replace(":", "")))
+                                            {
+                                                string cellStr = "";
+                                                cellStr = getKeyWordValue(getSheet, cell, formulaEvaluator, currentRowNumber.LastCellNum, "style");
+                                                styleCodeStr = cellStr.Contains(" ") ? cellStr.Substring(0, cellStr.IndexOf(" ")) : cellStr;
+                                                //當尺寸小於3碼 ,無效, 重取
+                                                if (styleCodeStr.Length <= 3)
+                                                    styleCodeStr = "";
+                                            }
+                                            //取得Season值
+                                            if (string.IsNullOrEmpty(SeasonStr) && cell.StringCellValue.ToLower().Replace(" ", "").Replace(":", "") == seasonWord)
+                                            {
+                                                SeasonStr = getKeyWordValue(getSheet, cell, formulaEvaluator, currentRowNumber.LastCellNum, "season");
+                                            }
+                                        }
+
+                                        //已取得就跳出迴圈 column
+                                        if (!string.IsNullOrEmpty(styleCodeStr) && !string.IsNullOrEmpty(SeasonStr) && !string.IsNullOrEmpty(generatedDateStr) && generatedDateStr != DateTime.MinValue.ToString("yyyy/MM/dd"))
+                                            break;
+                                    }
+                                    //已取得就跳出迴圈 row
+                                    if (!string.IsNullOrEmpty(styleCodeStr) && !string.IsNullOrEmpty(SeasonStr) && !string.IsNullOrEmpty(generatedDateStr) && generatedDateStr != DateTime.MinValue.ToString("yyyy/MM/dd"))
+                                        break;
+                                }
+                                break;
+                            }
+                        }
+                        #endregion
+                    }
+                } 
+            }
+            catch (Exception ex)
+            {
+                script = "alert('執行失敗!!!  " + System.Reflection.MethodBase.GetCurrentMethod() + ex.Message + "')";
+                return result;
+            }
+        }
+
+        result.Add("style", styleCodeStr);
+        result.Add("season", SeasonStr);
+        result.Add("BOMDate", generatedDateStr);
+        return result;
+    }
+
+    private string getKeyWordValue(ISheet sheet, ICell cell, IFormulaEvaluator formulaEvaluator, int lastCellNum, string keyWord)
+    {
+        string resultValue = "";
+        ICell resultCell = sheet.GetRow(cell.RowIndex).GetCell(cell.ColumnIndex + 1);
+        //是否有合併儲存格
+        if (cell.IsMergedCell)
+        {
+            int nextColInd = IsMergedCellFinanlColumnIndex(sheet, cell.RowIndex, cell.ColumnIndex + 1, lastCellNum);
+            if (nextColInd > 0)
+            {
+                 resultCell = sheet.GetRow(cell.RowIndex).GetCell(nextColInd);   
+            }                
+        }        
+
+        switch (keyWord)
+        {
+            case "date":
+                resultValue = getCellDateFromException(resultCell);
+                break;
+            case "style":
+            case "season":
+                resultValue = readCellValue(resultCell, formulaEvaluator);
+                break;
+            default:
+                break;
+        }
+
+        return resultValue;
+    }
+
+
+    private string readCellValue(ICell cell, IFormulaEvaluator formulaEvaluator)
+    {
+        string resultValue = "";
+        switch (cell.CellType)
+        {
+            case CellType.Numeric:  // 數值格式
+                if (DateUtil.IsCellDateFormatted(cell))
+                {   // 日期格式
+                    resultValue = cell.DateCellValue.ToString();
+                }
+                else
+                {   // 數值格式
+                    resultValue = cell.NumericCellValue.ToString();
+                }
+                break;
+            case CellType.String:   // 字串格式
+                resultValue = cell.StringCellValue;
+                break;
+            case CellType.Formula:  // 公式格式
+                var formulaValue = formulaEvaluator.Evaluate(cell);
+                if (formulaValue.CellType == CellType.String) resultValue = formulaValue.StringValue.ToString();          // 執行公式後的值為字串型態
+                else if (formulaValue.CellType == CellType.Numeric) resultValue = formulaValue.NumberValue.ToString();    // 執行公式後的值為數字型態
+                break;
+            default:
+                break;            
+        }
+        return resultValue;
+    }
 }

@@ -38,7 +38,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
         sSql = @"select distinct COLOR_GROUP,COLOR_DESC,CUST_COLOR_WAY,ERP_COLORID
 from [RD_SAMPLE].[dbo].[SAM_MAT_COLOR_DEF] a 
-where 1=1 AND ENABLE_FLAG = 'Y' ";
+where 1=1 AND ENABLE_FLAG = 'Y' and a.COLOR_GROUP in ('MATERIAL','THREAD','STYLE','ZIPPER')";
 
         if (!string.IsNullOrEmpty(COLOR_DESC))
         {

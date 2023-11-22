@@ -66,7 +66,8 @@
 										<%# Eval("gmname")%>
 									</td>
 									<td>
-										<%# (string)Eval("gmcate")=="1"?"Lulu": (string)Eval("gmcate")=="2"?"UA": (string)Eval("gmcate")=="3"?"GAP":""%>
+										<%--<%# (string)Eval("gmcate")=="1"?"Lulu": (string)Eval("gmcate")=="2"?"UA": (string)Eval("gmcate")=="3"?"GAP": (string)Eval("gmcate")=="4"?"ON RUNNING": (string)Eval("gmcate")=="5"?"GYMSHARK":""%>--%>
+                                        <%# Eval("CUSTOMER")%>
 									</td>
 									<td>
 										<%# Eval("creator")%>

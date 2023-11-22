@@ -105,7 +105,7 @@ order by hisversion asc";
 from PDFTAG.dbo.P_inProcess a
 where a.isShow=0 and a.pver=2 and a.pipid in (select pipid from PDFTAG.dbo.P_inProcess where isShow=0 and gmid='" + gmid + @"')
 and a.hdid not in (select hdid from PDFTAG.dbo.HistoryData where isshow=1  or pipid in (select pipid from PDFTAG.dbo.P_inProcess where isshow=1) )
-order by a.pidate,a.pipid";
+order by a.pidate desc,a.pipid desc";
 			}
 
 
@@ -183,14 +183,17 @@ order by a.pidate,a.pipid";
 	public class UA_Bom
 	{
 		public int rowId { get; set; }
-		//public string StandardPlacement { get; set; }
+        //public string StandardPlacement { get; set; }
 
-		//public string Placement { get; set; }
-		public string Usage { get; set; }
+        //public string Placement { get; set; }
+        public string lubid { get; set; }
+        public string org_lubid { get; set; }
+        public string Usage { get; set; }
 
 		public string SupplierArticle { get; set; }
+		public string QTY { get; set; }
 
-		public string W1 { get; set; }//Key
+        public string W1 { get; set; }//Key
 		public string W2 { get; set; }
 		public string W3 { get; set; }
 		public string W4 { get; set; }//Key
@@ -215,8 +218,9 @@ order by a.pidate,a.pipid";
 		//public string Placement_org { get; set; }
 
 		public string Usage_org { get; set; }
+		public string QTY_org { get; set; }
 
-		public string SupplierArticle_org { get; set; }
+        public string SupplierArticle_org { get; set; }
 
 		//public string Supplier_org { get; set; }
 
@@ -630,8 +634,9 @@ order by a.pidate,a.pipid";
                     sb.Append("<tr>");
 					sb.Append(" <th scope='col'>" + itemType.type + " </th>");
 					sb.Append(" <th scope='col'>Usage</th>");
+					sb.Append(" <th scope='col'>QTY</th>");
 
-					List<bool> arrCompareHeaderResult = new List<bool>();
+                    List<bool> arrCompareHeaderResult = new List<bool>();
 					List<string> arrBomHeader = new List<string>();
 					List<string> arrBomHeaderCompare = new List<string>();
 
@@ -705,13 +710,23 @@ order by a.pidate,a.pipid";
 							arrCompareData.Add(new UA_Bom()
 							{
 								rowId = iRowId,
-								Usage = drBomMain["Usage"].ToString().Replace(" ", string.Empty),
+                                lubid = drBomMain["lubid"].ToString(),
+                                org_lubid = drBomMain["org_lubid"].ToString(),
+                                Usage = drBomMain["Usage"].ToString().Replace(" ", string.Empty),
 								SupplierArticle = drBomMain["SupplierArticle"].ToString().Replace(" ", string.Empty),
+								QTY = drBomMain["QTY"].ToString(),
 
 								Usage_org = drBomMain["Usage"].ToString(),
 								SupplierArticle_org = drBomMain["SupplierArticle"].ToString(),
+                                QTY_org = drBomMain["QTY"].ToString(),
 								W1 = drBomMain["W1"].ToString().Trim(),
+								W2 = drBomMain["W2"].ToString().Trim(),
+								W3 = drBomMain["W3"].ToString().Trim(),
 								W4 = drBomMain["W4"].ToString().Trim(),
+								W5 = drBomMain["W5"].ToString().Trim(),
+								W6 = drBomMain["W6"].ToString().Trim(),
+								W7 = drBomMain["W7"].ToString().Trim(),
+								W8 = drBomMain["W8"].ToString().Trim(),
 
 								ColorName = sColorName,
 								ColorVal = sColorVal,
@@ -734,14 +749,17 @@ order by a.pidate,a.pipid";
 
 						string usage_source = "";
 						string supplierArticle_source = "";
+						string QTY_source = "";
 
 						string usage = "";
 						string supplierArticle = "";
-						string W1 = "";
+						string QTY = "";
+                        string W1 = "";
 						string W4 = "";
 
 						string usage_note = "";
 						string supplierArticle_note = "";
+						string QTY_note = "";
 
 						try
 						{
@@ -751,14 +769,17 @@ order by a.pidate,a.pipid";
 							type = drBoms[b]["type"].ToString();
 							usage_source = drBoms[b]["usage"].ToString();
 							supplierArticle_source = drBoms[b]["SupplierArticle"].ToString();
+                            QTY_source = drBoms[b]["QTY"].ToString();
 
 							usage = drBoms[b]["usage"].ToString();
 							supplierArticle = drBoms[b]["SupplierArticle"].ToString();
+							QTY = drBoms[b]["QTY"].ToString();
 							W1 = drBoms[b]["W1"].ToString().Trim();
 							W4 = drBoms[b]["W4"].ToString().Trim();
 
 							usage_note = FilterNote(arrNotes, lubid, "usage");
 							supplierArticle_note = FilterNote(arrNotes, lubid, "SupplierArticle");
+                            QTY_note = FilterNote(arrNotes, lubid, "QTY");
 						}
 						catch (Exception ex)
 						{
@@ -772,20 +793,30 @@ order by a.pidate,a.pipid";
 
 						string usage_compare = "";
 						string supplierArticle_compare = "";
+						string QTY_compare = "";
 
 						string usage_compare_note = "";
 						string supplierArticle_compare_note = "";
+						string QTY_compare_note = "";
 
 						bool isHasCompareRow = true;
 						try
 						{
-							lubid_compare = drComareBoms[b]["lubid"].ToString();
-							lubid_org_compare = drComareBoms[b]["org_lubid"].ToString();
-							usage_compare = drComareBoms[b]["usage"].ToString();
-							supplierArticle_compare = drComareBoms[b]["SupplierArticle"].ToString();
+                            var tmpCompareData = arrCompareData.FirstOrDefault(x => x.Usage_org == usage
+                                    && (itemType.type == "Fabric" ? x.W4 == W4 : x.W1 == W1));
+                            lubid_compare = tmpCompareData.lubid;
+                            lubid_org_compare = tmpCompareData.org_lubid;
+                            usage_compare = tmpCompareData.Usage;
+                            supplierArticle_compare = tmpCompareData.SupplierArticle;
+                            QTY_compare = tmpCompareData.QTY;
+                            //lubid_compare = drComareBoms[b]["lubid"].ToString();
+							//lubid_org_compare = drComareBoms[b]["org_lubid"].ToString();
+							//usage_compare = drComareBoms[b]["usage"].ToString();
+							//supplierArticle_compare = drComareBoms[b]["SupplierArticle"].ToString();
 
 							usage_compare_note = FilterNote(arrNotesCompare, lubid_compare, "usage");
 							supplierArticle_compare_note = FilterNote(arrNotesCompare, lubid_compare, "SupplierArticle");
+                            QTY_compare_note = FilterNote(arrNotesCompare, lubid_compare, "QTY");
 						}
 						catch (Exception ex)
 						{
@@ -806,14 +837,17 @@ order by a.pidate,a.pipid";
 							{
 								usage = usage_note;
 								supplierArticle = supplierArticle_note;
+								QTY = QTY_note;
 
 								usage_compare = usage_compare_note;
 								supplierArticle_compare = supplierArticle_compare_note;
+                                QTY_compare = QTY_compare_note;
 							}
 
 							sb.Append("<tr data-rowid='" + drBoms[b]["rowid"].ToString() + "'>");
 							sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='SupplierArticle'>" + supplierArticle_source + (string.IsNullOrEmpty(supplierArticle_note) ? "" : "<br>中:" + supplierArticle_note) + "</td>");
 							sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='usage'>" + usage_source + (string.IsNullOrEmpty(usage_note) ? "" : "<br>中:" + usage_note) + "</td>");
+							sb.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='QTY'>" + QTY_source + (string.IsNullOrEmpty(QTY_note) ? "" : "<br>中:" + QTY_note) + "</td>");
 
 							List<string> arrColorNameSource = new List<string>();
 							List<string> arrColorValSource = new List<string>();
@@ -859,13 +893,28 @@ order by a.pidate,a.pipid";
 								int iWCnt = 8;
 								if (type == "Fabric" || type== "Hangtag") iWCnt = 6;
 								else if (type == "Embellishment") iWCnt = 7;
-
-								for (int i = 1; i <= iWCnt; i++)
+                                var tmpCompareData = arrCompareData.FirstOrDefault(x => x.Usage_org == usage
+                                    && (itemType.type == "Fabric" ? x.W4 == W4 : x.W1 == W1));
+                                for (int i = 1; i <= iWCnt; i++)
 								{
 									string sW = drBoms[b]["W" + i].ToString();
-									string sCW = drComareBoms[b]["W" + i].ToString();
+									string sCW = tmpCompareData.W1;
+                                    if(i == 2)
+									    sCW = tmpCompareData.W2;
+                                    else if (i == 3)
+                                        sCW = tmpCompareData.W3;
+                                    else if (i == 4)
+                                        sCW = tmpCompareData.W4;
+                                    else if (i == 5)
+                                        sCW = tmpCompareData.W5;
+                                    else if (i == 6)
+                                        sCW = tmpCompareData.W6;
+                                    else if (i == 7)
+                                        sCW = tmpCompareData.W7;
+                                    else if (i == 8)
+                                        sCW = tmpCompareData.W8;
 
-									if (sW.Trim().Replace(" ", "") != sCW.Trim().Replace(" ", ""))
+                                    if (sW.Trim().Replace(" ", "") != sCW.Trim().Replace(" ", ""))
 									{
 										arrText.Add("<font color='red'>" + sCW + "</font>");
 									}
@@ -882,8 +931,9 @@ order by a.pidate,a.pipid";
 							sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' data-col='usage' >" + (isCompare ? Compare(sType, usage, usage_compare, usage_compare_note) : "") + "</td>");
 
 							isCompare = true;
+                            sb.Append(" <td scope='col' data-lubid='" + lubid_compare + "' data-org_lubid='" + lubid_org_compare + "' data-col='QTY' >" + (isHasCompareRow ? Compare(sType, QTY, QTY_compare, QTY_compare_note) : "") + "</td>");
 
-							int iIndexSource = 0;
+                            int iIndexSource = 0;
 							foreach (var color in arrUA_BOMGarmentcolors)
 							{
 								string colorValSource = arrColorValSource[iIndexSource];
@@ -991,8 +1041,9 @@ order by a.pidate,a.pipid";
 						sbNotExit.Append("<tr>");
 						sbNotExit.Append(" <th scope='col'>" + itemType.type + "</th>");
 						sbNotExit.Append(" <th scope='col'>Usage</th>");
+						sbNotExit.Append(" <th scope='col'>QTY</th>");
 
-						List<string> curBomStyleColor = new List<string>();
+                        List<string> curBomStyleColor = new List<string>();
 						foreach (DataRow drColor in dtUA_BOMGarmentcolor.Rows)
 						{
 							for (int i = 1; i <= 10; i++)
@@ -1050,8 +1101,10 @@ order by a.pidate,a.pipid";
 
 									SupplierArticle = drBomMain["SupplierArticle"].ToString().Replace(" ", string.Empty),
 									Usage = drBomMain["Usage"].ToString().Replace(" ", string.Empty),
+                                    QTY = drBomMain["QTY"].ToString().Replace(" ", string.Empty),
 									SupplierArticle_org = drBomMain["SupplierArticle"].ToString(),
 									Usage_org = drBomMain["Usage"].ToString(),
+									QTY_org = drBomMain["QTY"].ToString(),
 
 									ColorName = sColorName,
 									ColorVal = sColorVal,
@@ -1072,8 +1125,9 @@ order by a.pidate,a.pipid";
 							sbNotExit.Append("<tr>");
 							sbNotExit.Append(" <td scope='col'>" + resItem.SupplierArticle_org + "</td>");
 							sbNotExit.Append(" <td scope='col'>" + resItem.Usage_org + "</td>");
+							sbNotExit.Append(" <td scope='col'>" + resItem.QTY_org + "</td>");
 
-							foreach (var color in colorList)
+                            foreach (var color in colorList)
 							{
 								var resColor = arrCompareData.Where(x => x.ColorName == color
 																								&& x.SupplierArticle_org == resItem.SupplierArticle_org
@@ -1101,6 +1155,7 @@ order by a.pidate,a.pipid";
 					sbNotExit_table.Append("<tr>");
 					sbNotExit_table.Append(" <th scope='col'>" + itemType.type + "</th>");
 					sbNotExit_table.Append(" <th scope='col'>Usage</th>");
+					sbNotExit_table.Append(" <th scope='col'>QTY</th>");
 
 					List<bool> arrCompareHeaderResult = new List<bool>();
 					List<string> arrBomHeader = new List<string>();
@@ -1167,11 +1222,19 @@ order by a.pidate,a.pipid";
 
 								SupplierArticle = drBomMain["SupplierArticle"].ToString().Replace(" ", string.Empty),
 								Usage = drBomMain["Usage"].ToString().Replace(" ", string.Empty),
+								QTY = drBomMain["QTY"].ToString().Replace(" ", string.Empty),
 
 								SupplierArticle_org = drBomMain["SupplierArticle"].ToString(),
-								Usage_org = drBomMain["Usage"].ToString(),
+                                Usage_org = drBomMain["Usage"].ToString(),
+								QTY_org = drBomMain["QTY"].ToString(),
                                 W1 = drBomMain["W1"].ToString().Trim(),
+                                W2 = drBomMain["W2"].ToString().Trim(),
+                                W3 = drBomMain["W3"].ToString().Trim(),
                                 W4 = drBomMain["W4"].ToString().Trim(),
+                                W5 = drBomMain["W5"].ToString().Trim(),
+                                W6 = drBomMain["W6"].ToString().Trim(),
+                                W7 = drBomMain["W7"].ToString().Trim(),
+                                W8 = drBomMain["W8"].ToString().Trim(),
 
 
                                 ColorName = sColorName,
@@ -1193,34 +1256,41 @@ order by a.pidate,a.pipid";
 
 						string supplierArticle_source = "";
 						string usage_source = "";
+						string QTY_source = "";
 
-						string supplierArticle = "";
+                        string supplierArticle = "";
 						string usage = "";
+						string QTY = "";
                         string W1 = "";
                         string W4 = "";
 
                         string supplierArticle_note = "";
 						string usage_note = "";
+						string QTY_note = "";
 
-						lubid = drBoms[b]["lubid"].ToString();
+                        lubid = drBoms[b]["lubid"].ToString();
 						org_lubid = drBoms[b]["org_lubid"].ToString();
 
 						supplierArticle_source = drBoms[b]["SupplierArticle"].ToString();
 						usage_source = drBoms[b]["usage"].ToString();
+						QTY_source = drBoms[b]["QTY"].ToString();
 
 						supplierArticle = drBoms[b]["SupplierArticle"].ToString();
 						usage = drBoms[b]["usage"].ToString();
+						QTY = drBoms[b]["QTY"].ToString();
                         W1 = drBoms[b]["W1"].ToString().Trim();
                         W4 = drBoms[b]["W4"].ToString().Trim();
 
                         supplierArticle_note = FilterNote(arrNotes, lubid, "SupplierArticle");
 						usage_note = FilterNote(arrNotes, lubid, "usage");
+						QTY_note = FilterNote(arrNotes, lubid, "QTY");
 
 						#region         
 
 						sbNotExit_tablebody.Append("<tr data-rowid='" + drBoms[b]["rowid"].ToString() + "'>");
 						sbNotExit_tablebody.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='SupplierArticle'>" + supplierArticle_source + (string.IsNullOrEmpty(supplierArticle_note) ? "" : "<br>中:" + supplierArticle_note) + "</td>");
 						sbNotExit_tablebody.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='Usage'>" + usage_source + (string.IsNullOrEmpty(usage_note) ? "" : "<br>中:" + usage_note) + "</td>");
+						sbNotExit_tablebody.Append(" <td scope='col' data-lubid='" + lubid + "' data-org_lubid='" + org_lubid + "' data-col='QTY'>" + QTY_source + (string.IsNullOrEmpty(QTY_note) ? "" : "<br>中:" + QTY_note) + "</td>");
 
 						List<string> arrColorNameSource = new List<string>();
 						List<string> arrColorValSource = new List<string>();
@@ -1262,8 +1332,9 @@ order by a.pidate,a.pipid";
 							{
 								supplierArticle = supplierArticle.Replace(" ", string.Empty);
 								usage = usage.Replace(" ", string.Empty);
+								QTY = QTY.Replace(" ", string.Empty);
 
-								var resCompare = arrCompareData.FirstOrDefault(x => x.Usage == usage
+                                var resCompare = arrCompareData.FirstOrDefault(x => x.Usage == usage
                                 && (itemType.type == "Fabric" ? x.W4 == W4 : x.W1 == W1)
                                 && x.ColorName == color);
 

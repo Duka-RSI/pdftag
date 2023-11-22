@@ -105,7 +105,7 @@ order by hisversion asc";
 from PDFTAG.dbo.P_inProcess a
 where a.isShow=0 and a.pver=3 and a.pipid in (select pipid from PDFTAG.dbo.P_inProcess where isShow=0 and gmid='" + gmid + @"')
 and a.hdid not in (select hdid from PDFTAG.dbo.HistoryData where isshow=1  or pipid in (select pipid from PDFTAG.dbo.P_inProcess where isshow=1) )
-order by a.pidate,a.pipid";
+order by a.pidate desc,a.pipid desc";
             }
 
 
@@ -183,6 +183,8 @@ order by a.pidate,a.pipid";
     public class GAP_Bom
     {
         public int rowId { get; set; }
+        public string lubid { get; set; }
+        public string org_lubid { get; set; }
         public string StandardPlacement { get; set; }
 
         public string Placement { get; set; }
@@ -720,6 +722,8 @@ order by a.pidate,a.pipid";
                             arrCompareData.Add(new GAP_Bom()
                             {
                                 rowId = iRowId,
+                                lubid = drBomMain["lubid"].ToString(),
+                                org_lubid = drBomMain["org_lubid"].ToString(),
                                 StandardPlacement = drBomMain["StandardPlacement"].ToString().Replace(" ", string.Empty),
                                 //Placement = drBomMain["Placement"].ToString().Replace(" ", string.Empty),
                                 Usage = drBomMain["Usage"].ToString().Replace(" ", string.Empty),
@@ -826,19 +830,28 @@ order by a.pidate,a.pipid";
 
                         try
                         {
-                            lubid_compare = drComareBoms[b]["lubid"].ToString();
-                            lubid_org_compare = drComareBoms[b]["org_lubid"].ToString();
+                            var tmpCompareData = arrCompareData.FirstOrDefault(x => x.StandardPlacement == standardPlacement
+                                    && x.Usage == usage && x.SupplierArticle == supplierArticle);
+                            lubid_compare = tmpCompareData.lubid;
+                            lubid_org_compare = tmpCompareData.org_lubid;
+                            //lubid_compare = drComareBoms[b]["lubid"].ToString();
+                            //lubid_org_compare = drComareBoms[b]["org_lubid"].ToString();
 
                             if (string.IsNullOrEmpty(lubid_org_compare))
                                 lubid_org_compare = lubid_compare;//原文件
 
-
-                            standardPlacement_compare = drComareBoms[b]["StandardPlacement"].ToString();
-                            placement_compare = drComareBoms[b]["Placement"].ToString();
-                            usage_compare = drComareBoms[b]["usage"].ToString();
-                            supplierArticle_compare = drComareBoms[b]["SupplierArticle"].ToString();
-                            supplier_compare = drComareBoms[b]["Supplier"].ToString();
-                            QualityDetails_compare = drComareBoms[b]["QualityDetails"].ToString();
+                            standardPlacement_compare = tmpCompareData.StandardPlacement;
+                            placement_compare = tmpCompareData.Placement;
+                            usage_compare = tmpCompareData.Usage;
+                            supplierArticle_compare = tmpCompareData.SupplierArticle;
+                            supplier_compare = tmpCompareData.Supplier_org;
+                            QualityDetails_compare = tmpCompareData.QualityDetails;
+                            //standardPlacement_compare = drComareBoms[b]["StandardPlacement"].ToString();
+                            //placement_compare = drComareBoms[b]["Placement"].ToString();
+                            //usage_compare = drComareBoms[b]["usage"].ToString();
+                            //supplierArticle_compare = drComareBoms[b]["SupplierArticle"].ToString();
+                            //supplier_compare = drComareBoms[b]["Supplier"].ToString();
+                            //QualityDetails_compare = drComareBoms[b]["QualityDetails"].ToString();
 
                             standardPlacement_compare_note = FilterNote(arrNotesCompare, lubid_compare, "StandardPlacement");
                             placement_compare_note = FilterNote(arrNotesCompare, lubid_compare, "Placement");
@@ -971,7 +984,8 @@ order by a.pidate,a.pipid";
                                     //var resCompare = arrCompareData.FirstOrDefault(x => x.Usage == usage && x.SupplierArticle == supplierArticle && x.ColorName == color);
 
                                     //20230130
-                                    var resCompare = arrCompareData.FirstOrDefault(x => x.StandardPlacement == standardPlacement && x.Usage == usage && x.SupplierArticle == supplierArticle && x.ColorName == color);
+                                    var resCompare = arrCompareData.FirstOrDefault(x => x.StandardPlacement == standardPlacement 
+                                    && x.Usage == usage && x.SupplierArticle == supplierArticle && x.ColorName == color);
 
                                     if (resCompare != null)
                                     {
@@ -1024,7 +1038,7 @@ order by a.pidate,a.pipid";
 
                     #region 沒比對到的
                     var isNotComare = arrCompareData.Any(w => !w.isExistA);
-
+                    StringBuilder sbNotExitColor = new StringBuilder();
                     Response.Write("<!--NotComare Count=" + arrCompareData.Where(w => !w.isExistA).Count() + "-->");
 
                     if (isNotComare && !arrNotCompareExistTypes.Contains(itemType.type))
@@ -1032,17 +1046,17 @@ order by a.pidate,a.pipid";
                         arrNotCompareExistTypes.Add(itemType.type);
 
                         sbNotExit.Append("<h4>" + itemType.type + "</h4>");
-                        sbNotExit.Append("<table class='table table-hover'>");
-                        sbNotExit.Append("<tr>");
+                        sbNotExitColor.Append("<table class='table table-hover'>");
+                        sbNotExitColor.Append("<tr>");
                         //sbNotExit.Append(" <th scope='col'>Standard Placement</th>");
                         //sbNotExit.Append(" <th scope='col'>Placement</th>");
                         //sbNotExit.Append(" <th scope='col'>Supplier / Supplier Article</th>");
 
-                        sbNotExit.Append(" <th scope='col'>Product</th>");
-                        sbNotExit.Append(" <th scope='col'>Usage</th>");
-                        sbNotExit.Append(" <th scope='col'>Supplier Article Number</th>");
-                        sbNotExit.Append(" <th scope='col'>Quality Details</th>");
-                        sbNotExit.Append(" <th scope='col'>Supplier[Allocate]</th>");
+                        sbNotExitColor.Append(" <th scope='col'>Product</th>");
+                        sbNotExitColor.Append(" <th scope='col'>Usage</th>");
+                        sbNotExitColor.Append(" <th scope='col'>Supplier Article Number</th>");
+                        sbNotExitColor.Append(" <th scope='col'>Quality Details</th>");
+                        sbNotExitColor.Append(" <th scope='col'>Supplier[Allocate]</th>");
 
                         //foreach (var color in arrGAP_BOMGarmentcolors)
                         //{
@@ -1064,12 +1078,12 @@ order by a.pidate,a.pipid";
 
                             if (!isExistSource)
                             {
-                                sbNotExit.Append(" <th scope='col' style='background-color:red'>" + color + "</th>");
+                                sbNotExitColor.Append(" <th scope='col' style='background-color:red'>" + color + "</th>");
                                 isHasDifferent = true;
                             }
                         }
 
-                        sbNotExit.Append("</tr>");
+                        sbNotExitColor.Append("</tr>");
 
                         //var arrRowIds = arrCompareData.Where(w => !w.isExistA).Select(s => s.rowId).Distinct().OrderBy(o => o).ToList();
                         var arrProducts = arrCompareData.Where(w => !w.isExistA).Select(s => s.StandardPlacement_org).Distinct().OrderBy(o => o).ToList();
@@ -1091,12 +1105,12 @@ order by a.pidate,a.pipid";
                             var resItem = arrItem.First();
                             var arrItemRowIds = arrItem.Select(s => s.rowId).ToList();
 
-                            sbNotExit.Append("<tr>");
-                            sbNotExit.Append(" <td scope='col'>" + resItem.StandardPlacement_org + "</td>");
-                            sbNotExit.Append(" <td scope='col'>" + resItem.Usage_org + "</td>");
-                            sbNotExit.Append(" <td scope='col'>" + resItem.SupplierArticle_org + "</td>");
-                            sbNotExit.Append(" <td scope='col'>" + resItem.QualityDetails_org + "</td>");
-                            sbNotExit.Append(" <td scope='col'>" + resItem.Supplier_org + "</td>");
+                            sbNotExitColor.Append("<tr>");
+                            sbNotExitColor.Append(" <td scope='col'>" + resItem.StandardPlacement_org + "</td>");
+                            sbNotExitColor.Append(" <td scope='col'>" + resItem.Usage_org + "</td>");
+                            sbNotExitColor.Append(" <td scope='col'>" + resItem.SupplierArticle_org + "</td>");
+                            sbNotExitColor.Append(" <td scope='col'>" + resItem.QualityDetails_org + "</td>");
+                            sbNotExitColor.Append(" <td scope='col'>" + resItem.Supplier_org + "</td>");
 
 
                             foreach (var color in arrGAP_BOMGarmentcolorsCompare)
@@ -1111,66 +1125,68 @@ order by a.pidate,a.pipid";
                                     //var resColor = arrCompareData.FirstOrDefault(x => x.rowId == rowId && x.ColorName == color);
                                     var resColor = arrCompareData.FirstOrDefault(x => arrItemRowIds.Contains(x.rowId) && x.ColorName == color);
                                     if (resColor == null)
-                                        sbNotExit.Append(" <td scope='col'>X</td>");
+                                        sbNotExitColor.Append(" <td scope='col'>X</td>");
                                     else
-                                        sbNotExit.Append(" <td scope='col'>" + resColor.ColorVal + "</td>");
+                                        sbNotExitColor.Append(" <td scope='col'>" + resColor.ColorVal + "</td>");
                                 }
                             }
-                            sbNotExit.Append("</tr>");
+                            sbNotExitColor.Append("</tr>");
                         }
+                        
+                        sbNotExitColor.Append("</table>");
 
-
-                        sbNotExit.Append("</table>");
+                        if (!isHasDifferent) sbNotExitColor.Length = 0;
+                        sbNotExit.Append(sbNotExitColor);
 
                         //目的沒比對的Product
+                        StringBuilder sbNotExitProduct = new StringBuilder();
                         if (arrNotExistProducts.Count > 0)
                         {
                             foreach (var product in arrNotExistProducts)
                             {
-                                sbNotExit.Append("<table class='table table-hover'>");
-                                sbNotExit.Append("<tr>");
-                                sbNotExit.Append(" <th scope='col'>Product</th>");
-                                sbNotExit.Append(" <th scope='col'>Usage</th>");
-                                sbNotExit.Append(" <th scope='col'>Supplier Article Number</th>");
-                                sbNotExit.Append(" <th scope='col'>Quality Details</th>");
-                                sbNotExit.Append(" <th scope='col'>Supplier[Allocate]</th>");
+                                sbNotExitProduct.Append("<table class='table table-hover'>");
+                                sbNotExitProduct.Append("<tr>");
+                                sbNotExitProduct.Append(" <th scope='col'>Product</th>");
+                                sbNotExitProduct.Append(" <th scope='col'>Usage</th>");
+                                sbNotExitProduct.Append(" <th scope='col'>Supplier Article Number</th>");
+                                sbNotExitProduct.Append(" <th scope='col'>Quality Details</th>");
+                                sbNotExitProduct.Append(" <th scope='col'>Supplier[Allocate]</th>");
 
                                 arrGAP_BOMGarmentcolorsCompare = arrCompareData.Where(w => !w.isExistA && w.StandardPlacement_org == product).Select(s => s.ColorName).Distinct().ToList();
 
                                 foreach (var color in arrGAP_BOMGarmentcolorsCompare)
                                 {
-                                    sbNotExit.Append(" <th scope='col' style='background-color:red'>" + color + "</th>");
+                                    sbNotExitProduct.Append(" <th scope='col' style='background-color:red'>" + color + "</th>");
                                 }
 
-                                sbNotExit.Append("</tr>");
+                                sbNotExitProduct.Append("</tr>");
 
                                 var arrItem = arrCompareData.Where(x => !x.isExistA && x.StandardPlacement_org == product).ToList();
                                 var resItem = arrItem.First();
                                 var arrItemRowIds = arrItem.Select(s => s.rowId).ToList();
 
-                                sbNotExit.Append("<tr>");
-                                sbNotExit.Append(" <td scope='col'>" + resItem.StandardPlacement_org + "</td>");
-                                sbNotExit.Append(" <td scope='col'>" + resItem.Usage_org + "</td>");
-                                sbNotExit.Append(" <td scope='col'>" + resItem.SupplierArticle_org + "</td>");
-                                sbNotExit.Append(" <td scope='col'>" + resItem.QualityDetails_org + "</td>");
-                                sbNotExit.Append(" <td scope='col'>" + resItem.Supplier_org + "</td>");
+                                sbNotExitProduct.Append("<tr>");
+                                sbNotExitProduct.Append(" <td scope='col'>" + resItem.StandardPlacement_org + "</td>");
+                                sbNotExitProduct.Append(" <td scope='col'>" + resItem.Usage_org + "</td>");
+                                sbNotExitProduct.Append(" <td scope='col'>" + resItem.SupplierArticle_org + "</td>");
+                                sbNotExitProduct.Append(" <td scope='col'>" + resItem.QualityDetails_org + "</td>");
+                                sbNotExitProduct.Append(" <td scope='col'>" + resItem.Supplier_org + "</td>");
 
 
                                 foreach (var color in arrGAP_BOMGarmentcolorsCompare)
                                 {
                                     var resColor = arrCompareData.FirstOrDefault(x => !x.isExistA && x.StandardPlacement_org == product && x.ColorName == color);
                                     if (resColor == null)
-                                        sbNotExit.Append(" <td scope='col'>X</td>");
+                                        sbNotExitProduct.Append(" <td scope='col'>X</td>");
                                     else
-                                        sbNotExit.Append(" <td scope='col'>" + resColor.ColorVal + "</td>");
+                                        sbNotExitProduct.Append(" <td scope='col'>" + resColor.ColorVal + "</td>");
                                 }
-                                sbNotExit.Append("</tr>");
-                                sbNotExit.Append("</table>");
+                                sbNotExitProduct.Append("</tr>");
+                                sbNotExitProduct.Append("</table>");
                             }
                         }
-
-
-                        if (!isHasDifferent)
+                        sbNotExit.Append(sbNotExitProduct);
+                        if (!isHasDifferent && sbNotExitProduct.Length == 0)
                             sbNotExit.Length = 0;
                     }
                     //divHeaderNotCompare.InnerHtml = sbNotExit.ToString();
@@ -1232,13 +1248,13 @@ order by a.pidate,a.pipid";
                 }
 
 
-                sSql = "select a.*,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15 \n";
-                sSql += "from PDFTAG.dbo.GAP_SizeTable a              \n";
-                sSql += "join  PDFTAG.dbo.GAP_SizeTable_Header b on a.lusthid=b.lusthid               \n";
-                sSql += " where 1=1   \n";
-                sSql += " and a.pipid =@pipid   \n";
-                sSql += " and a.lusthid in ('" + hid_Compare_lusthid.Value.Replace(",", "','") + "')   \n";
-                sSql += " order by lusthid,rowid asc    \n";
+                sSql = @"select a.*,H1,H2,H3,H4,H5,H6,H7,H8,H9,H10,H11,H12,H13,H14,H15 
+                    from PDFTAG.dbo.GAP_SizeTable a
+                    join  PDFTAG.dbo.GAP_SizeTable_Header b on a.lusthid=b.lusthid
+                    where 1=1
+                    and a.pipid =@pipid
+                    --and a.lusthid in ('" + hid_Compare_lusthid.Value.Replace(",", "','") + @"')
+                    order by lusthid,rowid asc ";
 
                 cm.CommandText = sSql;
                 cm.Parameters.Clear();

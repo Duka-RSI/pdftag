@@ -105,7 +105,7 @@ order by hisversion asc";
 from PDFTAG.dbo.P_inProcess a
 where a.isShow=0 and a.pver=1 and a.pipid in (select pipid from PDFTAG.dbo.P_inProcess where isShow=0 and gmid='" + gmid + @"')
 and a.hdid not in (select hdid from PDFTAG.dbo.HistoryData where isshow=1  or pipid in (select pipid from PDFTAG.dbo.P_inProcess where isshow=1) )
-order by a.pidate,a.pipid";
+order by a.pidate desc,a.pipid desc";
             }
 
 
@@ -183,6 +183,8 @@ order by a.pidate,a.pipid";
     public class Lu_Bom
     {
         public int rowId { get; set; }
+        public string lubid { get; set; }
+        public string org_lubid { get; set; }
         public string StandardPlacement { get; set; }
 
         public string Placement { get; set; }
@@ -678,6 +680,8 @@ order by a.pidate,a.pipid";
                             arrCompareData.Add(new Lu_Bom()
                             {
                                 rowId = iRowId,
+                                lubid = drBomMain["lubid"].ToString(),
+                                org_lubid = drBomMain["org_lubid"].ToString(),
                                 StandardPlacement = drBomMain["StandardPlacement"].ToString().Replace(" ", string.Empty),
                                 Placement = drBomMain["Placement"].ToString().Replace(" ", string.Empty),
                                 SupplierArticle = drBomMain["SupplierArticle"].ToString().Replace(" ", string.Empty),
@@ -762,12 +766,20 @@ order by a.pidate,a.pipid";
 
                         try
                         {
-                            lubid_compare = drComareBoms[b]["lubid"].ToString();
-                            lubid_org_compare = drComareBoms[b]["org_lubid"].ToString();
-                            standardPlacement_compare = drComareBoms[b]["StandardPlacement"].ToString();
-                            placement_compare = drComareBoms[b]["Placement"].ToString();
-                            supplierArticle_compare = drComareBoms[b]["SupplierArticle"].ToString();
-                            supplier_compare = drComareBoms[b]["Supplier"].ToString();
+                            var tmpCompareData = arrCompareData.FirstOrDefault(x => x.StandardPlacement == standardPlacement
+                                    && x.Placement == placement && x.SupplierArticle == supplierArticle);
+                            lubid_compare = tmpCompareData.lubid;
+                            lubid_org_compare = tmpCompareData.org_lubid;
+                            standardPlacement_compare = tmpCompareData.StandardPlacement;
+                            placement_compare = tmpCompareData.Placement;
+                            supplierArticle_compare = tmpCompareData.SupplierArticle;
+                            supplier_compare = tmpCompareData.Supplier_org;
+                            //lubid_compare = drComareBoms[b]["lubid"].ToString();
+                            //lubid_org_compare = drComareBoms[b]["org_lubid"].ToString();
+                            //standardPlacement_compare = drComareBoms[b]["StandardPlacement"].ToString();
+                            //placement_compare = drComareBoms[b]["Placement"].ToString();
+                            //supplierArticle_compare = drComareBoms[b]["SupplierArticle"].ToString();
+                            //supplier_compare = drComareBoms[b]["Supplier"].ToString();
 
                             standardPlacement_compare_note = FilterNote(arrNotesCompare, lubid_compare, "StandardPlacement");
                             placement_compare_note = FilterNote(arrNotesCompare, lubid_compare, "Placement");
@@ -1563,7 +1575,8 @@ order by a.pidate,a.pipid";
                         sb.Append(" <th scope='col'>Criticality</th>");
                         sb.Append(" <th scope='col'>Tol(-)</th>");
                         sb.Append(" <th scope='col'>Tol(+)</th>");
-                                                        
+                        sb.Append(" <th scope='col'>HTM Instruction</th>");
+
                         foreach (var size in curSourceSize)
                         {
                             if (isMatch)
@@ -1709,6 +1722,7 @@ order by a.pidate,a.pipid";
                                 sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='Criticality' >" + criticality_source + (string.IsNullOrEmpty(criticality_note) ? "" : "<br>中:" + criticality_note) + "</td>");
                                 sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolA' >" + tolA_source + (string.IsNullOrEmpty(tolA_note) ? "" : "<br>中:" + tolA_note) + "</td>");
                                 sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='TolB' >" + tolB_source + (string.IsNullOrEmpty(tolB_note) ? "" : "<br>中:" + tolB_note) + "</td>");
+                                sb.Append(" <td scope='col' data-lustid='" + lustid + "' data-org_lustid='" + org_lustid + "' data-col='HTMInstruction' >" + hTMInstruction_source + (string.IsNullOrEmpty(hTMInstruction_note) ? "" : "<br>中:" + hTMInstruction_note) + "</td>");
                                     
                                 foreach (var header in curSourceSize)
                                 {
@@ -1737,6 +1751,7 @@ order by a.pidate,a.pipid";
                                 sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='Criticality' >" + (string.IsNullOrEmpty(criticality_compare) ? "" : Compare(sType, criticality, criticality_compare, criticality_compare_note)) + "</td>");
                                 sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='TolA' >" + (string.IsNullOrEmpty(tolA_compare) ? "" : Compare(sType, tolA, tolA_compare, tolA_compare_note)) + "</td>");
                                 sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='TolB' >" + (string.IsNullOrEmpty(tolB_compare) ? "" : Compare(sType, tolB, tolB_compare, tolB_compare_note)) + "</td>");
+                                sb.Append(" <td scope='col' data-lustid='" + lustid_compare + "' data-org_lustid='" + lustid_org_compare + "' data-col='HTMInstruction' >" + (string.IsNullOrEmpty(hTMInstruction_compare) ? "" : Compare(sType, hTMInstruction, hTMInstruction_compare, hTMInstruction_compare_note)) + "</td>");
                                     
                                 foreach (var header in curSourceSize)
                                 {

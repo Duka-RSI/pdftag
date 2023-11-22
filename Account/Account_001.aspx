@@ -61,7 +61,7 @@
 										<%# Eval("DEPARTMENT")%>
 									</td>
 									<td>
-										<%# Eval("strCUST_NO")%>
+										<%# Eval("CUST")%>
 									</td>
 									<td>
 										<%#(int)Eval("Role")==1?"管理者":(int)Eval("Role")==2?"使用者":""%>
@@ -137,17 +137,11 @@
 								<th>部門:
 								</th>
 								<td align="left">
-									<asp:TextBox ID="DEPARTMENT" runat="server" CssClass="form-control"></asp:TextBox>
+                                    <asp:DropDownList ID="DEPARTMENT" runat="server" CssClass="form-control" CheckBoxes="True">
+                                    </asp:DropDownList>
 								</td>
 							</tr>
 							<tr>
-								<th>版本:<font color="red">*</font>
-								</th>
-								<td align="left">
-									<asp:CheckBox ID="CUST_NO_1" runat="server" />Lulu
-                                    <asp:CheckBox ID="CUST_NO_2" runat="server" />UA
-                                    <asp:CheckBox ID="CUST_NO_3" runat="server" />GAP
-								</td>
 								<th>權限:
 								</th>
 								<td align="left">
@@ -181,10 +175,6 @@
 
 			function check() {
 				let USER_AD = $('#<%=USER_AD.ClientID %>').val();
-				let CUST_NO_1 = $('#<%=CUST_NO_1.ClientID %>').prop('checked');
-				let CUST_NO_2 = $('#<%=CUST_NO_2.ClientID %>').prop('checked');
-				let CUST_NO_3 = $('#<%=CUST_NO_3.ClientID %>').prop('checked');
-
 				if (!USER_AD) {
 					alert('帳號不可空白');
 					return false;
@@ -196,11 +186,6 @@
 					alert('帳號不能只有空白');
 					return false;
 				}
-
-				if (!CUST_NO_1 && !CUST_NO_2 && !CUST_NO_3) {
-					alert('版本 必選');
-					return false;
-				}
 			}
 
 			function clearAddOrEditPanel() {
@@ -209,9 +194,6 @@
 				$('#<%=USER_AD.ClientID %>').val('');
 				$('#<%=DEPARTMENT.ClientID %>').val('');
 
-				$('#<%=CUST_NO_1.ClientID %>').prop('checked', false);
-				$('#<%=CUST_NO_2.ClientID %>').prop('checked', false);
-				$('#<%=CUST_NO_3.ClientID %>').prop('checked', false);
 				$('#<%=dlRole.ClientID %>').val('1');
 
 				$('#<%=hidaid.ClientID %>').val('');
@@ -244,18 +226,6 @@
 				$('#<%=DEPARTMENT.ClientID %>').val(DEPARTMENT);
 
 				$('#<%=dlRole.ClientID %>').val(Role);
-
-
-				let arr = CUST_NO.split(',');
-				for (let i in arr) {
-					if (arr[i] == '1')
-						$('#<%=CUST_NO_1.ClientID %>').prop('checked', true);
-					else if (arr[i] == '2')
-						$('#<%=CUST_NO_2.ClientID %>').prop('checked', true);
-					else if (arr[i] == '3')
-						$('#<%=CUST_NO_3.ClientID %>').prop('checked', true);
-				}
-
 
 				$('#addModalTitle').text('編輯');
 				$('#addModal').modal('show')

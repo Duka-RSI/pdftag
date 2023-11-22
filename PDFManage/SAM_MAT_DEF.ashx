@@ -35,7 +35,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
         string searchonlyerp = context.Request["searchonlyerp"];
         string sSql = "";
 
-        MAT_NO = MAT_NO.Replace(" ", "").Trim();
+        MAT_NO = MAT_NO.Trim();
 
         sSql = @"select distinct MAT_NO,MAT_NAME, ISNULL(ERP_EXIST,'') ERP_EXIST
 from [RD_SAMPLE].[dbo].[SAM_MAT_DEF] a 

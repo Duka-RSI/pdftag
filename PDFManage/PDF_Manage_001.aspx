@@ -35,7 +35,7 @@
                             </label>
                         </div>
                         <div class="col-4 col-md-3">
-                            <asp:DropDownList ID="dlVersion" runat="server" CssClass="form-control" OnSelectedIndexChanged="dlVersion_SelectedIndexChanged" AutoPostBack="true">
+                            <asp:DropDownList ID="dlVersion" runat="server" CssClass="form-control" OnSelectedIndexChanged="dlVersion_SelectedIndexChanged" AutoPostBack="true" CheckBoxes="True">
                                 <%-- <asp:ListItem Value="" Text="全部"></asp:ListItem>--%>
                                 <%-- <asp:ListItem Value="1" Text="Lulu"></asp:ListItem>
                                 <asp:ListItem Value="2" Text="UA"></asp:ListItem>
@@ -113,7 +113,8 @@
                                         <a href="#" onclick="Open('<%# Eval("piuploadfile")%>')"><%# System.IO.Path.GetFileName((string)Eval("piuploadfile"))%></a>
                                     </td>
                                     <td>
-                                        <%# (int)Eval("pver")==1?"Lulu": (int)Eval("pver")==2?"UA": (int)Eval("pver")==3?"GAP":""%>
+                                       <%--<%# (int)Eval("pver")==1?"Lulu": (int)Eval("pver")==2?"UA": (int)Eval("pver")==3?"GAP": (int)Eval("pver")==4?"ON RUNNING":(int)Eval("pver")==5?"GYMSHARK":""%>--%>
+                                        <%# Eval("CUSTOMER")%>
                                     </td>
                                     <td>
                                         <%# Eval("creator")%>
@@ -142,6 +143,17 @@
                                         <span <%# ((int)Eval("pver")==3 && string.IsNullOrEmpty(Eval("mdate").ToString()))?"":"style='display:none'"%>>
                                             <%--<a href="#" onclick="showExecuteGAP('<%# Eval("pipid")%>');return false;"><input type="button" value="執行" class="btn btn-secondary"></a>--%>
                                             <asp:LinkButton ID="LinkButton3" CommandName="parsePDF_GAP" CommandArgument='<%# Eval("pipid")%>'
+                                                runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>
+                                        </span>
+
+                                        <span <%# ((int)Eval("pver")>3 && string.IsNullOrEmpty(Eval("mdate").ToString()) && Eval("piuploadfile").ToString().IndexOf(".pdf", StringComparison.OrdinalIgnoreCase) >= 0)?"":"style='display:none'"%>>
+                                            <%--<a href="#" onclick="showExecuteGAP('<%# Eval("pipid")%>');return false;"><input type="button" value="執行" class="btn btn-secondary"></a>--%>
+                                            <asp:LinkButton ID="LinkButton5" CommandName="parsePDF_All" CommandArgument='<%# Eval("pipid")%>'
+                                                runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>
+                                        </span>
+                                         <span <%# ((int)Eval("pver")>3 && string.IsNullOrEmpty(Eval("mdate").ToString()) && Eval("piuploadfile").ToString().IndexOf(".xlsx", StringComparison.OrdinalIgnoreCase) >= 0)?"":"style='display:none'"%>>
+                                            <%--<a href="#" onclick="showExecuteGAP('<%# Eval("pipid")%>');return false;"><input type="button" value="執行" class="btn btn-secondary"></a>--%>
+                                            <asp:LinkButton ID="LinkButton6" CommandName="parseExcel_All" CommandArgument='<%# Eval("pipid")%>'
                                                 runat="server" OnClientClick="return onParsePDF();"><input type="button" value="執行" class="btn btn-warning"></asp:LinkButton>
                                         </span>
                                     </td>
@@ -198,7 +210,7 @@
                                 <asp:TextBox ID="ptitle" runat="server" CssClass="form-control"></asp:TextBox>
                             </td>
                         </tr>
-                        <tr>
+                        <tr id="trFileUpload">
                             <th>檔案:
                             </th>
                             <td align="left">
@@ -274,11 +286,56 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id ="inputNonModal" >
+        <div class="modal-dialog">
+            <div  class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inputNonTitle"> </h5>
+                    	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span>&times;</span>
+					</button>
+                </div>
+                <div class="modal-body">
+                     <table class="table">
+                         <tbody>
+                             <tr>
+                                 <th>客戶款式<font color="red">*</font></th>
+                                 <td align="left">
+                                     <asp:TextBox  id="txtStyle"  runat="server" CssClass ="form-control"> </asp:TextBox>
+                                 </td>
+                             </tr>
+                             <tr>
+                                 <th>季節<font color="red">*</font></th>
+                                  <td align="left">
+                                      <asp:TextBox  ID="txtSeason" runat="server" CssClass ="form-control" MaxLength="4"> </asp:TextBox>
+                                 </td>
+                             </tr>
+                               <tr>
+                                 <th>BOM Date<font color="red">*</font></th>
+                                  <td align="left">                                     
+                                      <asp:TextBox  ID="txtBOMDate"  runat="server" CssClass ="form-control" MaxLength="10"> </asp:TextBox>
+                                 </td>
+                             </tr>
+                             <tr>
+							<td colspan="2" align="center">
+								<asp:HiddenField ID="HiddenField1" runat="server" />
+								<asp:Button ID="Button2" runat="server" Text="取消" CssClass="btn btn-danger" OnClientClick="return clearHiddenField1()" data-dismiss="modal" />
+								<asp:Button ID="Button3" runat="server" Text="確定" CssClass="btn btn-success" OnClick="btnInput_Click" OnClientClick="return checkInput()" />
+							</td>
+						</tr>
+                         </tbody>
+                     </table>
+                </div>
+                	<div class="modal-footer">
+				</div>
+            </div>
+        </div>
+    </div>
     <script type="text/javascript">
         $(document).ready(function () {
                 <%=script %>
 
-            $("#<%=FileUpload1.ClientID%>").attr('accept', 'application/pdf');
+            $("#<%=FileUpload1.ClientID%>").attr('accept', 'application/pdf, .xlsx');
             hideLoading();
             $('#<%=dlgmcate.ClientID %>').prop('disabled', true);
         });
@@ -300,6 +357,7 @@
 
         function onParsePDF() {
             if (confirm('是否要執行 ?')) {
+                clearHiddenField1();
                 showLoading();
                 return true;
             }
@@ -340,6 +398,23 @@
         }
 
         function showEdit(pipid, gmid, ptitle, pidate, piuploadfile, pver, Gaptype, creator, createordate, mdate, isShow, titleType, unit) {
+            $('#rowGap').hide();
+
+            //編輯隱藏文件、塞一個假資料繞過判斷且不更新文件
+            // Get a reference to our file input
+            const fileInput = document.querySelector('input[type="file"]');
+            // Create a new File object
+            const myFile = new File(['Hello World!'], 'myFile.pdf', {
+                type: 'text/plain',
+                lastModified: new Date(),
+            });
+            // Now let's create a DataTransfer to get a FileList
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(myFile);
+            fileInput.files = dataTransfer.files;
+
+            $('#trFileUpload').hide();
+
             $('#<%=btnAdd.ClientID %>').hide();
             $('#<%=btnEdit.ClientID %>').show();
 
@@ -377,8 +452,8 @@
             }
             let lastDot = file.lastIndexOf('.');
             let ext = file.substring(lastDot + 1);
-            if (ext.toLowerCase() !='pdf') {
-                alert('上傳檔案必須是pdf檔');
+            if (ext.toLowerCase() != 'pdf' && ext.toLowerCase() != 'xlsx') {
+                alert('上傳檔案必須是pdf或xlsx檔');
                 return false;
             }
 
@@ -487,7 +562,29 @@
         }
 
 
+       function showInput()
+       {
+            $('#inputNonTitle').text('請填寫必要欄位');
+            $('#inputNonModal').modal('show')
+       }
 
+      function checkInput()
+       {
+          var style =   $('#<%= txtStyle.ClientID %>').val();
+          var season =   $('#<%= txtSeason.ClientID %>').val();
+          var BOMDate = $('#<%= txtBOMDate.ClientID %>').val();
+          if (style == "" || season == "" || BOMDate == "" || BOMDate == "0001/01/01") {
+              alert("請輸入全部必要欄位");
+              return false;
+          }
+       return true;
+      }
+
+        function clearHiddenField1()
+        {
+            $('#<%= HiddenField1.ClientID %>').val("");
+            return;
+        }
 
 
     </script>
