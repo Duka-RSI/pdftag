@@ -559,7 +559,8 @@ values
                                 cm.Parameters.AddWithValue("@mdate", sNow);
                                 luhid = Convert.ToInt64(cm.ExecuteScalar().ToString());
 
-
+                                //20231214 比對條件 多加欄位 style為條件，做判斷
+                                arrLu_LearnmgrItemDto = arrLu_LearnmgrItemDto.Where(x => x.Style == style).ToList();
                             }
                         }
                         #endregion
@@ -1683,6 +1684,22 @@ insert into PDFTAG.dbo.Lu_SizeTable
 
             using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
             {
+                sSql = "select * \n";
+                sSql += "from PDFTAG.dbo.Lu_Header a              \n";
+                sSql += " where 1=1 and a.isshow=0   \n";
+                sSql += " and a.pipid = '" + pipid + "'   \n";
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                DataTable dtLu_Header = new DataTable();
+                using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                {
+                    da.Fill(dtLu_Header);
+                }
+
+                string style = dtLu_Header.Rows[0]["style"].ToString();
+
+                arrLu_LearnmgrItemDto = arrLu_LearnmgrItemDto.Where(x => x.Style == style).ToList();
+
                 #region Lu_BOM
 
                 sSql = "select a.*,b.* \n";

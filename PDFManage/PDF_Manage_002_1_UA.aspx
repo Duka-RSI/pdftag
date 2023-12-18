@@ -34,6 +34,7 @@
 						<a href="PDF_Manage_002.aspx">歷程管理</a> >>
                         <asp:Label ID="lblInfo" runat="server"></asp:Label>:進入編輯
                         <asp:HiddenField ID="hidpipid" runat="server" />
+						 <asp:HiddenField ID="hidStyle" runat="server" />
 					</th>
 				</tr>
 			</thead>
@@ -146,6 +147,7 @@
 								<td align="left">更改
 								</td>
 								<td align="left">
+									學習選取:<select id="dlLearnmgrItem" class="form-control" onchange="dlLearnmgrItem_change()">
 									<textarea id="editText" class="form-control"></textarea>
 								</td>
 							</tr>
@@ -398,10 +400,59 @@
 				$('#rowCompareColor').show();
 			}
 
+            $('#dlLearnmgrItem').html('<option value="">請選擇</option>');
+
+            let style = $('#<%=hidStyle.ClientID %>').val();
+            let data = {
+                orgId: orgId,
+                col: saveCol,
+                style: style,
+            };
+            $.ajax({
+                type: "POST",
+                url: "UA_BOM.ashx?fun=get_LearnmgrItem",
+                data: data,
+                dataType: 'json',
+                success: function (res) {
+
+                    let html = "<option value=''>請選擇</option>";
+                    for (let i in res) {
+                        html += "<option value='" + res[i].termname + "'>" + res[i].termname + "</option>";
+                    }
+
+                    $("#dlLearnmgrItem").html(html);
+
+                    if (res.length == 1) {
+
+                        $("#dlLearnmgrItem").val(res[0].termname);
+
+                        let editText = $('#editText').val();
+
+                        if (!editText)
+                            $('#editText').val(res[0].termname);
+                    }
+
+
+
+                },
+                complete: function () {
+
+                },
+                error: function (error) {
+                    alert("失敗");
+                }
+            });
+
 
 			$('#addModalTitle').text('編輯');
 			$('#addModal').modal('show')
 		}
+
+        function dlLearnmgrItem_change() {
+
+            let termname = $("#dlLearnmgrItem").val();
+            $('#editText').val(termname);
+        }
 
 		function showSelectMatNo(item) {
 
@@ -604,6 +655,50 @@
 
 			getOrgTest();
 			getChNote("lustid");
+
+            $('#dlLearnmgrItem').html('<option value="">請選擇</option>');
+
+            let style = $('#<%=hidStyle.ClientID %>').val();
+            let data = {
+                orgId: orgId,
+                col: saveCol,
+                style: style,
+            };
+            $.ajax({
+                type: "POST",
+                url: "UA_SizeTable.ashx?fun=get_LearnmgrItem",
+                data: data,
+                dataType: 'json',
+                success: function (res) {
+
+                    let html = "<option value=''>請選擇</option>";
+                    for (let i in res) {
+                        html += "<option value='" + res[i].termname + "'>" + res[i].termname + "</option>";
+                    }
+
+                    $("#dlLearnmgrItem").html(html);
+
+                    if (res.length == 1) {
+
+                        $("#dlLearnmgrItem").val(res[0].termname);
+
+                        let editText = $('#editText').val();
+
+                        if (!editText)
+                            $('#editText').val(res[0].termname);
+                    }
+
+
+
+                },
+                complete: function () {
+
+                },
+                error: function (error) {
+                    alert("失敗");
+                }
+            });
+
 			$('#addModalTitle').text('編輯');
 			$('#addModal').modal('show')
 		}
@@ -690,6 +785,7 @@
 			let orgtext = $('#orgText').val();
 			let text = $('#editText').val();
 			let note = $('#noteText').val();
+            let style = $('#<%=hidStyle.ClientID %>').val();
 
 			//UA_BOM
 			let PARTS_TYPE = $('#dlPARTS_TYPE').val();
@@ -707,9 +803,18 @@
 				}
 			}
 
+            if (saveCol == 'Code' || saveCol == 'Description') {
+                //if (isSaveRecord) {
+
+                if (confirm('改的內容是否紀錄至詞庫')) {
+                    isRecord = 1;
+                }
+            }
+
 			let data = {
 				orgId: orgId,
 				id: saveId,
+                style: style,
 				col: saveCol,
 				colorCol: saveColorCol,
 				text: text,
@@ -1334,5 +1439,5 @@
 
 
 
-	</script>
+    </script>
 </asp:Content>

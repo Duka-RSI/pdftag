@@ -28,7 +28,9 @@ public class Passport : IHttpHandler, IRequiresSessionState
             case "get_org":
                 get_org(context);
                 break;
-
+            case "get_LearnmgrItem":
+                get_LearnmgrItem(context);
+                break;
             case "saveByCol":
                 saveByCol(context);
                 break;
@@ -132,6 +134,35 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
     }
 
+    public void get_LearnmgrItem(HttpContext context)
+    {
+        string lubid_org = context.Request["orgId"];
+        string col = context.Request["col"];
+        string style = context.Request["style"];
+       
+        string sSql = "";
+
+
+        sSql = "select " + col + " as TextOrg  from  PDFTAG.dbo.Lu_BOM where lubid=@lubid";
+
+        using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
+        {
+            var resLu_BOM_Org = cn.Query<Text>(sSql, new { lubid = lubid_org }).FirstOrDefault();
+
+            string sTermname_org = resLu_BOM_Org.TextOrg.Trim().Replace(" ", "").ToLower();
+
+            sSql = "select * from PDFTAG.dbo.Lu_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and termname_org=@termname_org and style=@style \n";
+            var list = cn.Query(sSql, new
+            {
+                ColSource = "BOM",
+                ColName = col,
+                termname_org = sTermname_org,
+                style = style,
+            }).ToList();
+
+            context.Response.Write(JsonConvert.SerializeObject(list));
+        }
+    }
     public void saveByCol(HttpContext context)
     {
         string lubid_org = context.Request["orgId"];
@@ -140,6 +171,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
         string colorCol = context.Request["colorCol"];
         string text = context.Request["text"];
         string chNote = context.Request["chNote"];
+        string style = context.Request["style"];
 
         string PARTS_TYPE = context.Request["PARTS_TYPE"];
         string PARTS_CODE = context.Request["PARTS_CODE"];
@@ -218,12 +250,12 @@ public class Passport : IHttpHandler, IRequiresSessionState
                 string sFirstCharTermname_org = resLu_BOM_Org.TextOrg.Substring(0, 1);
                 string sTermname_org = resLu_BOM_Org.TextOrg.Trim().Replace(" ", "").ToLower();
 
-                sSql = @"IF NOT Exists (select * from PDFTAG.dbo.Lu_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and FirstCharTermname_org=@FirstCharTermname_org and termname_org=@termname_org )
+                sSql = @"IF NOT Exists (select * from PDFTAG.dbo.Lu_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and FirstCharTermname_org=@FirstCharTermname_org and termname_org=@termname_org and style=@style )
                              begin
                                   insert into PDFTAG.dbo.Lu_LearnmgrItem
-                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,creator,creatordate)
+                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,style,creator,creatordate)
                                     values 
-                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@creator,@creatordate)
+                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@style,@creator,@creatordate)
                               end 
                             --- else 
                             ---    begin
@@ -247,6 +279,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
                     FirstCharTermname_org = sFirstCharTermname_org,
                     termname_org = sTermname_org,
                     termname = text,
+                    style = style,
                     creator = LoginUser.PK,
                     creatordate = dtNow.ToString("yyyy/MM/dd HH:mm:ss"),
                     UpdateUser = LoginUser.PK,

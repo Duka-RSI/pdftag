@@ -29,7 +29,9 @@ public class Passport : IHttpHandler, IRequiresSessionState
             case "get_org":
                 get_org(context);
                 break;
-
+            case "get_LearnmgrItem":
+                get_LearnmgrItem(context);
+                break;
             case "saveByCol":
                 saveByCol(context);
                 break;
@@ -137,6 +139,36 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
     }
 
+    public void get_LearnmgrItem(HttpContext context)
+    {
+        string lustid_org = context.Request["orgId"];
+        string col = context.Request["col"];
+        string style = context.Request["style"];
+
+        string sSql = "";
+
+
+        sSql = "select " + col + " as TextOrg  from  PDFTAG.dbo.Lu_SizeTable where lustid=@lustid";
+
+        using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
+        {
+            var resLu_BOM_Org = cn.Query<Text>(sSql, new { lustid = lustid_org }).FirstOrDefault();
+
+            string sTermname_org = resLu_BOM_Org.TextOrg.Trim().Replace(" ", "").ToLower();
+
+            sSql = "select * from PDFTAG.dbo.Lu_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and termname_org=@termname_org and style=@style \n";
+            var list = cn.Query(sSql, new
+            {
+                ColSource = "Size",
+                ColName = col,
+                termname_org = sTermname_org,
+                style = style,
+            }).ToList();
+
+            context.Response.Write(JsonConvert.SerializeObject(list));
+        }
+    }
+
     public void saveByCol(HttpContext context)
     {
         string lustid_org = context.Request["orgId"];
@@ -145,6 +177,8 @@ public class Passport : IHttpHandler, IRequiresSessionState
         string text = context.Request["text"];
         string chNote = context.Request["chNote"];
         string isRecord = context.Request["isRecord"];
+        string style = context.Request["style"];
+
         string sSql = "";
         string co1_1 = "";
         string sizeColumnName = "";
@@ -261,12 +295,12 @@ public class Passport : IHttpHandler, IRequiresSessionState
                 string sTermname_org = resLu_SizeTable_Org.TextOrg.Trim().Replace(" ", "").ToLower();
 
 
-                sSql = @"IF NOT Exists (select * from PDFTAG.dbo.Lu_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and FirstCharTermname_org=@FirstCharTermname_org and termname_org=@termname_org )
+                sSql = @"IF NOT Exists (select * from PDFTAG.dbo.Lu_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and FirstCharTermname_org=@FirstCharTermname_org and termname_org=@termname_org and style=@style )
                              begin
                                   insert into PDFTAG.dbo.Lu_LearnmgrItem
-                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,creator,creatordate)
+                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,Ctermname,style,creator,creatordate)
                                     values 
-                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@creator,@creatordate)
+                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@Ctermname,@style,@creator,@creatordate)
                               end 
                             -- else 
                             --    begin
@@ -282,6 +316,8 @@ public class Passport : IHttpHandler, IRequiresSessionState
                     FirstCharTermname_org = sFirstCharTermname_org,
                     termname_org = sTermname_org,
                     termname = text,
+                    Ctermname = chNote,
+                    style = style,
                     creator = LoginUser.PK,
                     creatordate = dtNow.ToString("yyyy/MM/dd HH:mm:ss"),
                     UpdateUser = LoginUser.PK,

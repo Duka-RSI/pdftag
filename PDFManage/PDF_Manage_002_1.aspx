@@ -25,8 +25,11 @@
                 <tr>
                     <th scope="col" colspan="5">
                         <a href="PDF_Manage_002.aspx">歷程管理</a> >>
+                       
                         <asp:Label ID="lblInfo" runat="server"></asp:Label>:進入編輯
+                       
                         <asp:HiddenField ID="hidpipid" runat="server" />
+                        <asp:HiddenField ID="hidStyle" runat="server" />
                     </th>
                 </tr>
             </thead>
@@ -55,9 +58,10 @@
             </tr>--%>
             <tr>
                 <td style="height: 450px; vertical-align: top;">
-                    <font color="red">點擊儲存格進行編輯修改</font>  <asp:Button ID="btnQuery" runat="server" Text="學習" CssClass="btn btn-secondary" OnClick="btnLearn_Click" OnClientClick="return confirm('是否要學習 ?');" />
+                    <font color="red">點擊儲存格進行編輯修改</font>
+                    <asp:Button ID="btnQuery" runat="server" Text="學習" CssClass="btn btn-secondary" OnClick="btnLearn_Click" OnClientClick="return confirm('是否要學習 ?');" />
                     <div id="divHeader" runat="server"></div>
-                   
+
                 </td>
             </tr>
         </table>
@@ -84,7 +88,7 @@
                             <td align="left">比對
                             </td>
                             <td align="left">
-                              <%--  <select id="dlPARTS_TYPE" onchange="dlPARTS_TYPE_change()"></select>
+                                <%--  <select id="dlPARTS_TYPE" onchange="dlPARTS_TYPE_change()"></select>
                                 <select id="dlPARTS_CODE" onchange="dlPARTS_CODE_change()"></select>
                                 <select id="dlPARTS_DESC" onchange="dlPARTS_DESC_change()"></select>
                                 <select id="dlMAT_ID"></select>--%>
@@ -93,47 +97,39 @@
                                 <asp:HiddenField ID="hidPARTS_DESC" runat="server" />
                                 <asp:HiddenField ID="hidMAT_ID" runat="server" />
 
-                                 關鍵字:<input type="text" id="txtSearchMAT_NO"><input type="button" value="查詢" onclick="onSearchMAT_NO()" /> 
-                                只撈ERP料號:<input type='checkbox' name='rbERP_MAT' id="SearchOnlyERPMat" value="Y"/>
-                                <div style="height:200px;width:650px; overflow:scroll">
+                                關鍵字:<input type="text" id="txtSearchMAT_NO"><input type="button" value="查詢" onclick="onSearchMAT_NO()" />
+                                只撈ERP料號:<input type='checkbox' name='rbERP_MAT' id="SearchOnlyERPMat" value="Y" />
+                                <div style="height: 200px; width: 650px; overflow: scroll">
                                     <table class="table">
                                         <tr>
-                                             <th>
-                                                	
+                                            <th></th>
+                                            <th>MAT_NO	
                                             </th>
-                                            <th>
-                                                MAT_NO	
+                                            <th>MAT_NAME
                                             </th>
-                                             <th>
-                                                MAT_NAME
+                                            <th>ERP_EXIST
                                             </th>
-                                            <th>
-                                                ERP_EXIST
-                                            </th> 
                                         </tr>
                                         <tbody id="tblMAT_NO"></tbody>
                                     </table>
                                 </div>
                             </td>
                         </tr>
-                         <tr id="rowCompareColor">
+                        <tr id="rowCompareColor">
                             <td align="left">比對
                             </td>
-                            <td align="left">
-                                 關鍵字:<input type="text" id="txtSearchCOLOR_DESC"><input type="button" value="查詢" onclick="onSearchCOLOR_DESC()" /> 
-                                <div style="height:200px;width:650px; overflow:scroll">
+                            <td align="left">關鍵字:<input type="text" id="txtSearchCOLOR_DESC"><input type="button" value="查詢" onclick="onSearchCOLOR_DESC()" />
+                                <div style="height: 200px; width: 650px; overflow: scroll">
                                     <table class="table">
                                         <tr>
-                                             <th>
-                                                	
-                                            </th>
+                                            <th></th>
                                             <th>COLOR_GROUP	
 												</th>
-                                                <th>COLOR_DESC	
+                                            <th>COLOR_DESC	
 												</th>
-                                                <th>CUST_COLOR_WAY	
+                                            <th>CUST_COLOR_WAY	
 												</th>
-												<th>ERP_COLORID
+                                            <th>ERP_COLORID
 												</th>
                                         </tr>
                                         <tbody id="tblCOLOR_DESC"></tbody>
@@ -144,7 +140,10 @@
                         <tr>
                             <td align="left">更改
                             </td>
-                            <td align="left">
+                            <td align="left">學習選取:<select id="dlLearnmgrItem" class="form-control" onchange="dlLearnmgrItem_change()">
+                                <option value="">---</option>
+                            </select>
+                                <br>
                                 <textarea id="editText" class="form-control"></textarea>
                             </td>
                         </tr>
@@ -173,13 +172,13 @@
                 <%=script %>
 
             window.addEventListener('keydown', function (e) {
-				if (e.keyIdentifier == 'U+000A' || e.keyIdentifier == 'Enter' || e.keyCode == 13) {
-					if (e.target.nodeName == 'INPUT' && e.target.type == 'text') {
-						e.preventDefault();
-						return false;
-					}
-				}
-			}, true);
+                if (e.keyIdentifier == 'U+000A' || e.keyIdentifier == 'Enter' || e.keyCode == 13) {
+                    if (e.target.nodeName == 'INPUT' && e.target.type == 'text') {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+            }, true);
         });
         var objTd;
         var saveUrl = "";
@@ -247,7 +246,7 @@
                 MAT_ID = "";
 
                 $('#rowCompareSupplierArticle').hide();
-                
+
             }
 
             orgUrl = "Lu_BOM.ashx?fun=get_org"
@@ -260,9 +259,58 @@
                 $('#rowCompareColor').show();
             }
 
+            $('#dlLearnmgrItem').html('<option value="">請選擇</option>');
+
+            let style = $('#<%=hidStyle.ClientID %>').val();
+            let data = {
+                orgId: orgId,
+                col: saveCol,
+                style: style,
+            };
+            $.ajax({
+                type: "POST",
+                url: "Lu_BOM.ashx?fun=get_LearnmgrItem",
+                data: data,
+                dataType: 'json',
+                success: function (res) {
+
+                    let html = "<option value=''>請選擇</option>";
+                    for (let i in res) {
+                        html += "<option value='" + res[i].termname + "'>" + res[i].termname + "</option>";
+                    }
+
+                    $("#dlLearnmgrItem").html(html);
+
+                    if (res.length == 1) {
+
+                        $("#dlLearnmgrItem").val(res[0].termname);
+
+                        let editText = $('#editText').val();
+
+                        if (!editText)
+                            $('#editText').val(res[0].termname);
+                    }
+
+
+
+                },
+                complete: function () {
+
+                },
+                error: function (error) {
+                    alert("失敗");
+                }
+            });
+
 
             $('#addModalTitle').text('編輯');
             $('#addModal').modal('show')
+        }
+
+        function dlLearnmgrItem_change() {
+
+            let termname = $("#dlLearnmgrItem").val();
+            $('#editText').val(termname);
         }
 
         function editSizeTable(td) {
@@ -283,6 +331,51 @@
 
             getOrgTest();
             getChNote("lustid");
+
+
+            $('#dlLearnmgrItem').html('<option value="">請選擇</option>');
+
+            let style = $('#<%=hidStyle.ClientID %>').val();
+            let data = {
+                orgId: orgId,
+                col: saveCol,
+                style: style,
+            };
+            $.ajax({
+                type: "POST",
+                url: "Lu_SizeTable.ashx?fun=get_LearnmgrItem",
+                data: data,
+                dataType: 'json',
+                success: function (res) {
+
+                    let html = "<option value=''>請選擇</option>";
+                    for (let i in res) {
+                        html += "<option value='" + res[i].termname + "'>" + res[i].termname + "</option>";
+                    }
+
+                    $("#dlLearnmgrItem").html(html);
+
+                    if (res.length == 1) {
+
+                        $("#dlLearnmgrItem").val(res[0].termname);
+
+                        let editText = $('#editText').val();
+
+                        if (!editText)
+                            $('#editText').val(res[0].termname);
+                    }
+
+
+
+                },
+                complete: function () {
+
+                },
+                error: function (error) {
+                    alert("失敗");
+                }
+            });
+
             $('#addModalTitle').text('編輯');
             $('#addModal').modal('show')
         }
@@ -367,6 +460,7 @@
             let orgtext = $('#orgText').val();
             let text = $('#editText').val();
             let note = $('#noteText').val();
+            let style = $('#<%=hidStyle.ClientID %>').val();
 
             //Lu_BOM
             let PARTS_TYPE = $('#dlPARTS_TYPE').val();
@@ -377,18 +471,28 @@
 
             if (saveCol == 'StandardPlacement' || saveCol == 'Placement' || saveCol == 'SupplierArticle' || saveCol == 'Supplier' || saveCol == 'Name' || saveCol == 'Criticality'
                 || saveCol == 'B1' || saveCol == 'B2' || saveCol == 'B3' || saveCol == 'B4' || saveCol == 'B5' || saveCol == 'B6' || saveCol == 'B7' || saveCol == 'B8' || saveCol == 'B9' || saveCol == 'B10') {
-            //if (isSaveRecord) {
+                //if (isSaveRecord) {
 
                 if (confirm('改的內容是否紀錄至詞庫')) {
                     isRecord = 1;
                 }
             }
 
+            if (saveCol == 'Name' || saveCol == 'HTMInstruction') {
+                //if (isSaveRecord) {
+
+                if (confirm('改的內容是否紀錄至詞庫')) {
+                    isRecord = 1;
+                }
+            }
+
+
             let data = {
                 orgId: orgId,
                 id: saveId,
+                style: style,
                 col: saveCol,
-                colorCol:saveColorCol,
+                colorCol: saveColorCol,
                 text: text,
                 chNote: note,
 
@@ -408,7 +512,7 @@
                 dataType: 'json',
                 success: function (res) {
 
-                    if (isRecord==1 && res.learnmgrItem != 1) {
+                    if (isRecord == 1 && res.learnmgrItem != 1) {
                         alert('內容已存在於詞庫');
                     }
 
@@ -540,7 +644,7 @@
                 });
             }
 
-           
+
 
         }
 
@@ -646,7 +750,7 @@
             $("#dlPARTS_DESC").html('');
             $("#dlMAT_ID").html('');
 
-           
+
             let PARTS_TYPE = $('#dlPARTS_TYPE').val();
 
             getPARTS_CODE(PARTS_TYPE);
@@ -657,7 +761,7 @@
             $("#dlPARTS_DESC").html('');
             $("#dlMAT_ID").html('');
 
-            
+
             let PARTS_TYPE = $('#dlPARTS_TYPE').val();
             let PARTS_CODE = $('#dlPARTS_CODE').val();
 

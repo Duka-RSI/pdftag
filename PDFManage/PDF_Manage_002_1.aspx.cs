@@ -131,6 +131,8 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                 string generateddate = dt.Rows[0]["generateddate"].ToString();
                 bool isEditHeader = (dt.Rows[0]["isEdit"].ToString().ToLower() == "true" ? true : false);
 
+                hidStyle.Value = style;
+
                 DataRow[] drOrgHeades = dtLu_Header_Org.Select("luhid='" + org_luhid + "'");
 
                 if (isEditHeader)
