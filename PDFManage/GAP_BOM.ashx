@@ -230,12 +230,12 @@ public class Passport : IHttpHandler, IRequiresSessionState
                 string sFirstCharTermname_org = resLu_BOM_Org.TextOrg.Substring(0, 1);
                 string sTermname_org = resLu_BOM_Org.TextOrg.Trim().Replace(" ", "").ToLower();
 
-                sSql = @"IF NOT Exists (select * from PDFTAG.dbo.GAP_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and FirstCharTermname_org=@FirstCharTermname_org and termname_org=@termname_org and style=@style )
+                sSql = @"IF NOT Exists (select * from PDFTAG.dbo.GAP_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and FirstCharTermname_org=@FirstCharTermname_org and termname_org=@termname_org and termname=@termname and style=@style )
                              begin
                                   insert into PDFTAG.dbo.GAP_LearnmgrItem
-                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,style,creator,creatordate)
+                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,style,colorname,Ctermname,creator,creatordate)
                                     values 
-                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@style,@creator,@creatordate)
+                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@style,@colorname,@Ctermname,@creator,@creatordate)
                               end 
                             --- else 
                             ---    begin
@@ -250,7 +250,10 @@ public class Passport : IHttpHandler, IRequiresSessionState
                     //20220803 不會針對0002-WHT做判斷，只會針對White的內容做取代，並顯示 修: PreWhite。trm 也有一個 0002-WHT。點[學習]後，不會把 DTM 變成 PreWhite
                     col = "GarmentColor";
                 }
-
+                else
+                {
+                    colorCol = "";
+                }
 
                 iCntLearnmgrItem = cn.Execute(sSql, new
                 {
@@ -260,6 +263,8 @@ public class Passport : IHttpHandler, IRequiresSessionState
                     termname_org = sTermname_org,
                     termname = text,
                     style = style,
+                    colorname = colorCol,
+                    Ctermname = chNote,
                     creator = LoginUser.PK,
                     creatordate = dtNow.ToString("yyyy/MM/dd HH:mm:ss"),
                     UpdateUser = LoginUser.PK,

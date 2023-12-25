@@ -321,6 +321,7 @@
 		var PARTS_CODE = "";
 		var PARTS_DESC = "";
 		var MAT_ID = "";
+		var arrLearnmgrItem = [];
 
 
 		function editHeader(td) {
@@ -413,7 +414,9 @@
                 url: "UA_BOM.ashx?fun=get_LearnmgrItem",
                 data: data,
                 dataType: 'json',
-                success: function (res) {
+				success: function (res) {
+
+					arrLearnmgrItem = res;
 
                     let html = "<option value=''>請選擇</option>";
                     for (let i in res) {
@@ -671,6 +674,8 @@
                 dataType: 'json',
                 success: function (res) {
 
+					arrLearnmgrItem = res;
+
                     let html = "<option value=''>請選擇</option>";
                     for (let i in res) {
                         html += "<option value='" + res[i].termname + "'>" + res[i].termname + "</option>";
@@ -794,22 +799,24 @@
 			let MAT_ID = $('#dlMAT_ID').val();
 
 			let isRecord = 0;
+			let isExisted = arrLearnmgrItem.find(x => x.termname == text);
 
-			if (saveCol == 'Usage' || saveCol == 'SupplierArticle' || saveCol == 'B1' || saveCol == 'B2' || saveCol == 'B3' || saveCol == 'B4' || saveCol == 'B5' || saveCol == 'B6' || saveCol == 'B7' || saveCol == 'B8' || saveCol == 'B9' || saveCol == 'B10') {
-				//if (isSaveRecord) {
+			if (!isExisted) {
+				if (saveCol == 'Usage' || saveCol == 'SupplierArticle' || saveCol == 'B1' || saveCol == 'B2' || saveCol == 'B3' || saveCol == 'B4' || saveCol == 'B5' || saveCol == 'B6' || saveCol == 'B7' || saveCol == 'B8' || saveCol == 'B9' || saveCol == 'B10') {
+					//if (isSaveRecord) {
 
-				if (confirm('改的內容是否紀錄至詞庫')) {
-					isRecord = 1;
+					if (confirm('改的內容是否紀錄至詞庫')) {
+						isRecord = 1;
+					}
+				}
+				else if (saveCol == 'Code' || saveCol == 'Description') {
+					//if (isSaveRecord) {
+
+					if (confirm('改的內容是否紀錄至詞庫')) {
+						isRecord = 1;
+					}
 				}
 			}
-
-            if (saveCol == 'Code' || saveCol == 'Description') {
-                //if (isSaveRecord) {
-
-                if (confirm('改的內容是否紀錄至詞庫')) {
-                    isRecord = 1;
-                }
-            }
 
 			let data = {
 				orgId: orgId,
@@ -900,7 +907,7 @@
 				success: function (res) {
 
 					if (isRecord == 1 && res.learnmgrItem != 1) {
-						alert('內容已存在於詞庫');
+						//alert('內容已存在於詞庫');
 					}
 
 					if (res.data == 1) {

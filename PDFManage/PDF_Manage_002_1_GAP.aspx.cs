@@ -856,9 +856,9 @@ values
 
 			using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
 			{
-				sSql = "select * from PDftag.dbo.GAP_LearnmgrItem  \n";
+				sSql = "select * from PDftag.dbo.GAP_LearnmgrItem where style=@style order by creatordate \n";
 
-				arrGAP_LearnmgrItemDto = cn.Query<GAP_LearnmgrItemDto>(sSql, new { }).ToList();
+				arrGAP_LearnmgrItemDto = cn.Query<GAP_LearnmgrItemDto>(sSql, new { style = hidStyle.Value }).ToList();
 			}
 
 
@@ -957,7 +957,7 @@ values
 						switch (a)
 						{
 							case 1:
-								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A1
+								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A1
 			  && x.Termname_org == B1.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
@@ -968,7 +968,7 @@ values
 								break;
 
 							case 2:
-								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A2
+								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A2
 			  && x.Termname_org == B2.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
@@ -979,7 +979,7 @@ values
 								break;
 
 							case 3:
-								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A3
+								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A3
 			  && x.Termname_org == B3.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
@@ -990,7 +990,7 @@ values
 								break;
 
 							case 4:
-								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A4
+								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A4
 			  && x.Termname_org == B4.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
@@ -1000,7 +1000,7 @@ values
 								}
 								break;
 							case 5:
-								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A5
+								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A5
 			  && x.Termname_org == B5.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
@@ -1010,7 +1010,7 @@ values
 								}
 								break;
 							case 6:
-								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A6
+								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A6
 			  && x.Termname_org == B6.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
@@ -1020,7 +1020,7 @@ values
 								}
 								break;
 							case 7:
-								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A7
+								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A7
 			  && x.Termname_org == B7.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
@@ -1030,7 +1030,7 @@ values
 								}
 								break;
 							case 8:
-								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A8
+								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A8
 			  && x.Termname_org == B8.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
@@ -1040,7 +1040,7 @@ values
 								}
 								break;
 							case 9:
-								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A9
+								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A9
 			  && x.Termname_org == B9.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
@@ -1050,7 +1050,7 @@ values
 								}
 								break;
 							case 10:
-								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A10
+								res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A10
 			  && x.Termname_org == B10.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)

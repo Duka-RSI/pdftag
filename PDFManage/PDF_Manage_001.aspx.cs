@@ -18,7 +18,6 @@ using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-using NPOI.HSSF.UserModel;
 using NPOI.SS.Util;
 
 public partial class Passport_Passport_A000 : System.Web.UI.Page
@@ -280,12 +279,12 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
             Delete(e.CommandArgument.ToString());
             DataBind();
         }
-        if ("parsePDF" == e.CommandName)
+        else if ("parsePDF" == e.CommandName)
         {
             ParsePDF(e.CommandArgument.ToString());
             DataBind();
         }
-        if ("parsePDF_GAP" == e.CommandName)
+        else if("parsePDF_GAP" == e.CommandName)
         {
             string gaptype = PaseGAP_Header(e.CommandArgument.ToString());
 
@@ -304,7 +303,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
             DataBind();
         }
-        if ("parsePDF_UA" == e.CommandName)
+        else if("parsePDF_UA" == e.CommandName)
         {
             isChina = false;
             PaseUA_Header(e.CommandArgument.ToString());
@@ -313,12 +312,12 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
             Add_PDF_Manage_002_UA(e.CommandArgument.ToString());
             DataBind();
         }
-        if ("parsePDF_All" == e.CommandName)
+        else if("parsePDF_All" == e.CommandName)
         {
             ParsePDF_All(e.CommandArgument.ToString());
             DataBind();
         }
-        if ("parseExcel_All" == e.CommandName)
+        else if("parseExcel_All" == e.CommandName)
         {
             ParseExcel_All(e.CommandArgument.ToString());
             DataBind();
@@ -1076,7 +1075,7 @@ values
                                             arrLu_SizeTableDtos.Add(new Lu_SizeTableDto()
                                             {
                                                 rowid = iRowid,
-                                                codeid = arrRowValue[0].Trim(),
+                                                codeid = arrRowValue[0].Trim().Replace("\r","").Replace("\n", "").Replace(" ", ""),
                                                 Name = arrRowValue[1].Trim(),
                                                 Criticality = arrRowValue[2].Trim(),
                                                 TolA = arrRowValue[3].Trim(),
@@ -1106,7 +1105,7 @@ values
                                             arrLu_SizeTableDtos.Add(new Lu_SizeTableDto()
                                             {
                                                 rowid = iRowid,
-                                                codeid = arrRowValue[0].Trim(),
+                                                codeid = arrRowValue[0].Trim().Replace("\r", "").Replace("\n", "").Replace(" ", ""),
                                                 Name = arrRowValue[1].Trim(),
                                                 Criticality = arrRowValue[2].Trim(),
                                                 TolA = arrRowValue[3].Trim(),

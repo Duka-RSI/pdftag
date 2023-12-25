@@ -192,7 +192,7 @@
         var PARTS_CODE = "";
         var PARTS_DESC = "";
         var MAT_ID = "";
-
+        var arrLearnmgrItem = [];
 
         function editHeader(td) {
             let text = $(td).find('span:first').text();
@@ -274,9 +274,11 @@
                 dataType: 'json',
                 success: function (res) {
 
+                    arrLearnmgrItem = res;
+
                     let html = "<option value=''>請選擇</option>";
                     for (let i in res) {
-                        html += "<option value='" + res[i].termname + "'>" + res[i].termname + "</option>";
+                        html += "<option value='" + res[i].termname + "'>" + res[i].style + " - "+ res[i].termname + "</option>";
                     }
 
                     $("#dlLearnmgrItem").html(html);
@@ -347,6 +349,8 @@
                 data: data,
                 dataType: 'json',
                 success: function (res) {
+
+                    arrLearnmgrItem = res;
 
                     let html = "<option value=''>請選擇</option>";
                     for (let i in res) {
@@ -468,21 +472,24 @@
             let PARTS_DESC = $('#dlPARTS_DESC').val();
             let MAT_ID = $('#dlMAT_ID').val();
             let isRecord = 0;
+            let isExisted = arrLearnmgrItem.find(x=>x.termname == text)
 
-            if (saveCol == 'StandardPlacement' || saveCol == 'Placement' || saveCol == 'SupplierArticle' || saveCol == 'Supplier' || saveCol == 'Name' || saveCol == 'Criticality'
-                || saveCol == 'B1' || saveCol == 'B2' || saveCol == 'B3' || saveCol == 'B4' || saveCol == 'B5' || saveCol == 'B6' || saveCol == 'B7' || saveCol == 'B8' || saveCol == 'B9' || saveCol == 'B10') {
-                //if (isSaveRecord) {
+            if (!isExisted) {
 
-                if (confirm('改的內容是否紀錄至詞庫')) {
-                    isRecord = 1;
+                if (saveCol == 'StandardPlacement' || saveCol == 'Placement' || saveCol == 'SupplierArticle' || saveCol == 'Supplier' || saveCol == 'Name' || saveCol == 'Criticality'
+                    || saveCol == 'B1' || saveCol == 'B2' || saveCol == 'B3' || saveCol == 'B4' || saveCol == 'B5' || saveCol == 'B6' || saveCol == 'B7' || saveCol == 'B8' || saveCol == 'B9' || saveCol == 'B10') {
+                    //if (isSaveRecord) {
+
+                    if (confirm('改的內容是否紀錄至詞庫')) {
+                        isRecord = 1;
+                    }
                 }
-            }
+                else if (saveCol == 'HTMInstruction') {
+                    //if (isSaveRecord) {
 
-            if (saveCol == 'Name' || saveCol == 'HTMInstruction') {
-                //if (isSaveRecord) {
-
-                if (confirm('改的內容是否紀錄至詞庫')) {
-                    isRecord = 1;
+                    if (confirm('改的內容是否紀錄至詞庫')) {
+                        isRecord = 1;
+                    }
                 }
             }
 
@@ -513,7 +520,7 @@
                 success: function (res) {
 
                     if (isRecord == 1 && res.learnmgrItem != 1) {
-                        alert('內容已存在於詞庫');
+                        //alert('內容已存在於詞庫');
                     }
 
                     if (res.data == 1) {

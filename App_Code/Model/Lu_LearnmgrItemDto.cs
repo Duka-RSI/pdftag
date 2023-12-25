@@ -11,6 +11,7 @@ public class Lu_LearnmgrItemDto
     public long liid { get; set; }
     public string ColSource { get; set; }
     public string ColName { get; set; }
+    public string ColorName { get; set; }
     public string FirstCharTermname_org { get; set; }
     public string Termname_org { get; set; }
     public string Termname { get; set; }
