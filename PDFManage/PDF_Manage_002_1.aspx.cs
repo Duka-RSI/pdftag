@@ -625,7 +625,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
     public string Compare(string org, string newText, string note, bool IsMapping = true)
     {
         if (org == newText)
-            if (string.IsNullOrEmpty(note))
+            if(string.IsNullOrEmpty(note))
                 return org;
             else
                 return "<font>原:" + org + "</font><br><font color='blue'>中:" + note + "</font>";
@@ -813,9 +813,9 @@ values
 
             using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
             {
-                sSql = "select * from PDftag.dbo.Lu_LearnmgrItem where style=@style order by creatordate  \n";
+                sSql = "select * from PDftag.dbo.Lu_LearnmgrItem  \n";
 
-                arrLu_LearnmgrItemDto = cn.Query<Lu_LearnmgrItemDto>(sSql, new { style = hidStyle.Value }).ToList();
+                arrLu_LearnmgrItemDto = cn.Query<Lu_LearnmgrItemDto>(sSql, new { }).ToList();
             }
 
 
@@ -912,21 +912,21 @@ values
                     for (int a = 1; a <= 10; a++)
                     {
                         //20220803 不會針對0002-WHT做判斷，只會針對White的內容做取代，並顯示 修: PreWhite。trm 也有一個 0002-WHT。點[學習]後，不會把 DTM 變成 PreWhite
-                        //A1 = "GarmentColor";
-                        //A2 = "GarmentColor";
-                        //A3 = "GarmentColor";
-                        //A4 = "GarmentColor";
-                        //A5 = "GarmentColor";
-                        //A6 = "GarmentColor";
-                        //A7 = "GarmentColor";
-                        //A8 = "GarmentColor";
-                        //A9 = "GarmentColor";
-                        //A10 = "GarmentColor";
+                        A1 = "GarmentColor";
+                        A2 = "GarmentColor";
+                        A3 = "GarmentColor";
+                        A4 = "GarmentColor";
+                        A5 = "GarmentColor";
+                        A6 = "GarmentColor";
+                        A7 = "GarmentColor";
+                        A8 = "GarmentColor";
+                        A9 = "GarmentColor";
+                        A10 = "GarmentColor";
 
                         switch (a)
                         {
                             case 1:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A1
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A1
               && x.Termname_org == B1.Trim().Replace(" ", "").ToLower());
 
                                 //if (B1 == "White")
@@ -943,7 +943,7 @@ values
                                 break;
 
                             case 2:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A2
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A2
               && x.Termname_org == B2.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -955,7 +955,7 @@ values
                                 break;
 
                             case 3:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A3
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A3
               && x.Termname_org == B3.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -967,7 +967,7 @@ values
                                 break;
 
                             case 4:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A4
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A4
               && x.Termname_org == B4.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -978,7 +978,7 @@ values
                                 }
                                 break;
                             case 5:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A5
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A5
               && x.Termname_org == B5.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -989,7 +989,7 @@ values
                                 }
                                 break;
                             case 6:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A6
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A6
               && x.Termname_org == B6.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -1000,7 +1000,7 @@ values
                                 }
                                 break;
                             case 7:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A7
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A7
               && x.Termname_org == B7.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -1011,7 +1011,7 @@ values
                                 }
                                 break;
                             case 8:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A8
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A8
               && x.Termname_org == B8.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -1022,7 +1022,7 @@ values
                                 }
                                 break;
                             case 9:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A9
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A9
               && x.Termname_org == B9.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -1033,7 +1033,7 @@ values
                                 }
                                 break;
                             case 10:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor" && x.ColorName == A10
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A10
               && x.Termname_org == B10.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -1055,7 +1055,7 @@ values
                         bool isEdit = false;
 
                         //if (isUpdateColor)
-                        isEdit = true;
+                            isEdit = true;
 
                         sSql = "update PDFTAG.dbo.Lu_BOM \n";
                         sSql += "set  StandardPlacement=@StandardPlacement,Placement=@Placement,SupplierArticle=@SupplierArticle,Supplier=@Supplier           \n";
@@ -1080,7 +1080,7 @@ values
                         cm.Parameters.AddWithValue("@B10", B10);
                         cm.Parameters.AddWithValue("@isEdit", isEdit ? 1 : 0);
                         cm.ExecuteNonQuery();
-
+                        
                     }
 
                     //先不用，mark起來
@@ -1245,9 +1245,9 @@ values
                 //確認是否已有備註
                 string sqlNote = "";
                 if (_colSoruce == "BOM")
-                    sqlNote = "select * from Lu_Ch_Note a where a.IdName='lubid' and a.ColName = '" + _colName + "' and a.Id = " + _id;
+                    sqlNote = "select * from Lu_Ch_Note a where a.IdName='lubid' and a.ColName = '"+ _colName + "' and a.Id = " + _id;
                 else if (_colSoruce == "Size")
-                    sqlNote = "select * from Lu_Ch_Note a where a.IdName='lustid' and a.ColName = '" + _colName + "' and a.Id = " + _id;
+                    sqlNote = "select * from Lu_Ch_Note a where a.IdName='lustid' and a.ColName = '"+ _colName + "' and a.Id = " + _id;
                 cm.CommandText = sqlNote;
                 cm.Parameters.Clear();
                 DataTable dtNote = new DataTable();
@@ -1263,9 +1263,9 @@ values
                                 (@IdName,@id,@ColName,@note,@creator,@createordate) ";
                     cm.CommandText = newNoteSql;
                     cm.Parameters.Clear();
-                    if (_colSoruce == "BOM")
+                    if(_colSoruce == "BOM")
                         cm.Parameters.AddWithValue("@IdName", "lubid");
-                    else if (_colSoruce == "Size")
+                    else if(_colSoruce == "Size")
                         cm.Parameters.AddWithValue("@IdName", "lustid");
                     cm.Parameters.AddWithValue("@id", _id);
                     cm.Parameters.AddWithValue("@ColName", _colName);

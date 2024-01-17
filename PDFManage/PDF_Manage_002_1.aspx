@@ -140,9 +140,12 @@
                         <tr>
                             <td align="left">更改
                             </td>
-                            <td align="left">學習選取:<select id="dlLearnmgrItem" class="form-control" onchange="dlLearnmgrItem_change()">
-                                <option value="">---</option>
-                            </select>
+                            <td align="left">
+                                <div id="div_LearnmgrItem">
+                                    學習選取:<select id="dlLearnmgrItem" class="form-control" onchange="dlLearnmgrItem_change()">
+                                        <option value="">---</option>
+                                    </select>
+                                </div>
                                 <br>
                                 <textarea id="editText" class="form-control"></textarea>
                             </td>
@@ -151,6 +154,11 @@
                             <td align="left">中文備註
                             </td>
                             <td align="left">
+                                <div id="div_LearnmgrNote">
+                                    學習選取:<select id="dlLearnmgrNote" class="form-control" onchange="dlLearnmgrNote_change()">
+                                    </select>
+                                </div>
+                                <br>
                                 <textarea id="noteText" class="form-control"></textarea>
                             </td>
                         </tr>
@@ -192,7 +200,7 @@
         var PARTS_CODE = "";
         var PARTS_DESC = "";
         var MAT_ID = "";
-        var arrLearnmgrItem = [];
+
 
         function editHeader(td) {
             let text = $(td).find('span:first').text();
@@ -259,85 +267,20 @@
                 $('#rowCompareColor').show();
             }
 
-            $('#dlLearnmgrItem').html('<option value="">請選擇</option>');
-
+            
             let style = $('#<%=hidStyle.ClientID %>').val();
-            let data = {
-                orgId: orgId,
-                col: saveCol,
-                style: style,
-            };
-            $.ajax({
-                type: "POST",
-                url: "Lu_BOM.ashx?fun=get_LearnmgrItem",
-                data: data,
-                dataType: 'json',
-                success: function (res) {
-
-                    arrLearnmgrItem = res;
-
-                    let html = "<option value=''>請選擇</option>";
-                    for (let i in res) {
-                        html += "<option value='" + res[i].termname + "'>" + res[i].style + " - "+ res[i].termname + "</option>";
-                    }
-
-                    $("#dlLearnmgrItem").html(html);
-
-                    if (res.length == 1) {
-
-                        $("#dlLearnmgrItem").val(res[0].termname);
-
-                        let editText = $('#editText').val();
-
-                        if (!editText)
-                            $('#editText').val(res[0].termname);
-                    }
-
-
-
-                },
-                complete: function () {
-
-                },
-                error: function (error) {
-                    alert("失敗");
-                }
-            });
+            set_dlLearnmgrItem('LU_BOM', orgId, saveCol, style);
+            set_dlLearnmgrNote('LU_BOM', orgId, saveCol, style);
 
 
             $('#addModalTitle').text('編輯');
             $('#addModal').modal('show')
         }
 
-        function dlLearnmgrItem_change() {
-
-            let termname = $("#dlLearnmgrItem").val();
-            $('#editText').val(termname);
-        }
-
-        function editSizeTable(td) {
-            let text = $(td).find('span:first').text();
-            //$('#editText').val(text);
-
-            $('#rowCompareSupplierArticle').hide();
-            $('#rowCompareColor').hide();
-
-            objTd = $(td);
-            saveUrl = "Lu_SizeTable.ashx?fun=saveByCol"
-            saveId = $(td).attr('data-lustid');
-            saveCol = $(td).attr('data-col');
-            isSaveRecord = false;
-
-            orgUrl = "Lu_SizeTable.ashx?fun=get_org"
-            orgId = $(td).attr('data-org_lustid');
-
-            getOrgTest();
-            getChNote("lustid");
-
+        function set_dlLearnmgrItem(type, orgId, saveCol, style) {
 
             $('#dlLearnmgrItem').html('<option value="">請選擇</option>');
 
-            let style = $('#<%=hidStyle.ClientID %>').val();
             let data = {
                 orgId: orgId,
                 col: saveCol,
@@ -345,12 +288,10 @@
             };
             $.ajax({
                 type: "POST",
-                url: "Lu_SizeTable.ashx?fun=get_LearnmgrItem",
+                url: type + ".ashx?fun=get_LearnmgrItem",
                 data: data,
                 dataType: 'json',
                 success: function (res) {
-
-                    arrLearnmgrItem = res;
 
                     let html = "<option value=''>請選擇</option>";
                     for (let i in res) {
@@ -379,6 +320,100 @@
                     alert("失敗");
                 }
             });
+        }
+
+        function set_dlLearnmgrNote(type, orgId, saveCol, style) {
+
+            $('#dlLearnmgrNote').html('<option value="">請選擇</option>');
+
+            let data = {
+                orgId: orgId,
+                col: saveCol,
+                style: style,
+            };
+            $.ajax({
+                type: "POST",
+                url: type + ".ashx?fun=get_LearnmgrItem",
+                data: data,
+                dataType: 'json',
+                success: function (res) {
+
+                    let html = "<option value=''>請選擇</option>";
+                    for (let i in res) {
+
+                        if (res[i].Ctermname) {
+                            html += "<option value='" + res[i].Ctermname + "'>" + res[i].Ctermname + "</option>";
+                        }
+
+
+                    }
+
+                    $("#dlLearnmgrNote").html(html);
+
+                    if (res.length == 1) {
+
+                        $("#dlLearnmgrNote").val(res[0].Ctermname);
+
+                        let noteText = $('#noteText').val();
+
+                        if (!noteText)
+                            $('#noteText').val(res[0].Ctermname);
+                    }
+
+
+
+                },
+                complete: function () {
+
+                },
+                error: function (error) {
+                    alert("失敗");
+                }
+            });
+        }
+        function dlLearnmgrItem_change() {
+
+            let termname = $("#dlLearnmgrItem").val();
+            $('#editText').val(termname);
+        }
+        function dlLearnmgrNote_change() {
+
+            let termname = $("#dlLearnmgrNote").val();
+            $('#noteText').val(termname);
+        }
+
+        function editSizeTable(td) {
+            let text = $(td).find('span:first').text();
+            //$('#editText').val(text);
+
+            $('#rowCompareSupplierArticle').hide();
+            $('#rowCompareColor').hide();
+
+            objTd = $(td);
+            saveUrl = "Lu_SizeTable.ashx?fun=saveByCol"
+            saveId = $(td).attr('data-lustid');
+            saveCol = $(td).attr('data-col');
+            isSaveRecord = false;
+
+            orgUrl = "Lu_SizeTable.ashx?fun=get_org"
+            orgId = $(td).attr('data-org_lustid');
+
+            getOrgTest();
+            getChNote("lustid");
+
+
+            $('#dlLearnmgrItem').html('<option value="">請選擇</option>');
+
+            if (saveCol == "codeid") {
+                $('#div_LearnmgrItem').hide();
+            } else {
+                $('#div_LearnmgrItem').show();
+            }
+
+            let style = $('#<%=hidStyle.ClientID %>').val();
+            set_dlLearnmgrItem('Lu_SizeTable', orgId, saveCol, style);
+            set_dlLearnmgrNote('Lu_SizeTable', orgId, saveCol, style);
+
 
             $('#addModalTitle').text('編輯');
             $('#addModal').modal('show')
@@ -472,24 +507,21 @@
             let PARTS_DESC = $('#dlPARTS_DESC').val();
             let MAT_ID = $('#dlMAT_ID').val();
             let isRecord = 0;
-            let isExisted = arrLearnmgrItem.find(x=>x.termname == text)
 
-            if (!isExisted) {
+            if (saveCol == 'StandardPlacement' || saveCol == 'Placement' || saveCol == 'SupplierArticle' || saveCol == 'Supplier' || saveCol == 'Name' || saveCol == 'Criticality'
+                || saveCol == 'B1' || saveCol == 'B2' || saveCol == 'B3' || saveCol == 'B4' || saveCol == 'B5' || saveCol == 'B6' || saveCol == 'B7' || saveCol == 'B8' || saveCol == 'B9' || saveCol == 'B10') {
+                //if (isSaveRecord) {
 
-                if (saveCol == 'StandardPlacement' || saveCol == 'Placement' || saveCol == 'SupplierArticle' || saveCol == 'Supplier' || saveCol == 'Name' || saveCol == 'Criticality'
-                    || saveCol == 'B1' || saveCol == 'B2' || saveCol == 'B3' || saveCol == 'B4' || saveCol == 'B5' || saveCol == 'B6' || saveCol == 'B7' || saveCol == 'B8' || saveCol == 'B9' || saveCol == 'B10') {
-                    //if (isSaveRecord) {
-
-                    if (confirm('改的內容是否紀錄至詞庫')) {
-                        isRecord = 1;
-                    }
+                if (confirm('改的內容是否紀錄至詞庫')) {
+                    isRecord = 1;
                 }
-                else if (saveCol == 'HTMInstruction') {
-                    //if (isSaveRecord) {
+            }
 
-                    if (confirm('改的內容是否紀錄至詞庫')) {
-                        isRecord = 1;
-                    }
+            if (saveCol == 'Name' || saveCol == 'HTMInstruction') {
+                //if (isSaveRecord) {
+
+                if (confirm('改的內容是否紀錄至詞庫')) {
+                    isRecord = 1;
                 }
             }
 
@@ -520,7 +552,7 @@
                 success: function (res) {
 
                     if (isRecord == 1 && res.learnmgrItem != 1) {
-                        //alert('內容已存在於詞庫');
+                        alert('內容已存在於詞庫');
                     }
 
                     if (res.data == 1) {
