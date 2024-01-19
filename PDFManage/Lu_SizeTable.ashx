@@ -289,7 +289,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
             int iCntLearnmgrItem = 0;
 
-            if (isRecord == "1" && resLu_SizeTable_Org.TextOrg != text)
+            if (isRecord == "1")
             {
                 string sFirstCharTermname_org = resLu_SizeTable_Org.TextOrg.Substring(0, 1);
                 string sTermname_org = resLu_SizeTable_Org.TextOrg.Trim().Replace(" ", "").ToLower();

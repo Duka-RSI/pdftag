@@ -154,7 +154,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
             if(PublicFunction.arrLuBomColors.Contains(col))
                 col = "GarmentColor";
 
-            sSql = "select * from PDFTAG.dbo.Lu_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and termname_org=@termname_org and style=@style \n";
+            sSql = "select * from PDFTAG.dbo.Lu_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and termname_org=@termname_org \n";
             var list = cn.Query(sSql, new
             {
                 ColSource = "BOM",
@@ -248,7 +248,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
             int iCntLearnmgrItem = 0;
 
-            if (isRecord == "1" && resLu_BOM_Org.TextOrg != text)
+            if (isRecord == "1")
             {
                 string sFirstCharTermname_org = resLu_BOM_Org.TextOrg.Substring(0, 1);
                 string sTermname_org = resLu_BOM_Org.TextOrg.Trim().Replace(" ", "").ToLower();

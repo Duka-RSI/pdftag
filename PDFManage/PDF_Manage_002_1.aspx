@@ -516,8 +516,7 @@
                     isRecord = 1;
                 }
             }
-
-            if (saveCol == 'Name' || saveCol == 'HTMInstruction') {
+            else if (saveCol == 'HTMInstruction') {
                 //if (isSaveRecord) {
 
                 if (confirm('改的內容是否紀錄至詞庫')) {
