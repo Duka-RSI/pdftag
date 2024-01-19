@@ -155,7 +155,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
                 col = "GarmentColor";
 
 
-            sSql = "select * from PDFTAG.dbo.GAP_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and termname_org=@termname_org and style=@style \n";
+            sSql = "select * from PDFTAG.dbo.GAP_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and termname_org=@termname_org  \n";
             var list = cn.Query(sSql, new
             {
                 ColSource = "BOM",

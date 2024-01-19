@@ -173,7 +173,7 @@ select t.hdid,t.type,bc.lubid,t.tagnum,t.W1,t.W2,t.W3,t.W4,t.W5,t.W6,t.W7,t.W8,t
             if (PublicFunction.arrUABomColors.Contains(col))
                 col = "GarmentColor";
 
-            sSql = "select * from PDFTAG.dbo.UA_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and termname_org=@termname_org and style=@style \n";
+            sSql = "select * from PDFTAG.dbo.UA_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and termname_org=@termname_org  \n";
             var list = cn.Query(sSql, new
             {
                 ColSource = "BOM",
