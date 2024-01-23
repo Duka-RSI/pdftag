@@ -150,6 +150,7 @@ select t.hdid,t.type,bc.lubid,t.tagnum,t.W1,t.W2,t.W3,t.W4,t.W5,t.W6,t.W7,t.W8,t
     public class Text
     {
         public string TextOrg { get; set; }
+        public string usage { get; set; }
 
     }
 
@@ -158,6 +159,7 @@ select t.hdid,t.type,bc.lubid,t.tagnum,t.W1,t.W2,t.W3,t.W4,t.W5,t.W6,t.W7,t.W8,t
         string lubid_org = context.Request["orgId"];
         string col = context.Request["col"];
         string style = context.Request["style"];
+        string learnmgrItem = context.Request["learnmgrItem"];
 
         string sSql = "";
 
@@ -173,13 +175,12 @@ select t.hdid,t.type,bc.lubid,t.tagnum,t.W1,t.W2,t.W3,t.W4,t.W5,t.W6,t.W7,t.W8,t
             if (PublicFunction.arrUABomColors.Contains(col))
                 col = "GarmentColor";
 
-            sSql = "select * from PDFTAG.dbo.UA_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and termname_org=@termname_org  \n";
+            sSql = "select distinct " + learnmgrItem + " from PDFTAG.dbo.UA_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and termname_org=@termname_org  \n";
             var list = cn.Query(sSql, new
             {
                 ColSource = "BOM",
                 ColName = col,
                 termname_org = sTermname_org,
-                style = style,
             }).ToList();
 
             context.Response.Write(JsonConvert.SerializeObject(list));
@@ -207,7 +208,7 @@ select t.hdid,t.type,bc.lubid,t.tagnum,t.W1,t.W2,t.W3,t.W4,t.W5,t.W6,t.W7,t.W8,t
         string sSql = "";
 
 
-        sSql = "select " + col + " as TextOrg  from  PDFTAG.dbo.UA_BOM where lubid=@lubid";
+        sSql = "select " + col + " as TextOrg,usage  from  PDFTAG.dbo.UA_BOM where lubid=@lubid";
 
 
         using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
@@ -246,6 +247,7 @@ select t.hdid,t.type,bc.lubid,t.tagnum,t.W1,t.W2,t.W3,t.W4,t.W5,t.W6,t.W7,t.W8,t
             }
 
             int iCntLearnmgrItem = 0;
+
 
             if (isRecord == "1")
             {
@@ -324,28 +326,43 @@ select t.hdid,t.type,bc.lubid,t.tagnum,t.W1,t.W2,t.W3,t.W4,t.W5,t.W6,t.W7,t.W8,t
 
                     string sFirstCharTermname_org = resLu_BOM_Org.TextOrg.Substring(0, 1);
                     string sTermname_org = resLu_BOM_Org.TextOrg.Trim().Replace(" ", "").ToLower();
+                    string sUsage = "";
+                    string sW1 = "";
+                    string sColorname = "";
 
-                    sSql = @"IF NOT Exists (select * from PDFTAG.dbo.UA_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and FirstCharTermname_org=@FirstCharTermname_org and termname_org=@termname_org and style=@style)
-                             begin
-                                  insert into PDFTAG.dbo.UA_LearnmgrItem
-                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,style,creator,creatordate)
-                                    values 
-                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@style,@creator,@creatordate)
-                              end 
-                            --- else 
-                            ---    begin
-                            ---    update PDFTAG.dbo.UA_LearnmgrItem
-                            ---    set termname=@termname,updateDate=@updateDate,UpdateUser=@UpdateUser 
-                            --- where ColSource=@ColSource and ColName=@ColName and FirstCharTermname_org=@FirstCharTermname_org and termname_org=@termname_org
-                            --- end ";
+
+
 
                     if (col == "B1" || col == "B2" || col == "B3" || col == "B4" || col == "B5" || col == "B6" || col == "B7" || col == "B8" || col == "B9" || col == "B10")
                     {
                         //col = colorCol;
                         //20220803 不會針對0002-WHT做判斷，只會針對White的內容做取代，並顯示 修: PreWhite。trm 也有一個 0002-WHT。點[學習]後，不會把 DTM 變成 PreWhite
                         col = "GarmentColor";
+                        sUsage = resLu_BOM_Org.usage;
+                        sColorname = colorCol;
+
+                        sSql = "select *  from   PDFTAG.dbo.UA_TagData where lubid=@lubid";
+                        DataTable dtUUA_TagData = new DataTable();
+                        using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, cn))
+                        {
+                            cm.CommandText = sSql;
+                            cm.Parameters.AddWithValue("@lubid", lubid);
+                            using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                            {
+                                da.Fill(dtUUA_TagData);
+                            }
+                        }
+
+                        if (dtUUA_TagData.Rows.Count > 0)
+                        {
+                            sW1 = dtUUA_TagData.Rows[0]["W1"].ToString();
+                        }
                     }
 
+                    sSql = @" insert into PDFTAG.dbo.UA_LearnmgrItem
+                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,style,usage,W1,Colorname,creator,creatordate)
+                                    values 
+                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@style,@usage,@W1,@Colorname,@creator,@creatordate)";
 
                     iCntLearnmgrItem = cn.Execute(sSql, new
                     {
@@ -355,6 +372,9 @@ select t.hdid,t.type,bc.lubid,t.tagnum,t.W1,t.W2,t.W3,t.W4,t.W5,t.W6,t.W7,t.W8,t
                         termname_org = sTermname_org,
                         termname = text,
                         style = style,
+                        usage = sUsage,
+                        W1 = sW1,
+                        Colorname = sColorname,
                         creator = LoginUser.PK,
                         creatordate = dtNow.ToString("yyyy/MM/dd HH:mm:ss"),
                         UpdateUser = LoginUser.PK,

@@ -284,7 +284,7 @@
             let data = {
                 orgId: orgId,
                 col: saveCol,
-                style: style,
+                learnmgrItem: "termname"
             };
             $.ajax({
                 type: "POST",
@@ -329,7 +329,7 @@
             let data = {
                 orgId: orgId,
                 col: saveCol,
-                style: style,
+                learnmgrItem: "Ctermname"
             };
             $.ajax({
                 type: "POST",
@@ -550,9 +550,9 @@
                 dataType: 'json',
                 success: function (res) {
 
-                    if (isRecord == 1 && res.learnmgrItem != 1) {
-                        alert('內容已存在於詞庫');
-                    }
+                    //if (isRecord == 1 && res.learnmgrItem != 1) {
+                    //    alert('內容已存在於詞庫');
+                    //}
 
                     if (res.data == 1) {
 

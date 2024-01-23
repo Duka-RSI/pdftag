@@ -273,22 +273,18 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                     if (dtLu_BOMGarmentcolor.Rows.Count > 0)
                     {
 
-                        DataRow[] drLu_BOMGarmentcolor = dtLu_BOMGarmentcolor.Select("lubcid='" + itemType.lubcid + "'");
-                        if (drLu_BOMGarmentcolor.Length > 0)
+                        for (int i = 1; i <= 50; i++)
                         {
-                            for (int i = 1; i <= 50; i++)
+                            string sA = dtLu_BOMGarmentcolor.Rows[0]["A" + i].ToString();
+                            if (!string.IsNullOrEmpty(sA))
                             {
-                                string sA = drLu_BOMGarmentcolor[0]["A" + i].ToString();
-                                if (!string.IsNullOrEmpty(sA))
-                                {
-                                    sb.Append(" <th scope='col'>" + sA + "</th>");
-                                    arrColorHeader.Add(sA);
-                                    iColorCnt++;
-                                }
-                                else
-                                {
-                                    break;
-                                }
+                                sb.Append(" <th scope='col'>" + sA + "</th>");
+                                arrColorHeader.Add(sA);
+                                iColorCnt++;
+                            }
+                            else
+                            {
+                                break;
                             }
                         }
 

@@ -136,6 +136,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
         public string TextOrg { get; set; }
 
         public long lusthid { get; set; }
+        public string Code { get; set; }
 
     }
     public void get_LearnmgrItem(HttpContext context)
@@ -143,7 +144,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
         string lustid_org = context.Request["orgId"];
         string col = context.Request["col"];
         string style = context.Request["style"];
-
+        string learnmgrItem = context.Request["learnmgrItem"];
         string sSql = "";
 
 
@@ -155,13 +156,12 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
             string sTermname_org = resLu_BOM_Org.TextOrg.Trim().Replace(" ", "").ToLower();
 
-            sSql = "select * from PDFTAG.dbo.UA_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and termname_org=@termname_org and style=@style \n";
+            sSql = "select distinct " + learnmgrItem + " from PDFTAG.dbo.UA_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and termname_org=@termname_org \n";
             var list = cn.Query(sSql, new
             {
                 ColSource = "Size",
                 ColName = col,
                 termname_org = sTermname_org,
-                style = style,
             }).ToList();
 
             context.Response.Write(JsonConvert.SerializeObject(list));
@@ -183,7 +183,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
 
 
-        sSql = "select " + col + " as TextOrg,lusthid  from  PDFTAG.dbo.UA_SizeTable where lustid=@lustid";
+        sSql = "select " + col + " as TextOrg,lusthid,Code  from  PDFTAG.dbo.UA_SizeTable where lustid=@lustid";
 
 
         using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
@@ -270,21 +270,12 @@ public class Passport : IHttpHandler, IRequiresSessionState
             {
                 string sFirstCharTermname_org = resLu_SizeTable_Org.TextOrg.Substring(0, 1);
                 string sTermname_org = resLu_SizeTable_Org.TextOrg.Trim().Replace(" ", "").ToLower();
+                string sCode = resLu_SizeTable_Org.Code;
 
-
-                sSql = @"IF NOT Exists (select * from PDFTAG.dbo.UA_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and FirstCharTermname_org=@FirstCharTermname_org and termname_org=@termname_org  and style=@style)
-                             begin
-                                  insert into PDFTAG.dbo.UA_LearnmgrItem
-                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,Ctermname,style,creator,creatordate)
+                sSql = @"  insert into PDFTAG.dbo.UA_LearnmgrItem
+                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,Ctermname,style,Code,creator,creatordate)
                                     values 
-                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@Ctermname,@style,@creator,@creatordate)
-                              end 
-                            -- else 
-                            --    begin
-                            --    update PDFTAG.dbo.UA_LearnmgrItem
-                            --    set termname=@termname,updateDate=@updateDate,UpdateUser=@UpdateUser 
-                            -- where ColSource=@ColSource and ColName=@ColName and FirstCharTermname_org=@FirstCharTermname_org and termname_org=@termname_org
-                            -- end ";
+                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@Ctermname,@style,@Code,@creator,@creatordate) ";
 
                 iCntLearnmgrItem = cn.Execute(sSql, new
                 {
@@ -295,6 +286,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
                     termname = text,
                     Ctermname = chNote,
                     style = style,
+                    code = sCode,
                     creator = LoginUser.PK,
                     creatordate = dtNow.ToString("yyyy/MM/dd HH:mm:ss"),
                     UpdateUser = LoginUser.PK,

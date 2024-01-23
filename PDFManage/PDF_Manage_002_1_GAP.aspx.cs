@@ -291,26 +291,21 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 					if (dtGAP_BOMGarmentcolor.Rows.Count > 0)
 					{
 
-						DataRow[] drGAP_BOMGarmentcolor = dtGAP_BOMGarmentcolor.Select("lubcid='" + itemType.lubcid + "'");
-						if (drGAP_BOMGarmentcolor.Length > 0)
-						{
-							for (int i = 1; i <= 10; i++)
-							{
-								string sA = drGAP_BOMGarmentcolor[0]["A" + i].ToString();
-								if (!string.IsNullOrEmpty(sA))
-								{
-									sbHeader.Append(" <th scope='col'>" + sA + "</th>");
-									arrColorHeader.Add(sA);
-									iColorCnt++;
-								}
-								else
-								{
-									break;
-								}
-							}
-						}
-
-					}
+                        for (int i = 1; i <= 10; i++)
+                        {
+                            string sA = dtGAP_BOMGarmentcolor.Rows[0]["A" + i].ToString();
+                            if (!string.IsNullOrEmpty(sA))
+                            {
+                                sbHeader.Append(" <th scope='col'>" + sA + "</th>");
+                                arrColorHeader.Add(sA);
+                                iColorCnt++;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
 					sbHeader.Append(" <th scope='col'></th>");
 					sbHeader.Append("</tr>");
 
@@ -408,7 +403,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
 						for (int i = 1; i <= iColorCnt; i++)
 						{
-							string colorHeader = arrColorHeader[iColorCnt - 1];
+							string colorHeader = arrColorHeader[i - 1];
 							string color = drBom["B" + i].ToString();
 							if (isEdit)
 							{

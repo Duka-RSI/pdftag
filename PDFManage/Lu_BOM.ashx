@@ -131,6 +131,8 @@ public class Passport : IHttpHandler, IRequiresSessionState
     public class Text
     {
         public string TextOrg { get; set; }
+        public string SupplierArticle { get; set; }
+        public string Placement { get; set; }
 
     }
 
@@ -139,6 +141,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
         string lubid_org = context.Request["orgId"];
         string col = context.Request["col"];
         string style = context.Request["style"];
+        string learnmgrItem = context.Request["learnmgrItem"];
 
         string sSql = "";
 
@@ -151,16 +154,15 @@ public class Passport : IHttpHandler, IRequiresSessionState
 
             string sTermname_org = resLu_BOM_Org.TextOrg.Trim().Replace(" ", "").ToLower();
 
-            if(PublicFunction.arrLuBomColors.Contains(col))
+            if (PublicFunction.arrLuBomColors.Contains(col))
                 col = "GarmentColor";
 
-            sSql = "select * from PDFTAG.dbo.Lu_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and termname_org=@termname_org \n";
+            sSql = "select distinct " + learnmgrItem + " from PDFTAG.dbo.Lu_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and termname_org=@termname_org \n";
             var list = cn.Query(sSql, new
             {
                 ColSource = "BOM",
                 ColName = col,
                 termname_org = sTermname_org,
-                style = style,
             }).ToList();
 
             context.Response.Write(JsonConvert.SerializeObject(list));
@@ -187,7 +189,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
         string sSql = "";
 
 
-        sSql = "select " + col + " as TextOrg  from  PDFTAG.dbo.Lu_BOM where lubid=@lubid";
+        sSql = "select " + col + " as TextOrg,Placement,SupplierArticle  from  PDFTAG.dbo.Lu_BOM where lubid=@lubid";
 
 
         using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
@@ -252,26 +254,23 @@ public class Passport : IHttpHandler, IRequiresSessionState
             {
                 string sFirstCharTermname_org = resLu_BOM_Org.TextOrg.Substring(0, 1);
                 string sTermname_org = resLu_BOM_Org.TextOrg.Trim().Replace(" ", "").ToLower();
+                string sSupplierArticle = "";
+                string sPlacement = "";
+                string sColorname = "";
 
-                sSql = @"IF NOT Exists (select * from PDFTAG.dbo.Lu_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and FirstCharTermname_org=@FirstCharTermname_org and termname_org=@termname_org and style=@style )
-                             begin
-                                  insert into PDFTAG.dbo.Lu_LearnmgrItem
-                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,style,creator,creatordate)
+                sSql = @"insert into PDFTAG.dbo.Lu_LearnmgrItem
+                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,style,SupplierArticle,Placement,colorname,creator,creatordate)
                                     values 
-                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@style,@creator,@creatordate)
-                              end 
-                            --- else 
-                            ---    begin
-                            ---    update PDFTAG.dbo.Lu_LearnmgrItem
-                            ---    set termname=@termname,updateDate=@updateDate,UpdateUser=@UpdateUser 
-                            --- where ColSource=@ColSource and ColName=@ColName and FirstCharTermname_org=@FirstCharTermname_org and termname_org=@termname_org
-                            --- end ";
+                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@style,@SupplierArticle,@Placement,@colorname,@creator,@creatordate) ";
 
                 if (col == "B1" || col == "B2" || col == "B3" || col == "B4" || col == "B5" || col == "B6" || col == "B7" || col == "B8" || col == "B9" || col == "B10")
                 {
                     //col = colorCol;
                     //20220803 不會針對0002-WHT做判斷，只會針對White的內容做取代，並顯示 修: PreWhite。trm 也有一個 0002-WHT。點[學習]後，不會把 DTM 變成 PreWhite
                     col = "GarmentColor";
+                    sSupplierArticle = resLu_BOM_Org.SupplierArticle;
+                    sPlacement = resLu_BOM_Org.Placement;
+                    sColorname = colorCol;
                 }
 
 
@@ -283,6 +282,9 @@ public class Passport : IHttpHandler, IRequiresSessionState
                     termname_org = sTermname_org,
                     termname = text,
                     style = style,
+                    SupplierArticle = sSupplierArticle,
+                    Placement = sPlacement,
+                    Colorname = sColorname,
                     creator = LoginUser.PK,
                     creatordate = dtNow.ToString("yyyy/MM/dd HH:mm:ss"),
                     UpdateUser = LoginUser.PK,
