@@ -295,7 +295,9 @@
 
                     let html = "<option value=''>請選擇</option>";
                     for (let i in res) {
-                        html += "<option value='" + res[i].termname + "'>" + res[i].termname + "</option>";
+                        if (res[i].termname) {
+                            html += "<option value='" + res[i].termname + "'>" + res[i].termname + "</option>";
+                        }
                     }
 
                     $("#dlLearnmgrItem").html(html);
@@ -507,20 +509,52 @@
             let PARTS_DESC = $('#dlPARTS_DESC').val();
             let MAT_ID = $('#dlMAT_ID').val();
             let isRecord = 0;
+            let isExisted = false;
 
-            if (saveCol == 'StandardPlacement' || saveCol == 'Placement' || saveCol == 'SupplierArticle' || saveCol == 'Supplier' || saveCol == 'Name' || saveCol == 'Criticality'
-                || saveCol == 'B1' || saveCol == 'B2' || saveCol == 'B3' || saveCol == 'B4' || saveCol == 'B5' || saveCol == 'B6' || saveCol == 'B7' || saveCol == 'B8' || saveCol == 'B9' || saveCol == 'B10') {
-                //if (isSaveRecord) {
 
-                if (confirm('改的內容是否紀錄至詞庫')) {
-                    isRecord = 1;
+            let data_check = {
+                orgId: orgId,
+                id: saveId,
+                style: style,
+                col: saveCol,
+                colorCol: saveColorCol,
+                text: text,
+                chNote: note,
+            };
+            $.ajax({
+                type: "POST",
+                url: saveUrl + "_check",
+                data: data_check,
+                dataType: 'json',
+                async: false,
+                success: function (res) {
+
+                    if (res.length > 0)
+                        isExisted = true;
+                },
+                complete: function () {
+
+                },
+                error: function (error) {
+
                 }
-            }
-            else if (saveCol == 'HTMInstruction') {
-                //if (isSaveRecord) {
+            });
 
-                if (confirm('改的內容是否紀錄至詞庫')) {
-                    isRecord = 1;
+            if (!isExisted) {
+                if (saveCol == 'StandardPlacement' || saveCol == 'Placement' || saveCol == 'SupplierArticle' || saveCol == 'Supplier' || saveCol == 'Name' || saveCol == 'Criticality'
+                    || saveCol == 'B1' || saveCol == 'B2' || saveCol == 'B3' || saveCol == 'B4' || saveCol == 'B5' || saveCol == 'B6' || saveCol == 'B7' || saveCol == 'B8' || saveCol == 'B9' || saveCol == 'B10') {
+                    //if (isSaveRecord) {
+
+                    if (confirm('改的內容是否紀錄至詞庫')) {
+                        isRecord = 1;
+                    }
+                }
+                else if (saveCol == 'HTMInstruction') {
+                    //if (isSaveRecord) {
+
+                    if (confirm('改的內容是否紀錄至詞庫')) {
+                        isRecord = 1;
+                    }
                 }
             }
 

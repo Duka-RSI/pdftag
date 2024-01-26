@@ -34,7 +34,9 @@ public class Passport : IHttpHandler, IRequiresSessionState
             case "saveByCol":
                 saveByCol(context);
                 break;
-
+            case "saveByCol_check":
+                saveByCol_check(context);
+                break;
             case "delete":
                 delete(context);
                 break;
@@ -168,6 +170,41 @@ public class Passport : IHttpHandler, IRequiresSessionState
             context.Response.Write(JsonConvert.SerializeObject(list));
         }
     }
+
+    public void saveByCol_check(HttpContext context)
+    {
+        string col = context.Request["col"];
+        string style = context.Request["style"];
+        string text = context.Request["text"];
+        string chNote = context.Request["chNote"];
+
+        string sSql = "";
+
+        using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
+        {
+            if (PublicFunction.arrGapBomColors.Contains(col))
+                col = "GarmentColor";
+
+
+            sSql = @"select * from PDFTAG.dbo.Lu_LearnmgrItem 
+where ColSource=@ColSource 
+and ColName=@ColName
+and style=@style  
+and termname=@termname 
+and ISNULL(Ctermname,'')=@Ctermname 
+";
+            var list = cn.Query(sSql, new
+            {
+                ColSource = "BOM",
+                ColName = col,
+                style = style,
+                termname = text,
+                Ctermname = chNote,
+            }).ToList();
+
+            context.Response.Write(JsonConvert.SerializeObject(list));
+        }
+    }
     public void saveByCol(HttpContext context)
     {
         string lubid_org = context.Request["orgId"];
@@ -258,10 +295,12 @@ public class Passport : IHttpHandler, IRequiresSessionState
                 string sPlacement = "";
                 string sColorname = "";
 
+                //20240126 若該筆資料,[termname]、[Ctermname]、[style] 已經存在於學習資料表時
+
                 sSql = @"insert into PDFTAG.dbo.Lu_LearnmgrItem
-                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,style,SupplierArticle,Placement,colorname,creator,creatordate)
+                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,Ctermname,style,SupplierArticle,Placement,colorname,creator,creatordate)
                                     values 
-                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@style,@SupplierArticle,@Placement,@colorname,@creator,@creatordate) ";
+                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@Ctermname,@style,@SupplierArticle,@Placement,@colorname,@creator,@creatordate) ";
 
                 if (col == "B1" || col == "B2" || col == "B3" || col == "B4" || col == "B5" || col == "B6" || col == "B7" || col == "B8" || col == "B9" || col == "B10")
                 {
@@ -281,6 +320,7 @@ public class Passport : IHttpHandler, IRequiresSessionState
                     FirstCharTermname_org = sFirstCharTermname_org,
                     termname_org = sTermname_org,
                     termname = text,
+                    Ctermname = chNote,
                     style = style,
                     SupplierArticle = sSupplierArticle,
                     Placement = sPlacement,

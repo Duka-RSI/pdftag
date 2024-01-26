@@ -34,7 +34,9 @@ public class Passport : IHttpHandler, IRequiresSessionState
             case "saveByCol":
                 saveByCol(context);
                 break;
-
+            case "saveByCol_check":
+                saveByCol_check(context);
+                break;
             case "delete":
                 delete(context);
                 break;
@@ -186,7 +188,40 @@ select t.hdid,t.type,bc.lubid,t.tagnum,t.W1,t.W2,t.W3,t.W4,t.W5,t.W6,t.W7,t.W8,t
             context.Response.Write(JsonConvert.SerializeObject(list));
         }
     }
+    public void saveByCol_check(HttpContext context)
+    {
+        string col = context.Request["col"];
+        string style = context.Request["style"];
+        string text = context.Request["text"];
+        string chNote = context.Request["chNote"];
 
+        string sSql = "";
+
+        using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
+        {
+            if (PublicFunction.arrGapBomColors.Contains(col))
+                col = "GarmentColor";
+
+
+            sSql = @"select * from PDFTAG.dbo.UA_LearnmgrItem 
+where ColSource=@ColSource
+and ColName=@ColName
+and style=@style  
+and termname=@termname 
+and ISNULL(Ctermname,'')=@Ctermname 
+";
+            var list = cn.Query(sSql, new
+            {
+                ColSource = "BOM",
+                ColName = col,
+                style = style,
+                termname = text,
+                Ctermname = chNote,
+            }).ToList();
+
+            context.Response.Write(JsonConvert.SerializeObject(list));
+        }
+    }
     public void saveByCol(HttpContext context)
     {
         string lubid_org = context.Request["orgId"];
@@ -289,19 +324,12 @@ select t.hdid,t.type,bc.lubid,t.tagnum,t.W1,t.W2,t.W3,t.W4,t.W5,t.W6,t.W7,t.W8,t
                             if (EditText == null || EditText == sTermname_org)
                                 continue;
 
-                            sSql = @"IF NOT Exists (select * from PDFTAG.dbo.UA_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and FirstCharTermname_org=@FirstCharTermname_org and termname_org=@termname_org )
-                             begin
+                            sSql = @"
                                   insert into PDFTAG.dbo.UA_LearnmgrItem
                                    (ColSource,ColName,FirstCharTermname_org,termname_org,termname,utdid,SubColName,creator,creatordate)
                                     values 
                               (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@utdid,@SubColName,@creator,@creatordate)
-                              end 
-                            --- else 
-                            ---    begin
-                            ---    update PDFTAG.dbo.UA_LearnmgrItem
-                            ---    set termname=@termname,updateDate=@updateDate,UpdateUser=@UpdateUser 
-                            --- where ColSource=@ColSource and ColName=@ColName and FirstCharTermname_org=@FirstCharTermname_org and termname_org=@termname_org
-                            --- end ";
+                            ";
 
                             iCntLearnmgrItem = cn.Execute(sSql, new
                             {
@@ -360,9 +388,9 @@ select t.hdid,t.type,bc.lubid,t.tagnum,t.W1,t.W2,t.W3,t.W4,t.W5,t.W6,t.W7,t.W8,t
                     }
 
                     sSql = @" insert into PDFTAG.dbo.UA_LearnmgrItem
-                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,style,usage,W1,Colorname,creator,creatordate)
+                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,Ctermname,style,usage,W1,Colorname,creator,creatordate)
                                     values 
-                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@style,@usage,@W1,@Colorname,@creator,@creatordate)";
+                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@Ctermname,@style,@usage,@W1,@Colorname,@creator,@creatordate)";
 
                     iCntLearnmgrItem = cn.Execute(sSql, new
                     {
@@ -371,6 +399,7 @@ select t.hdid,t.type,bc.lubid,t.tagnum,t.W1,t.W2,t.W3,t.W4,t.W5,t.W6,t.W7,t.W8,t
                         FirstCharTermname_org = sFirstCharTermname_org,
                         termname_org = sTermname_org,
                         termname = text,
+                        Ctermname = chNote,
                         style = style,
                         usage = sUsage,
                         W1 = sW1,
