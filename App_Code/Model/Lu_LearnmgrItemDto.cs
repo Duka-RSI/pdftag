@@ -16,4 +16,7 @@ public class Lu_LearnmgrItemDto
     public string Termname_org { get; set; }
     public string Termname { get; set; }
     public string Style { get; set; }
+    public string SupplierArticle { get; set; }
+    public string Placement { get; set; }
+    public string code { get; set; }
 }

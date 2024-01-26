@@ -17,5 +17,9 @@ public class UA_LearnmgrItemDto
     public string Termname_org { get; set; }
     public string Termname { get; set; }
     public string SubColName { get; set; }
+    public string Ctermname { get; set; }
     public string Style { get; set; }
+    public string W1 { get; set; }
+    public string Usage { get; set; }
+    public string Code { get; set; }
 }

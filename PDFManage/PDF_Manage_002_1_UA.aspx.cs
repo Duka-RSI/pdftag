@@ -931,20 +931,33 @@ values
 
 			List<UA_LearnmgrItemDto> arrUA_LearnmgrItemDto = new List<UA_LearnmgrItemDto>();
 
-			using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
-			{
-				sSql = "select * from PDftag.dbo.UA_LearnmgrItem  \n";
-
-				arrUA_LearnmgrItemDto = cn.Query<UA_LearnmgrItemDto>(sSql, new { }).ToList();
-			}
-
-
-
+			
 			using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
 			{
-				#region UA_TagData
+                sSql = "select * \n";
+                sSql += "from PDFTAG.dbo.UA_Header a              \n";
+                sSql += " where 1=1 and a.isshow=0   \n";
+                sSql += " and a.pipid = '" + hidpipid.Value + "'   \n";
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                DataTable dtLu_Header = new DataTable();
+                using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                {
+                    da.Fill(dtLu_Header);
+                }
 
-				sSql = "select c.* \n";
+                string style = dtLu_Header.Rows[0]["style"].ToString();
+
+                using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
+                {
+                    sSql = "select * from PDftag.dbo.UA_LearnmgrItem where style=@style  \n";
+
+                    arrUA_LearnmgrItemDto = cn.Query<UA_LearnmgrItemDto>(sSql, new { style = style }).ToList();
+                }
+
+                #region UA_TagData
+
+                sSql = "select c.* \n";
 				sSql += "from PDFTAG.dbo.UA_BOM a              \n";
 				sSql += " join PDFTAG.dbo.UA_BOMGarmentcolor b on a.lubcid=b.lubcid              \n";
 				sSql += " join PDFTAG.dbo.UA_TagData c on a.lubid=c.lubid               \n";
@@ -1001,9 +1014,18 @@ values
 				#region UA_BOM
 
 				sSql = "select a.*,b.* \n";
-				sSql += "from PDFTAG.dbo.UA_BOM a              \n";
+                sSql += ",c.W1              \n";
+                sSql += ",c.W2              \n";
+                sSql += ",c.W3              \n";
+                sSql += ",c.W4              \n";
+                sSql += ",c.W5              \n";
+                sSql += ",c.W6              \n";
+                sSql += ",c.W7              \n";
+                sSql += ",c.W8              \n";
+                sSql += "from PDFTAG.dbo.UA_BOM a              \n";
 				sSql += " join PDFTAG.dbo.UA_BOMGarmentcolor b on a.lubcid=b.lubcid              \n";
-				sSql += " where 1=1   \n";
+                sSql += " left join PDFTAG.dbo.UA_TagData c on a.lubid=c.lubid               \n";
+                sSql += " where 1=1   \n";
 				sSql += " and a.luhid=(select luhid from PDFTAG.dbo.UA_Header where isshow=0 and pipid='" + hidpipid.Value + "')   \n";
 				Response.Write("<!--" + sSql + "-->");
 				cm.CommandText = sSql;
@@ -1018,11 +1040,12 @@ values
 				{
 					string lubid = drBom["lubid"].ToString();
 					string StandardPlacement = drBom["StandardPlacement"].ToString();
-					//string Placement = drBom["Placement"].ToString();
+					string Usage = drBom["Usage"].ToString();
 					string SupplierArticle = drBom["SupplierArticle"].ToString();
 					string Supplier = drBom["Supplier"].ToString();
+                    string W1 = drBom["W1"].ToString();
 
-					string B1 = drBom["B1"].ToString();
+                    string B1 = drBom["B1"].ToString();
 					string B2 = drBom["B2"].ToString();
 					string B3 = drBom["B3"].ToString();
 					string B4 = drBom["B4"].ToString();
@@ -1091,7 +1114,9 @@ values
 						{
 							case 1:
 								res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
-			  && x.Termname_org == B1.Trim().Replace(" ", "").ToLower());
+                                 && x.Usage == Usage
+                            && x.W1 == W1
+              && x.Termname_org == B1.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
 								{
@@ -1102,7 +1127,9 @@ values
 
 							case 2:
 								res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
-			  && x.Termname_org == B2.Trim().Replace(" ", "").ToLower());
+                                 && x.Usage == Usage
+                            && x.W1 == W1
+              && x.Termname_org == B2.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
 								{
@@ -1113,7 +1140,9 @@ values
 
 							case 3:
 								res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
-			  && x.Termname_org == B3.Trim().Replace(" ", "").ToLower());
+                                 && x.Usage == Usage
+                            && x.W1 == W1
+              && x.Termname_org == B3.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
 								{
@@ -1124,7 +1153,9 @@ values
 
 							case 4:
 								res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
-			  && x.Termname_org == B4.Trim().Replace(" ", "").ToLower());
+                                 && x.Usage == Usage
+                            && x.W1 == W1
+              && x.Termname_org == B4.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
 								{
@@ -1134,7 +1165,9 @@ values
 								break;
 							case 5:
 								res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
-			  && x.Termname_org == B5.Trim().Replace(" ", "").ToLower());
+                                 && x.Usage == Usage
+                            && x.W1 == W1
+              && x.Termname_org == B5.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
 								{
@@ -1144,7 +1177,9 @@ values
 								break;
 							case 6:
 								res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
-			  && x.Termname_org == B6.Trim().Replace(" ", "").ToLower());
+                                 && x.Usage == Usage
+                            && x.W1 == W1
+              && x.Termname_org == B6.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
 								{
@@ -1154,7 +1189,9 @@ values
 								break;
 							case 7:
 								res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
-			  && x.Termname_org == B7.Trim().Replace(" ", "").ToLower());
+                                 && x.Usage == Usage
+                            && x.W1 == W1
+              && x.Termname_org == B7.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
 								{
@@ -1164,7 +1201,9 @@ values
 								break;
 							case 8:
 								res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
-			  && x.Termname_org == B8.Trim().Replace(" ", "").ToLower());
+                                 && x.Usage == Usage
+                            && x.W1 == W1
+              && x.Termname_org == B8.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
 								{
@@ -1174,7 +1213,9 @@ values
 								break;
 							case 9:
 								res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
-			  && x.Termname_org == B9.Trim().Replace(" ", "").ToLower());
+                                 && x.Usage == Usage
+                            && x.W1 == W1
+              && x.Termname_org == B9.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
 								{
@@ -1184,7 +1225,9 @@ values
 								break;
 							case 10:
 								res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "GarmentColor"
-			  && x.Termname_org == B10.Trim().Replace(" ", "").ToLower());
+                                 && x.Usage == Usage
+                            && x.W1 == W1
+              && x.Termname_org == B10.Trim().Replace(" ", "").ToLower());
 
 								if (res != null)
 								{
@@ -1247,7 +1290,8 @@ values
 				foreach (DataRow drUA_SizeTable in dtUA_SizeTable.Rows)
 				{
 					string lustid = drUA_SizeTable["lustid"].ToString();
-					string Description = drUA_SizeTable["Description"].ToString();
+                    string Code = drUA_SizeTable["Code"].ToString();
+                    string Description = drUA_SizeTable["Description"].ToString();
 					string Criticality = drUA_SizeTable["Criticality"].ToString();
 
 					string A1 = drUA_SizeTable["A1"].ToString();
@@ -1287,7 +1331,8 @@ values
 					#region 比對詞彙
 
 					var res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "Size" && x.ColName == "Description"
-								  && x.Termname_org == Description.Trim().Replace(" ", "").ToLower());
+                    && x.Code == Code
+                                  && x.Termname_org == Description.Trim().Replace(" ", "").ToLower());
 
 					if (res != null)
 					{
@@ -1296,7 +1341,8 @@ values
 					}
 
 					res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "Size" && x.ColName == "Criticality"
-					 && x.Termname_org == Criticality.Trim().Replace(" ", "").ToLower());
+                    && x.Code == Code
+                     && x.Termname_org == Criticality.Trim().Replace(" ", "").ToLower());
 
 					if (res != null)
 					{

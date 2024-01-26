@@ -807,17 +807,31 @@ values
 
             List<Lu_LearnmgrItemDto> arrLu_LearnmgrItemDto = new List<Lu_LearnmgrItemDto>();
 
-            using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
-            {
-                sSql = "select * from PDftag.dbo.Lu_LearnmgrItem  \n";
-
-                arrLu_LearnmgrItemDto = cn.Query<Lu_LearnmgrItemDto>(sSql, new { }).ToList();
-            }
-
-
-
+            
             using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
             {
+                sSql = "select * \n";
+                sSql += "from PDFTAG.dbo.Lu_Header a              \n";
+                sSql += " where 1=1 and a.isshow=0   \n";
+                sSql += " and a.pipid = '" + hidpipid.Value + "'   \n";
+                cm.CommandText = sSql;
+                cm.Parameters.Clear();
+                DataTable dtLu_Header = new DataTable();
+                using (System.Data.SqlClient.SqlDataAdapter da = new System.Data.SqlClient.SqlDataAdapter(cm))
+                {
+                    da.Fill(dtLu_Header);
+                }
+
+                string style = dtLu_Header.Rows[0]["style"].ToString();
+
+
+                using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
+                {
+                    sSql = "select * from PDftag.dbo.Lu_LearnmgrItem where style=@style  \n";
+
+                    arrLu_LearnmgrItemDto = cn.Query<Lu_LearnmgrItemDto>(sSql, new { style = style }).ToList();
+                }
+
                 #region Lu_BOM
 
                 sSql = "select a.*,b.* \n";
@@ -923,6 +937,8 @@ values
                         {
                             case 1:
                                 res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A1
+                                && x.SupplierArticle == SupplierArticle
+                                && x.Placement == Placement
               && x.Termname_org == B1.Trim().Replace(" ", "").ToLower());
 
                                 //if (B1 == "White")
@@ -940,6 +956,8 @@ values
 
                             case 2:
                                 res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A2
+                                 && x.SupplierArticle == SupplierArticle
+                                && x.Placement == Placement
               && x.Termname_org == B2.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -952,6 +970,8 @@ values
 
                             case 3:
                                 res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A3
+                                 && x.SupplierArticle == SupplierArticle
+                                && x.Placement == Placement
               && x.Termname_org == B3.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -964,6 +984,8 @@ values
 
                             case 4:
                                 res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A4
+                                 && x.SupplierArticle == SupplierArticle
+                                && x.Placement == Placement
               && x.Termname_org == B4.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -975,6 +997,8 @@ values
                                 break;
                             case 5:
                                 res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A5
+                                 && x.SupplierArticle == SupplierArticle
+                                && x.Placement == Placement
               && x.Termname_org == B5.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -986,6 +1010,8 @@ values
                                 break;
                             case 6:
                                 res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A6
+                                 && x.SupplierArticle == SupplierArticle
+                                && x.Placement == Placement
               && x.Termname_org == B6.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -997,6 +1023,8 @@ values
                                 break;
                             case 7:
                                 res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A7
+                                 && x.SupplierArticle == SupplierArticle
+                                && x.Placement == Placement
               && x.Termname_org == B7.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -1008,6 +1036,8 @@ values
                                 break;
                             case 8:
                                 res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A8
+                                 && x.SupplierArticle == SupplierArticle
+                                && x.Placement == Placement
               && x.Termname_org == B8.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -1019,6 +1049,8 @@ values
                                 break;
                             case 9:
                                 res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A9
+                                 && x.SupplierArticle == SupplierArticle
+                                && x.Placement == Placement
               && x.Termname_org == B9.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -1030,6 +1062,8 @@ values
                                 break;
                             case 10:
                                 res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A10
+                                 && x.SupplierArticle == SupplierArticle
+                                && x.Placement == Placement
               && x.Termname_org == B10.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
@@ -1119,8 +1153,10 @@ values
                 foreach (DataRow drLu_SizeTable in dtLu_SizeTable.Rows)
                 {
                     string lustid = drLu_SizeTable["lustid"].ToString();
+                    string codeid = drLu_SizeTable["codeid"].ToString();
                     string Name = drLu_SizeTable["Name"].ToString();
                     string Criticality = drLu_SizeTable["Criticality"].ToString();
+                    string HTMInstruction = drLu_SizeTable["HTMInstruction"].ToString();
 
                     string A1 = drLu_SizeTable["A1"].ToString();
                     string A2 = drLu_SizeTable["A2"].ToString();
@@ -1159,6 +1195,7 @@ values
                     #region 比對詞彙
 
                     var res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "Size" && x.ColName == "Name"
+                    && x.code== codeid
                                   && x.Termname_org == Name.Trim().Replace(" ", "").ToLower());
 
                     if (res != null)
@@ -1167,12 +1204,23 @@ values
                         isUpdate = true;
                     }
 
-                    res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "Size" && x.ColName == "Criticality"
-                     && x.Termname_org == Criticality.Trim().Replace(" ", "").ToLower());
+                    //res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "Size" && x.ColName == "Criticality"
+                    // && x.code == codeid
+                    // && x.Termname_org == Criticality.Trim().Replace(" ", "").ToLower());
+
+                    //if (res != null)
+                    //{
+                    //    Criticality = res.Termname;
+                    //    isUpdate = true;
+                    //}
+
+                    res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "Size" && x.ColName == "HTMInstruction"
+                     && x.code == codeid
+                     && x.Termname_org == HTMInstruction.Trim().Replace(" ", "").ToLower());
 
                     if (res != null)
                     {
-                        Criticality = res.Termname;
+                        HTMInstruction = res.Termname;
                         isUpdate = true;
                     }
 
@@ -1181,13 +1229,13 @@ values
                     if (isUpdate)
                     {
                         sSql = "update PDFTAG.dbo.Lu_SizeTable \n";
-                        sSql += "set  Name=@Name,Criticality=@Criticality          \n";
+                        sSql += "set  Name=@Name,HTMInstruction=@HTMInstruction          \n";
                         sSql += "where lustid=@lustid\n";
                         cm.CommandText = sSql;
                         cm.Parameters.Clear();
                         cm.Parameters.AddWithValue("@lustid", lustid);
                         cm.Parameters.AddWithValue("@Name", Name);
-                        cm.Parameters.AddWithValue("@Criticality", Criticality);
+                        cm.Parameters.AddWithValue("@HTMInstruction", HTMInstruction);
                         cm.ExecuteNonQuery();
                     }
                     //先不用，mark起來
