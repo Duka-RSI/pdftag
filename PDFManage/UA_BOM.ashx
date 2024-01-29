@@ -31,6 +31,9 @@ public class Passport : IHttpHandler, IRequiresSessionState
             case "get_LearnmgrItem":
                 get_LearnmgrItem(context);
                 break;
+            case "get_EWLearnmgrItem":
+                get_EWLearnmgrItem(context);
+                break;
             case "saveByCol":
                 saveByCol(context);
                 break;
@@ -188,6 +191,40 @@ select t.hdid,t.type,bc.lubid,t.tagnum,t.W1,t.W2,t.W3,t.W4,t.W5,t.W6,t.W7,t.W8,t
             context.Response.Write(JsonConvert.SerializeObject(list));
         }
     }
+    public void get_EWLearnmgrItem(HttpContext context)
+    {
+        string lubid_org = context.Request["orgId"];
+        string col = context.Request["col"];
+        string style = context.Request["style"];
+        string learnmgrItem = context.Request["learnmgrItem"];
+        string subColName = context.Request["subColName"];
+
+
+        string sSql = "";
+
+
+        sSql = "select " + subColName + " as TextOrg  from  PDFTAG.dbo.UA_TagData  where lubid=@lubid";
+
+        using (var cn = SqlMapperUtil.GetOpenConnection("DB"))
+        {
+            var resLu_BOM_Org = cn.Query<Text>(sSql, new { lubid = lubid_org }).FirstOrDefault();
+
+            string sTermname_org = resLu_BOM_Org.TextOrg.Trim().Replace(" ", "").ToLower();
+
+    
+            sSql = "select distinct " + learnmgrItem + " from PDFTAG.dbo.UA_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and subColName=@subColName and termname_org=@termname_org and style=@style  \n";
+            var list = cn.Query(sSql, new
+            {
+                ColSource = "BOM",
+                ColName = col,
+                subColName = subColName,
+                termname_org = sTermname_org,
+                style = style
+            }).ToList();
+
+            context.Response.Write(JsonConvert.SerializeObject(list));
+        }
+    }
     public void saveByCol_check(HttpContext context)
     {
         string col = context.Request["col"];
@@ -319,16 +356,17 @@ and ISNULL(Ctermname,'')=@Ctermname
                         for (int i = 1; i <= 8; i++)
                         {
                             string EditText = context.Request["EW" + i];
+                            string EditNoteText = context.Request["EW" + i + "_Note"];
                             string sTermname_org = dtUUA_TagData.Rows[0]["W" + i].ToString();
 
-                            if (EditText == null || EditText == sTermname_org)
+                            if ((EditText == null || EditText == sTermname_org) && string.IsNullOrEmpty(EditNoteText))
                                 continue;
 
                             sSql = @"
                                   insert into PDFTAG.dbo.UA_LearnmgrItem
-                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,utdid,SubColName,creator,creatordate)
+                                   (ColSource,ColName,FirstCharTermname_org,termname_org,termname,utdid,SubColName,Ctermname,style,creator,creatordate)
                                     values 
-                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@utdid,@SubColName,@creator,@creatordate)
+                              (@ColSource,@ColName,@FirstCharTermname_org,@termname_org,@termname,@utdid,@SubColName,@Ctermname,@style,@creator,@creatordate)
                             ";
 
                             iCntLearnmgrItem = cn.Execute(sSql, new
@@ -336,10 +374,12 @@ and ISNULL(Ctermname,'')=@Ctermname
                                 ColSource = "BOM",
                                 ColName = col,
                                 FirstCharTermname_org = "",
-                                termname_org = sTermname_org,
+                                termname_org = sTermname_org.Trim().Replace(" ", "").ToLower(),
                                 termname = EditText,
                                 utdid = utdid,
                                 SubColName = "W" + i,
+                                style = style,
+                                Ctermname = EditNoteText,
                                 creator = LoginUser.PK,
                                 creatordate = dtNow.ToString("yyyy/MM/dd HH:mm:ss"),
                                 UpdateUser = LoginUser.PK,

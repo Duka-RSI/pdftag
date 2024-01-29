@@ -172,58 +172,10 @@
                                             <th></th>
                                             <th>原文件</th>
                                             <th>更改</th>
+                                            <th>中文備註</th>
                                         </tr>
                                         <tbody id="tblUATagData">
-                                            <%--<tr>
-											<td>描述</td>
-											<td><span id="span_W1"></span></td>
-											<td>
-												<input type="text" id="EW1" value="" style="width: 300px"></td>
-										</tr>
-										<tr>
-											<td>物料描述</td>
-											<td><span id="span_W2"></span></td>
-											<td>
-												<input type="text" id="EW2" value="" style="width: 300px"></td>
-										</tr>
-										<tr>
-											<td>廠商</td>
-											<td><span id="span_W3"></span></td>
-											<td>
-												<input type="text" id="EW3" value="" style="width: 300px"></td>
-										</tr>
-										<tr>
-											<td>廠商料號</td>
-											<td><span id="span_W4"></span></td>
-											<td>
-												<input type="text" id="EW4" value="" style="width: 300px">
-												<input type="button" value="挑選" onclick="showSelectMatNo();return false;" />
-											</td>
-										</tr>
-										<tr>
-											<td>物料狀態</td>
-											<td><span id="span_W5"></span></td>
-											<td>
-												<input type="text" id="EW5" value="" style="width: 300px"></td>
-										</tr>
-										<tr>
-											<td>成份</td>
-											<td><span id="span_W6"></span></td>
-											<td>
-												<input type="text" id="EW6" value="" style="width: 300px"></td>
-										</tr>
-										<tr class="rowNotFabric">
-											<td>規格</td>
-											<td><span id="span_W7"></span></td>
-											<td>
-												<input type="text" id="EW7" value="" style="width: 300px"></td>
-										</tr>
-										<tr class="rowNotFabric">
-											<td>單位</td>
-											<td><span id="span_W8"></span></td>
-											<td>
-												<input type="text" id="EW8" value="" style="width: 300px"></td>
-										</tr>--%>
+                                           
                                         </tbody>
                                     </table>
                                 </td>
@@ -384,7 +336,8 @@
                 isSaveUATagData = true;
                 getUADataTagTable(saveId);
 
-
+                $('#div_LearnmgrItem').hide();
+                $('#div_LearnmgrNote').hide();
 
             } else {
 
@@ -395,6 +348,9 @@
 
                 $('.rowCompareSupplierArticle').hide();
                 $('#editText').prop('disabled', false);
+
+                $('#div_LearnmgrItem').show();
+                $('#div_LearnmgrNote').show();
             }
 
             orgUrl = "UA_BOM.ashx?fun=get_org"
@@ -524,6 +480,108 @@
             $('#noteText').val(termname);
         }
 
+        function set_dlEWLearnmgrItem(type, orgId, saveCol, subColName, EWType) {
+
+            let style = $('#<%=hidStyle.ClientID %>').val();
+
+            $('#dlEWLearnmgrItem_' + EWType).html('<option value="">請選擇</option>');
+
+            let data = {
+                orgId: orgId,
+                col: saveCol,
+                subColName: subColName,
+                learnmgrItem: "termname",
+                style: style
+            };
+            $.ajax({
+                type: "POST",
+                url: type + ".ashx?fun=get_EWLearnmgrItem",
+                data: data,
+                dataType: 'json',
+                success: function (res) {
+
+                    let html = "<option value=''>請選擇</option>";
+                    for (let i in res) {
+                        if (res[i].termname) {
+                            html += "<option value='" + res[i].termname + "'>" + res[i].termname + "</option>";
+                        }
+                    }
+
+                    $("#dlEWLearnmgrItem_" + EWType).html(html);
+
+                    if (res.length == 1) {
+
+                        $("#dlEWLearnmgrItem_" + EWType).val(res[0].termname);
+
+                        let editText = $('#EW' + EWType).val();
+
+                        if (!editText)
+                            $('#EW' + EWType).val(res[0].termname);
+                    }
+
+
+
+                },
+                complete: function () {
+
+                },
+                error: function (error) {
+                    
+                }
+            });
+        }
+
+        function set_dlEWLearnmgrNote(type, orgId, saveCol, subColName, EWType) {
+            let style = $('#<%=hidStyle.ClientID %>').val();
+            $('#dlEWLearnmgrNote_' + EWType).html('<option value="">請選擇</option>');
+
+            let data = {
+                orgId: orgId,
+                col: saveCol,
+                subColName: subColName,
+                learnmgrItem: "Ctermname",
+                style: style
+            };
+            $.ajax({
+                type: "POST",
+                url: type + ".ashx?fun=get_EWLearnmgrItem",
+                data: data,
+                dataType: 'json',
+                success: function (res) {
+
+                    let html = "<option value=''>請選擇</option>";
+                    for (let i in res) {
+
+                        if (res[i].Ctermname) {
+                            html += "<option value='" + res[i].Ctermname + "'>" + res[i].Ctermname + "</option>";
+                        }
+
+
+                    }
+
+                    $("#dlEWLearnmgrNote_" + EWType).html(html);
+
+                    if (res.length == 1) {
+
+                        $("#dlEWLearnmgrNote_" + EWType).val(res[0].Ctermname);
+
+                        let noteText = $('#EW' + EWType +'_noteText').val();
+
+                        if (!noteText)
+                            $('#EW' + EWType +'_noteText').val(res[0].Ctermname);
+                    }
+
+
+
+                },
+                complete: function () {
+
+                },
+                error: function (error) {
+                    
+                }
+            });
+        }
         
         function showSelectMatNo(item) {
 
@@ -615,12 +673,19 @@
 
                             html += "<tr " + (isHideRow ? "style='display:none'" : "") + ">";
                             html += "<td>" + arrName[i - 1] + "</td>";
-                            html += "<td style='width:50%'><div><span id='span_W" + i + "' class='span_w'>" + res["W" + i] + "</span></div></td>";
-                            html += "<td style='width:50%'><input type='text' id='EW" + i + "' value='' style='width:100%'>";
+                            html += "<td style='width:20%'><div><span id='span_W" + i + "' class='span_w'>" + res["W" + i] + "</span></div></td>";
+                            html += "<td style='width:30%'>";
+                            html += "  學習選取:<select class='form-control' id='dlEWLearnmgrItem_"+i+"' onchange='dlEWLearnmgrItem_change(" + i +")'></select><br>";
+                            html += "  <input type='text' id='EW" + i + "' value='' style='width:100%'>";
 
                             if ((!isFabric && i == 1) || (isFabric && i == 4)) {
                                 html += "<input type='button' value='挑選' onclick='showSelectMatNo(" + i + "); return false;' />";
                             }
+                            html += "</td>";
+                            html += "<td style='width:30%'>";
+                            html += "  學習選取:<select class='form-control' id='dlEWLearnmgrNote_" + i +"' onchange='dlEWLearnmgrNote(" + i + ")'></select><br>";
+                            html += "  <textarea id='EW" + i + "_noteText' class='form-control'>" + res["EW" + i +"_note"] +"</textarea>";
+
                             html += "</td>";
                             html += "</tr>";
 
@@ -629,12 +694,17 @@
 
                         $("#tblUATagData").html(html);
 
+                        
                         let arrVal = [];
                         for (let i = 1; i <= arrName.length; i++) {
 
                             $('#EW' + i).val((res["EW" + i] ?? res["W" + i]));
 
                             arrVal.push((res["EW" + i] ?? res["W" + i]));
+
+     
+                            set_dlEWLearnmgrItem('UA_BOM', orgId, saveCol, "W" + i, i);
+                            set_dlEWLearnmgrNote('UA_BOM', orgId, saveCol, "W" + i, i)
                         }
 
                         $('#editText').val(arrVal.join(' / '));
@@ -673,6 +743,14 @@
             let EW6 = $('#EW6').val();
             let EW7 = $('#EW7').val();
             let EW8 = $('#EW8').val();
+            let EW1_noteText = $('#EW1_noteText').val();
+            let EW2_noteText = $('#EW2_noteText').val();
+            let EW3_noteText = $('#EW3_noteText').val();
+            let EW4_noteText = $('#EW4_noteText').val();
+            let EW5_noteText = $('#EW5_noteText').val();
+            let EW6_noteText = $('#EW6_noteText').val();
+            let EW7_noteText = $('#EW7_noteText').val();
+            let EW8_noteText = $('#EW8_noteText').val();
 
             let data = {
                 lubid: lubid,
@@ -684,7 +762,15 @@
                 EW5: EW5,
                 EW6: EW6,
                 EW7: EW7,
-                EW8: EW8
+                EW8: EW8,
+                EW1_note:EW1_noteText,
+                EW2_note:EW2_noteText,
+                EW3_note:EW3_noteText,
+                EW4_note:EW4_noteText,
+                EW5_note:EW5_noteText,
+                EW6_note:EW6_noteText,
+                EW7_note:EW7_noteText,
+                EW8_note: EW8_noteText,
             };
             $.ajax({
                 type: "POST",
@@ -921,6 +1007,15 @@
                 let EW7 = $('#EW7').val();
                 let EW8 = $('#EW8').val();
 
+                let EW1_noteText = $('#EW1_noteText').val();
+                let EW2_noteText = $('#EW2_noteText').val();
+                let EW3_noteText = $('#EW3_noteText').val();
+                let EW4_noteText = $('#EW4_noteText').val();
+                let EW5_noteText = $('#EW5_noteText').val();
+                let EW6_noteText = $('#EW6_noteText').val();
+                let EW7_noteText = $('#EW7_noteText').val();
+                let EW8_noteText = $('#EW8_noteText').val();
+
 
                 if (W1 != EW1 || W2 != EW2 || W3 != EW3 || W4 != EW4 || W5 != EW5 || W6 != EW6 || W7 != EW7 || W8 != EW8) {
                     //有修改
@@ -956,6 +1051,15 @@
                     data["EW7"] = EW7;
                 if (W8)
                     data["EW8"] = EW8;
+
+                data["EW1_Note"] = EW1_noteText;
+                data["EW2_Note"] = EW2_noteText;
+                data["EW3_Note"] = EW3_noteText;
+                data["EW4_Note"] = EW4_noteText;
+                data["EW5_Note"] = EW5_noteText;
+                data["EW6_Note"] = EW6_noteText;
+                data["EW7_Note"] = EW7_noteText;
+                data["EW8_Note"] = EW8_noteText;
             }
 
 
