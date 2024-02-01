@@ -888,6 +888,7 @@ values
                     if (res != null)
                     {
                         StandardPlacement = res.Termname;
+                        InsertLuLuNote(cm, lubid, "StandardPlacement", res.Ctermname);
                         //isUpdate = true;
                     }
 
@@ -897,6 +898,7 @@ values
                     if (res != null)
                     {
                         Placement = res.Termname;
+                        InsertLuLuNote(cm, lubid, "Placement", res.Ctermname);
                         //isUpdate = true;
                     }
 
@@ -906,6 +908,7 @@ values
                     if (res != null)
                     {
                         SupplierArticle = res.Termname;
+                        InsertLuLuNote(cm, lubid, "SupplierArticle", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -915,6 +918,7 @@ values
                     if (res != null)
                     {
                         Supplier = res.Termname;
+                        InsertLuLuNote(cm, lubid, "Supplier", res.Ctermname);
                         //isUpdate = true;
                     }
 
@@ -922,23 +926,25 @@ values
                     for (int a = 1; a <= 10; a++)
                     {
                         //20220803 不會針對0002-WHT做判斷，只會針對White的內容做取代，並顯示 修: PreWhite。trm 也有一個 0002-WHT。點[學習]後，不會把 DTM 變成 PreWhite
-                        A1 = "GarmentColor";
-                        A2 = "GarmentColor";
-                        A3 = "GarmentColor";
-                        A4 = "GarmentColor";
-                        A5 = "GarmentColor";
-                        A6 = "GarmentColor";
-                        A7 = "GarmentColor";
-                        A8 = "GarmentColor";
-                        A9 = "GarmentColor";
-                        A10 = "GarmentColor";
+                        //A1 = "GarmentColor";
+                        //A2 = "GarmentColor";
+                        //A3 = "GarmentColor";
+                        //A4 = "GarmentColor";
+                        //A5 = "GarmentColor";
+                        //A6 = "GarmentColor";
+                        //A7 = "GarmentColor";
+                        //A8 = "GarmentColor";
+                        //A9 = "GarmentColor";
+                        //A10 = "GarmentColor";
 
                         switch (a)
                         {
                             case 1:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A1
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                 && x.SupplierArticle == SupplierArticle
                                 && x.Placement == Placement
+                                && x.ColorName == A1
               && x.Termname_org == B1.Trim().Replace(" ", "").ToLower());
 
                                 //if (B1 == "White")
@@ -949,126 +955,154 @@ values
                                 {
 
                                     B1 = res.Termname;
+                                    InsertLuLuNote(cm, lubid, "B1", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
                                 break;
 
                             case 2:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A2
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticle == SupplierArticle
                                 && x.Placement == Placement
+                                 && x.ColorName == A2
               && x.Termname_org == B2.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B2 = res.Termname;
+                                    InsertLuLuNote(cm, lubid, "B2", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
                                 break;
 
                             case 3:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A3
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticle == SupplierArticle
                                 && x.Placement == Placement
+                                 && x.ColorName == A3
               && x.Termname_org == B3.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B3 = res.Termname;
+                                    InsertLuLuNote(cm, lubid, "B3", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
                                 break;
 
                             case 4:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A4
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticle == SupplierArticle
                                 && x.Placement == Placement
+                                 && x.ColorName == A4
               && x.Termname_org == B4.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B4 = res.Termname;
+                                    InsertLuLuNote(cm, lubid, "B4", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
                                 break;
                             case 5:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A5
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticle == SupplierArticle
                                 && x.Placement == Placement
+                                 && x.ColorName == A5
               && x.Termname_org == B5.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B5 = res.Termname;
+                                    InsertLuLuNote(cm, lubid, "B5", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
                                 break;
                             case 6:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A6
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticle == SupplierArticle
                                 && x.Placement == Placement
+                                 && x.ColorName == A6
               && x.Termname_org == B6.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B6 = res.Termname;
+                                    InsertLuLuNote(cm, lubid, "B6", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
                                 break;
                             case 7:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A7
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticle == SupplierArticle
                                 && x.Placement == Placement
+                                 && x.ColorName == A7
               && x.Termname_org == B7.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B7 = res.Termname;
+                                    InsertLuLuNote(cm, lubid, "B7", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
                                 break;
                             case 8:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A8
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticle == SupplierArticle
                                 && x.Placement == Placement
+                                 && x.ColorName == A8
               && x.Termname_org == B8.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B8 = res.Termname;
+                                    InsertLuLuNote(cm, lubid, "B8", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
                                 break;
                             case 9:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A9
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticle == SupplierArticle
                                 && x.Placement == Placement
+                                 && x.ColorName == A9
               && x.Termname_org == B9.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B9 = res.Termname;
+                                    InsertLuLuNote(cm, lubid, "B9", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
                                 break;
                             case 10:
-                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A10
+                                res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticle == SupplierArticle
                                 && x.Placement == Placement
+                                 && x.ColorName == A10
               && x.Termname_org == B10.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B10 = res.Termname;
+                                    InsertLuLuNote(cm, lubid, "B10", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1322,4 +1356,33 @@ values
         }
     }
 
+
+    public void InsertLuLuNote(System.Data.SqlClient.SqlCommand cm, string lubid, string ColName, string note)
+    {
+        if (string.IsNullOrEmpty(note))
+            return;
+        string sSql = @"IF NOT Exists (select * from PDFTAG.dbo.Lu_Ch_Note where IdName=@IdName and id=@id and ColName=@ColName )
+                             begin
+                                  insert into PDFTAG.dbo.Lu_Ch_Note
+                                   (IdName,id,ColName,note,creator,createordate)
+                                    values 
+                              (@IdName,@id,@ColName,@note,@creator,@createordate)
+                              end 
+                             else 
+                                begin
+                                update PDFTAG.dbo.Lu_Ch_Note
+                                set note=@note
+                             where IdName=@IdName and id=@id and ColName=@ColName
+                             end ";
+
+        cm.CommandText = sSql;
+        cm.Parameters.Clear();
+        cm.Parameters.AddWithValue("@IdName", "lubid");
+        cm.Parameters.AddWithValue("@id", lubid);
+        cm.Parameters.AddWithValue("@ColName", ColName);
+        cm.Parameters.AddWithValue("@note", note);
+        cm.Parameters.AddWithValue("@creator", LoginUser.PK);
+        cm.Parameters.AddWithValue("@createordate", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"));
+        cm.ExecuteNonQuery();
+    }
 }

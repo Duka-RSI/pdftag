@@ -9,6 +9,7 @@ using System.IO;
 using System.Text;
 using OfficeOpenXml;
 using Dapper;
+using Aspose.Pdf;
 
 public partial class Passport_Passport_A000 : System.Web.UI.Page
 {
@@ -872,7 +873,11 @@ values
                 {
                     sSql = "select * from PDftag.dbo.GAP_LearnmgrItem where style=@style  \n";
 
+                    Response.Write("<!--btnLearn_Click:" + sSql.Replace("@style", "'" + style + "'") + "-->");
+
                     arrGAP_LearnmgrItemDto = cn.Query<GAP_LearnmgrItemDto>(sSql, new { style = style }).ToList();
+
+                    //LogFile.Logger.Log(Newtonsoft.Json.JsonConvert.SerializeObject(arrGAP_LearnmgrItemDto));
                 }
 
                 #region GAP_BOM
@@ -882,7 +887,7 @@ values
                 sSql += " join PDFTAG.dbo.GAP_BOMGarmentcolor b on a.lubcid=b.lubcid              \n";
                 sSql += " where 1=1   \n";
                 sSql += " and a.luhid=(select luhid from PDFTAG.dbo.GAP_Header where isshow=0 and pipid='" + hidpipid.Value + "')   \n";
-                Response.Write("<!--" + sSql + "-->");
+                Response.Write("<!--btnLearn_Click:" + sSql + "-->");
                 cm.CommandText = sSql;
                 cm.Parameters.Clear();
                 DataTable dtGAP_BOM = new DataTable();
@@ -931,6 +936,7 @@ values
                     if (res != null)
                     {
                         StandardPlacement = res.Termname;
+                        InsertGapNote(cm, lubid, "StandardPlacement", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -940,6 +946,7 @@ values
                     if (res != null)
                     {
                         Usage = res.Termname;
+                        InsertGapNote(cm, lubid, "Usage", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -949,6 +956,7 @@ values
                     if (res != null)
                     {
                         SupplierArticle = res.Termname;
+                        InsertGapNote(cm, lubid, "SupplierArticle", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -958,134 +966,178 @@ values
                     if (res != null)
                     {
                         Supplier = res.Termname;
+                        InsertGapNote(cm, lubid, "Supplier", res.Ctermname);
                         isUpdate = true;
                     }
 
 
                     for (int a = 1; a <= 10; a++)
                     {
+
                         switch (a)
                         {
                             case 1:
-                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A1
+                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                 && x.SupplierArticleNumber == SupplierArticle
                                 && x.Usage == Usage
+                                && x.ColorName == A1
               && x.Termname_org == B1.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B1 = res.Termname;
+                                    //Response.Write("<!--btnLearn_Click: lubid=" + lubid + "  " + res.Ctermname + "-->");
+                                    InsertGapNote(cm, lubid, "B1", res.Ctermname);
                                     isUpdate = true;
                                 }
+                                //if (lubid == "2359")
+                                //{
+                                //    Response.Write("<!--btnLearn_Click:lubid=" + lubid + " B1=" + B1 + "SupplierArticle=" + SupplierArticle + "Usage=" + Usage + " ColorName='" + A1 + "' B1=" + B1.Trim().Replace(" ", "").ToLower() + " res=" + (res == null) + "-->");
+
+                                //    var arr = arrGAP_LearnmgrItemDto.Where(x => x.ColSource == "BOM"
+                                //&& x.ColName == "GarmentColor").ToList();
+                                //    LogFile.Logger.Log(Newtonsoft.Json.JsonConvert.SerializeObject(arr));
+                                //    LogFile.Logger.Log("SupplierArticle='" + SupplierArticle + "' Usage='" + Usage + "' ColorName='" + A1 + "' Termname_org='" + B1.Trim().Replace(" ", "").ToLower() + "'");
+                                //}
+
+
                                 break;
 
                             case 2:
-                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A2
+                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticleNumber == SupplierArticle
                                 && x.Usage == Usage
+                                && x.ColorName == A2
               && x.Termname_org == B2.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B2 = res.Termname;
+                                    InsertGapNote(cm, lubid, "B2", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
 
                             case 3:
-                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A3
-                                 && x.SupplierArticleNumber == SupplierArticle
+                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
+                                && x.SupplierArticleNumber == SupplierArticle
                                 && x.Usage == Usage
+                                && x.ColorName == A3
               && x.Termname_org == B3.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B3 = res.Termname;
+                                    InsertGapNote(cm, lubid, "B3", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
 
                             case 4:
-                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A4
+                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticleNumber == SupplierArticle
                                 && x.Usage == Usage
+                                 && x.ColorName == A4
               && x.Termname_org == B4.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B4 = res.Termname;
+                                    InsertGapNote(cm, lubid, "B4", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
                             case 5:
-                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A5
+                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticleNumber == SupplierArticle
                                 && x.Usage == Usage
+                                 && x.ColorName == A5
               && x.Termname_org == B5.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B5 = res.Termname;
+                                    InsertGapNote(cm, lubid, "B5", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
                             case 6:
-                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A6
+                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticleNumber == SupplierArticle
                                 && x.Usage == Usage
+                                 && x.ColorName == A6
               && x.Termname_org == B6.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B6 = res.Termname;
+                                    InsertGapNote(cm, lubid, "B6", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
                             case 7:
-                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A7
+                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticleNumber == SupplierArticle
                                 && x.Usage == Usage
+                                 && x.ColorName == A7
               && x.Termname_org == B7.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B7 = res.Termname;
+                                    InsertGapNote(cm, lubid, "B7", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
                             case 8:
-                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A8
+                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticleNumber == SupplierArticle
                                 && x.Usage == Usage
+                                 && x.ColorName == A8
               && x.Termname_org == B8.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B8 = res.Termname;
+                                    InsertGapNote(cm, lubid, "B8", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
                             case 9:
-                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A9
+                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticleNumber == SupplierArticle
                                 && x.Usage == Usage
+                                 && x.ColorName == A9
               && x.Termname_org == B9.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B9 = res.Termname;
+                                    InsertGapNote(cm, lubid, "B9", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
                             case 10:
-                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == A10
+                                res = arrGAP_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM"
+                                && x.ColName == "GarmentColor"
                                  && x.SupplierArticleNumber == SupplierArticle
                                 && x.Usage == Usage
+                                 && x.ColorName == A10
               && x.Termname_org == B10.Trim().Replace(" ", "").ToLower());
 
                                 if (res != null)
                                 {
                                     B10 = res.Termname;
+                                    InsertGapNote(cm, lubid, "B10", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1232,6 +1284,33 @@ values
 
         DataBind();
     }
-
+    public void InsertGapNote(System.Data.SqlClient.SqlCommand cm, string lubid, string ColName, string note)
+    {
+        if (string.IsNullOrEmpty(note))
+            return;
+        string sSql = @"IF NOT Exists (select * from PDFTAG.dbo.GAP_Ch_Note where IdName=@IdName and id=@id and ColName=@ColName )
+                             begin
+                                  insert into PDFTAG.dbo.GAP_Ch_Note
+                                   (IdName,id,ColName,note,creator,createordate)
+                                    values 
+                              (@IdName,@id,@ColName,@note,@creator,@createordate)
+                              end 
+                             else 
+                                begin
+                                update PDFTAG.dbo.GAP_Ch_Note
+                                set note=@note
+                             where IdName=@IdName and id=@id and ColName=@ColName
+                             end ";
+        
+        cm.CommandText = sSql;
+        cm.Parameters.Clear();
+        cm.Parameters.AddWithValue("@IdName", "lubid");
+        cm.Parameters.AddWithValue("@id", lubid);
+        cm.Parameters.AddWithValue("@ColName", ColName);
+        cm.Parameters.AddWithValue("@note", note);
+        cm.Parameters.AddWithValue("@creator", LoginUser.PK);
+        cm.Parameters.AddWithValue("@createordate", DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"));
+        cm.ExecuteNonQuery();
+    }
 
 }

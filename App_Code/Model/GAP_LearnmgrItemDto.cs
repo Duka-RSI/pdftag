@@ -15,6 +15,7 @@ public class GAP_LearnmgrItemDto
     public string FirstCharTermname_org { get; set; }
     public string Termname_org { get; set; }
     public string Termname { get; set; }
+    public string Ctermname { get; set; }
     public string Style { get; set; }
     public string SupplierArticleNumber { get; set; }
     public string Usage { get; set; }

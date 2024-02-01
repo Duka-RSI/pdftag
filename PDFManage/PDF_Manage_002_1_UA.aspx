@@ -763,14 +763,14 @@
                 EW6: EW6,
                 EW7: EW7,
                 EW8: EW8,
-                EW1_note:EW1_noteText,
-                EW2_note:EW2_noteText,
-                EW3_note:EW3_noteText,
-                EW4_note:EW4_noteText,
-                EW5_note:EW5_noteText,
-                EW6_note:EW6_noteText,
-                EW7_note:EW7_noteText,
-                EW8_note: EW8_noteText,
+                EW1_note: (EW1_noteText == 'null' ? "" : EW1_noteText),
+                EW2_note: (EW2_noteText == 'null' ? "" : EW2_noteText),
+                EW3_note: (EW3_noteText == 'null' ? "" : EW3_noteText),
+                EW4_note: (EW4_noteText == 'null' ? "" : EW4_noteText),
+                EW5_note: (EW5_noteText == 'null' ? "" : EW5_noteText),
+                EW6_note: (EW6_noteText == 'null' ? "" : EW6_noteText),
+                EW7_note: (EW7_noteText == 'null' ? "" : EW7_noteText),
+                EW8_note: (EW8_noteText == 'null' ? "" : EW8_noteText),
             };
             $.ajax({
                 type: "POST",
@@ -1052,14 +1052,14 @@
                 if (W8)
                     data["EW8"] = EW8;
 
-                data["EW1_Note"] = EW1_noteText;
-                data["EW2_Note"] = EW2_noteText;
-                data["EW3_Note"] = EW3_noteText;
-                data["EW4_Note"] = EW4_noteText;
-                data["EW5_Note"] = EW5_noteText;
-                data["EW6_Note"] = EW6_noteText;
-                data["EW7_Note"] = EW7_noteText;
-                data["EW8_Note"] = EW8_noteText;
+                data["EW1_Note"] =(EW1_noteText == 'null' ? "" : EW1_noteText);
+                data["EW2_Note"] =(EW2_noteText == 'null' ? "" : EW2_noteText);
+                data["EW3_Note"] =(EW3_noteText == 'null' ? "" : EW3_noteText);
+                data["EW4_Note"] =(EW4_noteText == 'null' ? "" : EW4_noteText);
+                data["EW5_Note"] =(EW5_noteText == 'null' ? "" : EW5_noteText);
+                data["EW6_Note"] =(EW6_noteText == 'null' ? "" : EW6_noteText);
+                data["EW7_Note"] =(EW7_noteText == 'null' ? "" : EW7_noteText);
+                data["EW8_Note"] = (EW8_noteText == 'null' ? "" : EW8_noteText);
             }
 
 
