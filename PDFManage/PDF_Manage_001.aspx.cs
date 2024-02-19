@@ -1705,7 +1705,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
                     if (res != null)
                     {
                         Placement = res.Termname;
-                        InsertLuLuNote(cm, lubid, "Placement", res.Ctermname);
+                        InsertLuLuNote(cm, "lubid", lubid, "Placement", res.Ctermname);
                         //isUpdate = true;
                     }
 
@@ -1715,7 +1715,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
                     if (res != null)
                     {
                         SupplierArticle = res.Termname;
-                        InsertLuLuNote(cm, lubid, "SupplierArticle", res.Ctermname);
+                        InsertLuLuNote(cm, "lubid", lubid, "SupplierArticle", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -1753,7 +1753,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
                                 {
 
                                     B1 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B1", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B1", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1770,7 +1770,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
                                 if (res != null)
                                 {
                                     B2 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B2", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B2", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1787,7 +1787,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
                                 if (res != null)
                                 {
                                     B3 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B3", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B3", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1804,7 +1804,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
                                 if (res != null)
                                 {
                                     B4 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B4", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B4", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1820,7 +1820,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
                                 if (res != null)
                                 {
                                     B5 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B5", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B5", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1836,7 +1836,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
                                 if (res != null)
                                 {
                                     B6 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B6", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B6", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1852,7 +1852,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
                                 if (res != null)
                                 {
                                     B7 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B7", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B7", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1868,7 +1868,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
                                 if (res != null)
                                 {
                                     B8 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B8", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B8", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1884,7 +1884,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
                                 if (res != null)
                                 {
                                     B9 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B9", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B9", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1900,7 +1900,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
                                 if (res != null)
                                 {
                                     B10 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B10", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B10", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -2019,6 +2019,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
                     if (res != null)
                     {
                         Name = res.Termname;
+                        InsertLuLuNote(cm, "lustid", lustid, "Name", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -2038,6 +2039,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
                     if (res != null)
                     {
                         HTMInstruction = res.Termname;
+                        InsertLuLuNote(cm, "lustid", lustid, "HTMInstruction", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -2046,7 +2048,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
                     if (isUpdate)
                     {
                         sSql = "update PDFTAG.dbo.Lu_SizeTable \n";
-                        sSql += "set  Name=@Name,HTMInstruction=@HTMInstruction          \n";
+                        sSql += "set  Name=@Name,HTMInstruction=@HTMInstruction,isEdit=1          \n";
                         sSql += "where lustid=@lustid\n";
                         cm.CommandText = sSql;
                         cm.Parameters.Clear();
@@ -2068,7 +2070,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
             Response.Write("btnAdd_Click:" + err.ToString());
         }
     }
-    public void InsertLuLuNote(System.Data.SqlClient.SqlCommand cm, string lubid, string ColName, string note)
+    public void InsertLuLuNote(System.Data.SqlClient.SqlCommand cm,string IdName, string lubid, string ColName, string note)
     {
         if (string.IsNullOrEmpty(note))
             return;
@@ -2088,7 +2090,7 @@ insert into PDFTAG.dbo.Lu_SizeTable
 
         cm.CommandText = sSql;
         cm.Parameters.Clear();
-        cm.Parameters.AddWithValue("@IdName", "lubid");
+        cm.Parameters.AddWithValue("@IdName", IdName);
         cm.Parameters.AddWithValue("@id", lubid);
         cm.Parameters.AddWithValue("@ColName", ColName);
         cm.Parameters.AddWithValue("@note", note);
@@ -4145,7 +4147,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                 if (res != null)
                 {
                     StandardPlacement = res.Termname;
-                    InsertGapNote(cm, lubid, "StandardPlacement", res.Ctermname);
+                    InsertGapNote(cm, "lubid", lubid, "StandardPlacement", res.Ctermname);
                     isUpdate = true;
                 }
 
@@ -4155,7 +4157,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                 if (res != null)
                 {
                     Usage = res.Termname;
-                    InsertGapNote(cm, lubid, "Usage", res.Ctermname);
+                    InsertGapNote(cm, "lubid", lubid, "Usage", res.Ctermname);
                     isUpdate = true;
                 }
 
@@ -4165,7 +4167,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                 if (res != null)
                 {
                     SupplierArticle = res.Termname;
-                    InsertGapNote(cm, lubid, "SupplierArticle", res.Ctermname);
+                    InsertGapNote(cm, "lubid", lubid, "SupplierArticle", res.Ctermname);
                     isUpdate = true;
                 }
 
@@ -4175,7 +4177,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                 if (res != null)
                 {
                     Supplier = res.Termname;
-                    InsertGapNote(cm, lubid, "Supplier", res.Ctermname);
+                    InsertGapNote(cm, "lubid", lubid, "Supplier", res.Ctermname);
                     isUpdate = true;
                 }
 
@@ -4197,7 +4199,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                             {
                                 B1 = res.Termname;
                                 //Response.Write("<!--btnLearn_Click: lubid=" + lubid + "  " + res.Ctermname + "-->");
-                                InsertGapNote(cm, lubid, "B1", res.Ctermname);
+                                InsertGapNote(cm, "lubid", lubid, "B1", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -4213,7 +4215,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                             if (res != null)
                             {
                                 B2 = res.Termname;
-                                InsertGapNote(cm, lubid, "B2", res.Ctermname);
+                                InsertGapNote(cm, "lubid", lubid, "B2", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -4229,7 +4231,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                             if (res != null)
                             {
                                 B3 = res.Termname;
-                                InsertGapNote(cm, lubid, "B3", res.Ctermname);
+                                InsertGapNote(cm, "lubid", lubid, "B3", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -4245,7 +4247,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                             if (res != null)
                             {
                                 B4 = res.Termname;
-                                InsertGapNote(cm, lubid, "B4", res.Ctermname);
+                                InsertGapNote(cm, "lubid", lubid, "B4", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -4260,7 +4262,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                             if (res != null)
                             {
                                 B5 = res.Termname;
-                                InsertGapNote(cm, lubid, "B5", res.Ctermname);
+                                InsertGapNote(cm, "lubid", lubid, "B5", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -4275,7 +4277,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                             if (res != null)
                             {
                                 B6 = res.Termname;
-                                InsertGapNote(cm, lubid, "B6", res.Ctermname);
+                                InsertGapNote(cm, "lubid", lubid, "B6", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -4290,7 +4292,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                             if (res != null)
                             {
                                 B7 = res.Termname;
-                                InsertGapNote(cm, lubid, "B7", res.Ctermname);
+                                InsertGapNote(cm, "lubid", lubid, "B7", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -4305,7 +4307,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                             if (res != null)
                             {
                                 B8 = res.Termname;
-                                InsertGapNote(cm, lubid, "B8", res.Ctermname);
+                                InsertGapNote(cm, "lubid", lubid, "B8", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -4320,7 +4322,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                             if (res != null)
                             {
                                 B9 = res.Termname;
-                                InsertGapNote(cm, lubid, "B9", res.Ctermname);
+                                InsertGapNote(cm, "lubid", lubid, "B9", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -4335,7 +4337,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                             if (res != null)
                             {
                                 B10 = res.Termname;
-                                InsertGapNote(cm, lubid, "B10", res.Ctermname);
+                                InsertGapNote(cm, "lubid", lubid, "B10", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -4441,6 +4443,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                 if (res != null)
                 {
                     POM = res.Termname;
+                    InsertGapNote(cm, "lustid", lustid, "POM", res.Ctermname);
                     isUpdate = true;
                 }
 
@@ -4451,6 +4454,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                 if (res != null)
                 {
                     Description = res.Termname;
+                    InsertGapNote(cm, "lustid", lustid, "Description", res.Ctermname);
                     isUpdate = true;
                 }
 
@@ -4459,7 +4463,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
                 if (isUpdate)
                 {
                     sSql = "update PDFTAG.dbo.GAP_SizeTable \n";
-                    sSql += "set  POM=@POM,Description=@Description          \n";
+                    sSql += "set  POM=@POM,Description=@Description,isEdit=1          \n";
                     sSql += "where lustid=@lustid\n";
                     cm.CommandText = sSql;
                     cm.Parameters.Clear();
@@ -4474,7 +4478,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
         }
     }
 
-    public void InsertGapNote(System.Data.SqlClient.SqlCommand cm, string lubid, string ColName, string note)
+    public void InsertGapNote(System.Data.SqlClient.SqlCommand cm, string IdName, string lubid, string ColName, string note)
     {
         if (string.IsNullOrEmpty(note))
             return;
@@ -4494,7 +4498,7 @@ insert into PDFTAG.dbo.GAP_SizeTable
 
         cm.CommandText = sSql;
         cm.Parameters.Clear();
-        cm.Parameters.AddWithValue("@IdName", "lubid");
+        cm.Parameters.AddWithValue("@IdName", IdName);
         cm.Parameters.AddWithValue("@id", lubid);
         cm.Parameters.AddWithValue("@ColName", ColName);
         cm.Parameters.AddWithValue("@note", note);
@@ -5774,7 +5778,7 @@ where b.pipid=@pipid;
                 if (res != null)
                 {
                     StandardPlacement = res.Termname;
-                    InsertLuLuNote(cm, lubid, "StandardPlacement", res.Ctermname);
+                    InsertUANote(cm, "lubid", lubid, "StandardPlacement", res.Ctermname);
                     isUpdate = true;
                 }
 
@@ -5793,7 +5797,7 @@ where b.pipid=@pipid;
                 if (res != null)
                 {
                     SupplierArticle = res.Termname;
-                    InsertLuLuNote(cm, lubid, "SupplierArticle", res.Ctermname);
+                    InsertUANote(cm, "lubid", lubid, "SupplierArticle", res.Ctermname);
                     isUpdate = true;
                 }
 
@@ -5803,7 +5807,7 @@ where b.pipid=@pipid;
                 if (res != null)
                 {
                     Supplier = res.Termname;
-                    InsertLuLuNote(cm, lubid, "Supplier", res.Ctermname);
+                    InsertUANote(cm, "lubid", lubid, "Supplier", res.Ctermname);
                     isUpdate = true;
                 }
 
@@ -5824,7 +5828,7 @@ where b.pipid=@pipid;
                             if (res != null)
                             {
                                 B1 = res.Termname;
-                                InsertUANote(cm, lubid, "B1", res.Ctermname);
+                                InsertUANote(cm, "lubid", lubid, "B1", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -5839,7 +5843,7 @@ where b.pipid=@pipid;
                             if (res != null)
                             {
                                 B2 = res.Termname;
-                                InsertUANote(cm, lubid, "B2", res.Ctermname);
+                                InsertUANote(cm, "lubid", lubid, "B2", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -5854,7 +5858,7 @@ where b.pipid=@pipid;
                             if (res != null)
                             {
                                 B3 = res.Termname;
-                                InsertUANote(cm, lubid, "B3", res.Ctermname);
+                                InsertUANote(cm, "lubid", lubid, "B3", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -5869,7 +5873,7 @@ where b.pipid=@pipid;
                             if (res != null)
                             {
                                 B4 = res.Termname;
-                                InsertUANote(cm, lubid, "B4", res.Ctermname);
+                                InsertUANote(cm, "lubid", lubid, "B4", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -5883,7 +5887,7 @@ where b.pipid=@pipid;
                             if (res != null)
                             {
                                 B5 = res.Termname;
-                                InsertUANote(cm, lubid, "B5", res.Ctermname);
+                                InsertUANote(cm, "lubid", lubid, "B5", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -5897,7 +5901,7 @@ where b.pipid=@pipid;
                             if (res != null)
                             {
                                 B6 = res.Termname;
-                                InsertUANote(cm, lubid, "B6", res.Ctermname);
+                                InsertUANote(cm, "lubid", lubid, "B6", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -5911,7 +5915,7 @@ where b.pipid=@pipid;
                             if (res != null)
                             {
                                 B7 = res.Termname;
-                                InsertUANote(cm, lubid, "B7", res.Ctermname);
+                                InsertUANote(cm, "lubid", lubid, "B7", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -5925,7 +5929,7 @@ where b.pipid=@pipid;
                             if (res != null)
                             {
                                 B8 = res.Termname;
-                                InsertUANote(cm, lubid, "B8", res.Ctermname);
+                                InsertUANote(cm, "lubid", lubid, "B8", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -5939,7 +5943,7 @@ where b.pipid=@pipid;
                             if (res != null)
                             {
                                 B9 = res.Termname;
-                                InsertUANote(cm, lubid, "B9", res.Ctermname);
+                                InsertUANote(cm, "lubid", lubid, "B9", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -5953,7 +5957,7 @@ where b.pipid=@pipid;
                             if (res != null)
                             {
                                 B10 = res.Termname;
-                                InsertUANote(cm, lubid, "B10", res.Ctermname);
+                                InsertUANote(cm, "lubid", lubid, "B10", res.Ctermname);
                                 isUpdate = true;
                             }
                             break;
@@ -6060,6 +6064,7 @@ where b.pipid=@pipid;
                 if (res != null)
                 {
                     Description = res.Termname;
+                    InsertUANote(cm, "lustid", lustid, "Description", res.Ctermname);
                     isUpdate = true;
                 }
 
@@ -6078,7 +6083,7 @@ where b.pipid=@pipid;
                 if (isUpdate)
                 {
                     sSql = "update PDFTAG.dbo.UA_SizeTable \n";
-                    sSql += "set  Description=@Description,Criticality=@Criticality          \n";
+                    sSql += "set  Description=@Description,Criticality=@Criticality,isEdit=1          \n";
                     sSql += "where lustid=@lustid\n";
                     cm.CommandText = sSql;
                     cm.Parameters.Clear();
@@ -6096,7 +6101,7 @@ where b.pipid=@pipid;
 
     }
 
-    public void InsertUANote(System.Data.SqlClient.SqlCommand cm, string lubid, string ColName, string note)
+    public void InsertUANote(System.Data.SqlClient.SqlCommand cm, string IdName, string lubid, string ColName, string note)
     {
         if (string.IsNullOrEmpty(note))
             return;
@@ -6116,7 +6121,7 @@ where b.pipid=@pipid;
 
         cm.CommandText = sSql;
         cm.Parameters.Clear();
-        cm.Parameters.AddWithValue("@IdName", "lubid");
+        cm.Parameters.AddWithValue("@IdName", IdName);
         cm.Parameters.AddWithValue("@id", lubid);
         cm.Parameters.AddWithValue("@ColName", ColName);
         cm.Parameters.AddWithValue("@note", note);

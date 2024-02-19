@@ -211,15 +211,15 @@ select t.hdid,t.type,bc.lubid,t.tagnum,t.W1,t.W2,t.W3,t.W4,t.W5,t.W6,t.W7,t.W8,t
 
             string sTermname_org = resLu_BOM_Org.TextOrg.Trim().Replace(" ", "").ToLower();
 
-    
-            sSql = "select distinct " + learnmgrItem + " from PDFTAG.dbo.UA_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and subColName=@subColName and termname_org=@termname_org and style=@style  \n";
+
+            sSql = "select distinct " + learnmgrItem + " from PDFTAG.dbo.UA_LearnmgrItem where "+learnmgrItem+" !='null' and ColSource=@ColSource and ColName=@ColName and subColName=@subColName and termname_org=@termname_org   \n";
             var list = cn.Query(sSql, new
             {
                 ColSource = "BOM",
                 ColName = col,
                 subColName = subColName,
                 termname_org = sTermname_org,
-                style = style
+                //style = style //20240219
             }).ToList();
 
             context.Response.Write(JsonConvert.SerializeObject(list));

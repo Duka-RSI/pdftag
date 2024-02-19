@@ -83,7 +83,7 @@
                 <div class="modal-body">
                     <div style="overflow-y: scroll; height: 600px">
                         <table class="table">
-                            <tr>
+                            <tr class="rowAdd1">
                                 <td align="left">原文件
                                 </td>
                                 <td align="left">
@@ -143,7 +143,7 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr class="rowAdd1">
                                 <td align="left">更改
                                 </td>
                                 <td align="left">
@@ -154,7 +154,7 @@
                                     <textarea id="editText" class="form-control"></textarea>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr class="rowAdd1">
                                 <td align="left">中文備註
                                 </td>
                                 <td align="left">
@@ -335,9 +335,11 @@
 
                 isSaveUATagData = true;
                 getUADataTagTable(saveId);
-
+                
+                $('.rowAdd1').hide();
                 $('#div_LearnmgrItem').hide();
                 $('#div_LearnmgrNote').hide();
+
 
             } else {
 
@@ -349,6 +351,7 @@
                 $('.rowCompareSupplierArticle').hide();
                 $('#editText').prop('disabled', false);
 
+                $('.rowAdd1').show();
                 $('#div_LearnmgrItem').show();
                 $('#div_LearnmgrNote').show();
             }
@@ -478,6 +481,17 @@
 
             let termname = $("#dlLearnmgrNote").val();
             $('#noteText').val(termname);
+        }
+
+        function dlEWLearnmgrItem_change(i) {
+
+            let termname = $("#dlEWLearnmgrItem_"+i).val();
+            $('#EW'+i).val(termname);
+        }
+        function dlEWLearnmgrNote_change(i) {
+
+            let termname = $("#dlEWLearnmgrNote_" + i).val();
+            $('#EW'+i+'_noteText').val(termname);
         }
 
         function set_dlEWLearnmgrItem(type, orgId, saveCol, subColName, EWType) {
@@ -676,15 +690,15 @@
                             html += "<td style='width:20%'><div><span id='span_W" + i + "' class='span_w'>" + res["W" + i] + "</span></div></td>";
                             html += "<td style='width:30%'>";
                             html += "  學習選取:<select class='form-control' id='dlEWLearnmgrItem_"+i+"' onchange='dlEWLearnmgrItem_change(" + i +")'></select><br>";
-                            html += "  <input type='text' id='EW" + i + "' value='' style='width:100%'>";
+                            html += "  <textarea  id='EW" + i + "' value='' style='width:100%'></textarea>";
 
                             if ((!isFabric && i == 1) || (isFabric && i == 4)) {
                                 html += "<input type='button' value='挑選' onclick='showSelectMatNo(" + i + "); return false;' />";
                             }
                             html += "</td>";
                             html += "<td style='width:30%'>";
-                            html += "  學習選取:<select class='form-control' id='dlEWLearnmgrNote_" + i +"' onchange='dlEWLearnmgrNote(" + i + ")'></select><br>";
-                            html += "  <textarea id='EW" + i + "_noteText' class='form-control'>" + res["EW" + i +"_note"] +"</textarea>";
+                            html += "  學習選取:<select class='form-control' id='dlEWLearnmgrNote_" + i +"' onchange='dlEWLearnmgrNote_change(" + i + ")'></select><br>";
+                            html += "  <textarea id='EW" + i + "_noteText' class='form-control'>" + (res["EW" + i + "_note"]=='null'?"": res["EW" + i + "_note"]) +"</textarea>";
 
                             html += "</td>";
                             html += "</tr>";

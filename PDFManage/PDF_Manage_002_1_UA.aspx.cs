@@ -407,6 +407,10 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                                         {
                                             da.Fill(dtSAM_MAT_DEF);
                                         }
+
+                                        //20240219
+                                        supplierArticle = Compare(org_supplierArticle2, supplierArticle2, FilterNote(arrNotes, lubid, "supplierArticle"));
+
                                         if (dtSAM_MAT_DEF.Rows.Count > 0)
                                         {
                                             //supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"));
@@ -414,7 +418,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                                                 supplierArticle = supplierArticle + "<br><font color='red' data-id='1'>修:" + dtSAM_MAT_DEF.Rows[0]["MAT_NO"].ToString() + "</font>";
                                         }
                                         else
-                                            supplierArticle = supplierArticle + "<br><font color='red' data-id='1'>修:無對應</font>";
+                                            supplierArticle = supplierArticle + "<br><font color='red' data-id='1'>MAT_NO:無對應</font>";
                                     }
                                     else
                                     {
@@ -1107,7 +1111,7 @@ values
                     if (res != null)
                     {
                         StandardPlacement = res.Termname;
-                        InsertUANote(cm, lubid, "StandardPlacement", res.Ctermname);
+                        InsertUANote(cm, "lubid", lubid, "StandardPlacement", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -1126,7 +1130,7 @@ values
                     if (res != null)
                     {
                         SupplierArticle = res.Termname;
-                        InsertUANote(cm, lubid, "SupplierArticle", res.Ctermname);
+                        InsertUANote(cm, "lubid", lubid, "SupplierArticle", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -1136,7 +1140,7 @@ values
                     if (res != null)
                     {
                         Supplier = res.Termname;
-                        InsertUANote(cm, lubid, "Supplier", res.Ctermname);
+                        InsertUANote(cm, "lubid", lubid, "Supplier", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -1155,7 +1159,7 @@ values
                                 if (res != null)
                                 {
                                     B1 = res.Termname;
-                                    InsertUANote(cm, lubid, "B1", res.Ctermname);
+                                    InsertUANote(cm, "lubid", lubid, "B1", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1170,7 +1174,7 @@ values
                                 if (res != null)
                                 {
                                     B2 = res.Termname;
-                                    InsertUANote(cm, lubid, "B2", res.Ctermname);
+                                    InsertUANote(cm, "lubid", lubid, "B2", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1185,7 +1189,7 @@ values
                                 if (res != null)
                                 {
                                     B3 = res.Termname;
-                                    InsertUANote(cm, lubid, "B3", res.Ctermname);
+                                    InsertUANote(cm, "lubid", lubid, "B3", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1200,7 +1204,7 @@ values
                                 if (res != null)
                                 {
                                     B4 = res.Termname;
-                                    InsertUANote(cm, lubid, "B4", res.Ctermname);
+                                    InsertUANote(cm, "lubid", lubid, "B4", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1214,7 +1218,7 @@ values
                                 if (res != null)
                                 {
                                     B5 = res.Termname;
-                                    InsertUANote(cm, lubid, "B5", res.Ctermname);
+                                    InsertUANote(cm, "lubid", lubid, "B5", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1228,7 +1232,7 @@ values
                                 if (res != null)
                                 {
                                     B6 = res.Termname;
-                                    InsertUANote(cm, lubid, "B6", res.Ctermname);
+                                    InsertUANote(cm, "lubid", lubid, "B6", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1242,7 +1246,7 @@ values
                                 if (res != null)
                                 {
                                     B7 = res.Termname;
-                                    InsertUANote(cm, lubid, "B7", res.Ctermname);
+                                    InsertUANote(cm, "lubid", lubid, "B7", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1256,7 +1260,7 @@ values
                                 if (res != null)
                                 {
                                     B8 = res.Termname;
-                                    InsertUANote(cm, lubid, "B8", res.Ctermname);
+                                    InsertUANote(cm, "lubid", lubid, "B8", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1270,7 +1274,7 @@ values
                                 if (res != null)
                                 {
                                     B9 = res.Termname;
-                                    InsertUANote(cm, lubid, "B9", res.Ctermname);
+                                    InsertUANote(cm, "lubid", lubid, "B9", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1284,7 +1288,7 @@ values
                                 if (res != null)
                                 {
                                     B10 = res.Termname;
-                                    InsertUANote(cm, lubid, "B10", res.Ctermname);
+                                    InsertUANote(cm, "lubid", lubid, "B10", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1390,6 +1394,7 @@ values
                     if (res != null)
                     {
                         Description = res.Termname;
+                        InsertUANote(cm, "lustid", lustid, "Description", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -1432,7 +1437,7 @@ values
 
         DataBind();
     }
-    public void InsertUANote(System.Data.SqlClient.SqlCommand cm, string lubid, string ColName, string note)
+    public void InsertUANote(System.Data.SqlClient.SqlCommand cm, string IdName, string lubid, string ColName, string note)
     {
         if (string.IsNullOrEmpty(note))
             return;
@@ -1452,7 +1457,7 @@ values
 
         cm.CommandText = sSql;
         cm.Parameters.Clear();
-        cm.Parameters.AddWithValue("@IdName", "lubid");
+        cm.Parameters.AddWithValue("@IdName", IdName);
         cm.Parameters.AddWithValue("@id", lubid);
         cm.Parameters.AddWithValue("@ColName", ColName);
         cm.Parameters.AddWithValue("@note", note);

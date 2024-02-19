@@ -936,7 +936,7 @@ values
                     if (res != null)
                     {
                         StandardPlacement = res.Termname;
-                        InsertGapNote(cm, lubid, "StandardPlacement", res.Ctermname);
+                        InsertGapNote(cm, "lubid", lubid, "StandardPlacement", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -946,7 +946,7 @@ values
                     if (res != null)
                     {
                         Usage = res.Termname;
-                        InsertGapNote(cm, lubid, "Usage", res.Ctermname);
+                        InsertGapNote(cm, "lubid", lubid, "Usage", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -956,7 +956,7 @@ values
                     if (res != null)
                     {
                         SupplierArticle = res.Termname;
-                        InsertGapNote(cm, lubid, "SupplierArticle", res.Ctermname);
+                        InsertGapNote(cm, "lubid", lubid, "SupplierArticle", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -966,7 +966,7 @@ values
                     if (res != null)
                     {
                         Supplier = res.Termname;
-                        InsertGapNote(cm, lubid, "Supplier", res.Ctermname);
+                        InsertGapNote(cm, "lubid", lubid, "Supplier", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -988,7 +988,7 @@ values
                                 {
                                     B1 = res.Termname;
                                     //Response.Write("<!--btnLearn_Click: lubid=" + lubid + "  " + res.Ctermname + "-->");
-                                    InsertGapNote(cm, lubid, "B1", res.Ctermname);
+                                    InsertGapNote(cm, "lubid", lubid, "B1", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 //if (lubid == "2359")
@@ -1015,7 +1015,7 @@ values
                                 if (res != null)
                                 {
                                     B2 = res.Termname;
-                                    InsertGapNote(cm, lubid, "B2", res.Ctermname);
+                                    InsertGapNote(cm, "lubid", lubid, "B2", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1031,7 +1031,7 @@ values
                                 if (res != null)
                                 {
                                     B3 = res.Termname;
-                                    InsertGapNote(cm, lubid, "B3", res.Ctermname);
+                                    InsertGapNote(cm, "lubid", lubid, "B3", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1047,7 +1047,7 @@ values
                                 if (res != null)
                                 {
                                     B4 = res.Termname;
-                                    InsertGapNote(cm, lubid, "B4", res.Ctermname);
+                                    InsertGapNote(cm, "lubid", lubid, "B4", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1062,7 +1062,7 @@ values
                                 if (res != null)
                                 {
                                     B5 = res.Termname;
-                                    InsertGapNote(cm, lubid, "B5", res.Ctermname);
+                                    InsertGapNote(cm, "lubid", lubid, "B5", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1077,7 +1077,7 @@ values
                                 if (res != null)
                                 {
                                     B6 = res.Termname;
-                                    InsertGapNote(cm, lubid, "B6", res.Ctermname);
+                                    InsertGapNote(cm, "lubid", lubid, "B6", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1092,7 +1092,7 @@ values
                                 if (res != null)
                                 {
                                     B7 = res.Termname;
-                                    InsertGapNote(cm, lubid, "B7", res.Ctermname);
+                                    InsertGapNote(cm, "lubid", lubid, "B7", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1107,7 +1107,7 @@ values
                                 if (res != null)
                                 {
                                     B8 = res.Termname;
-                                    InsertGapNote(cm, lubid, "B8", res.Ctermname);
+                                    InsertGapNote(cm, "lubid", lubid, "B8", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1122,7 +1122,7 @@ values
                                 if (res != null)
                                 {
                                     B9 = res.Termname;
-                                    InsertGapNote(cm, lubid, "B9", res.Ctermname);
+                                    InsertGapNote(cm, "lubid", lubid, "B9", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1137,7 +1137,7 @@ values
                                 if (res != null)
                                 {
                                     B10 = res.Termname;
-                                    InsertGapNote(cm, lubid, "B10", res.Ctermname);
+                                    InsertGapNote(cm, "lubid", lubid, "B10", res.Ctermname);
                                     isUpdate = true;
                                 }
                                 break;
@@ -1242,6 +1242,7 @@ values
                     if (res != null)
                     {
                         POM = res.Termname;
+                        InsertGapNote(cm, "lustid", lustid, "POM", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -1252,6 +1253,7 @@ values
                     if (res != null)
                     {
                         Description = res.Termname;
+                        InsertGapNote(cm, "lustid", lustid, "Description", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -1260,7 +1262,7 @@ values
                     if (isUpdate)
                     {
                         sSql = "update PDFTAG.dbo.GAP_SizeTable \n";
-                        sSql += "set  POM=@POM,Description=@Description          \n";
+                        sSql += "set  POM=@POM,Description=@Description,isEdit=1          \n";
                         sSql += "where lustid=@lustid\n";
                         cm.CommandText = sSql;
                         cm.Parameters.Clear();
@@ -1284,7 +1286,7 @@ values
 
         DataBind();
     }
-    public void InsertGapNote(System.Data.SqlClient.SqlCommand cm, string lubid, string ColName, string note)
+    public void InsertGapNote(System.Data.SqlClient.SqlCommand cm, string IdName, string lubid, string ColName, string note)
     {
         if (string.IsNullOrEmpty(note))
             return;
@@ -1304,7 +1306,7 @@ values
         
         cm.CommandText = sSql;
         cm.Parameters.Clear();
-        cm.Parameters.AddWithValue("@IdName", "lubid");
+        cm.Parameters.AddWithValue("@IdName", IdName);
         cm.Parameters.AddWithValue("@id", lubid);
         cm.Parameters.AddWithValue("@ColName", ColName);
         cm.Parameters.AddWithValue("@note", note);

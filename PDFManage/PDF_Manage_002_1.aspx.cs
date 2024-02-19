@@ -326,6 +326,8 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
 
                                 if (drOrgBom["supplierArticle"].ToString() == supplierArticle)
                                 {
+                                    string sMAT_NO = supplierArticle;
+
                                     sSql = @"select distinct MAT_NO,MAT_NAME from [RD_SAMPLE].[dbo].[SAM_MAT_DEF] where UPPER(MAT_NO)='" + supplierArticle + "'";
 
                                     cm.CommandText = sSql;
@@ -335,10 +337,14 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                                     {
                                         da.Fill(dtSAM_MAT_DEF);
                                     }
+
+                                    //20240219
+                                    supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), sMAT_NO, FilterNote(arrNotes, lubid, "supplierArticle"));
+
                                     if (dtSAM_MAT_DEF.Rows.Count > 0) { }
                                     //supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"));
                                     else
-                                        supplierArticle = supplierArticle + "<br><font color='red'>修:無對應</font>";
+                                        supplierArticle = supplierArticle + "<br><font color='red'>MAT_NO:無對應</font>";
                                 }
                                 else
                                     supplierArticle = Compare(drOrgBom["supplierArticle"].ToString(), supplierArticle, FilterNote(arrNotes, lubid, "supplierArticle"));
@@ -621,7 +627,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
     public string Compare(string org, string newText, string note, bool IsMapping = true)
     {
         if (org == newText)
-            if(string.IsNullOrEmpty(note))
+            if (string.IsNullOrEmpty(note))
                 return org;
             else
                 return "<font>原:" + org + "</font><br><font color='blue'>中:" + note + "</font>";
@@ -807,7 +813,7 @@ values
 
             List<Lu_LearnmgrItemDto> arrLu_LearnmgrItemDto = new List<Lu_LearnmgrItemDto>();
 
-            
+
             using (System.Data.SqlClient.SqlCommand cm = new System.Data.SqlClient.SqlCommand(sSql, sql.getDbcn()))
             {
                 sSql = "select * \n";
@@ -888,7 +894,7 @@ values
                     if (res != null)
                     {
                         StandardPlacement = res.Termname;
-                        InsertLuLuNote(cm, lubid, "StandardPlacement", res.Ctermname);
+                        InsertLuLuNote(cm, "lubid", lubid, "StandardPlacement", res.Ctermname);
                         //isUpdate = true;
                     }
 
@@ -898,7 +904,7 @@ values
                     if (res != null)
                     {
                         Placement = res.Termname;
-                        InsertLuLuNote(cm, lubid, "Placement", res.Ctermname);
+                        InsertLuLuNote(cm, "lubid", lubid, "Placement", res.Ctermname);
                         //isUpdate = true;
                     }
 
@@ -908,7 +914,7 @@ values
                     if (res != null)
                     {
                         SupplierArticle = res.Termname;
-                        InsertLuLuNote(cm, lubid, "SupplierArticle", res.Ctermname);
+                        InsertLuLuNote(cm, "lubid", lubid, "SupplierArticle", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -918,7 +924,7 @@ values
                     if (res != null)
                     {
                         Supplier = res.Termname;
-                        InsertLuLuNote(cm, lubid, "Supplier", res.Ctermname);
+                        InsertLuLuNote(cm, "lubid", lubid, "Supplier", res.Ctermname);
                         //isUpdate = true;
                     }
 
@@ -955,7 +961,7 @@ values
                                 {
 
                                     B1 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B1", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B1", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -972,7 +978,7 @@ values
                                 if (res != null)
                                 {
                                     B2 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B2", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B2", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -989,7 +995,7 @@ values
                                 if (res != null)
                                 {
                                     B3 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B3", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B3", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1006,7 +1012,7 @@ values
                                 if (res != null)
                                 {
                                     B4 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B4", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B4", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1022,7 +1028,7 @@ values
                                 if (res != null)
                                 {
                                     B5 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B5", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B5", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1038,7 +1044,7 @@ values
                                 if (res != null)
                                 {
                                     B6 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B6", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B6", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1054,7 +1060,7 @@ values
                                 if (res != null)
                                 {
                                     B7 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B7", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B7", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1070,7 +1076,7 @@ values
                                 if (res != null)
                                 {
                                     B8 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B8", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B8", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1086,7 +1092,7 @@ values
                                 if (res != null)
                                 {
                                     B9 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B9", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B9", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1102,7 +1108,7 @@ values
                                 if (res != null)
                                 {
                                     B10 = res.Termname;
-                                    InsertLuLuNote(cm, lubid, "B10", res.Ctermname);
+                                    InsertLuLuNote(cm, "lubid", lubid, "B10", res.Ctermname);
                                     isUpdate = true;
                                     isUpdateColor = true;
                                 }
@@ -1119,7 +1125,7 @@ values
                         bool isEdit = false;
 
                         //if (isUpdateColor)
-                            isEdit = true;
+                        isEdit = true;
 
                         sSql = "update PDFTAG.dbo.Lu_BOM \n";
                         sSql += "set  StandardPlacement=@StandardPlacement,Placement=@Placement,SupplierArticle=@SupplierArticle,Supplier=@Supplier           \n";
@@ -1144,7 +1150,7 @@ values
                         cm.Parameters.AddWithValue("@B10", B10);
                         cm.Parameters.AddWithValue("@isEdit", isEdit ? 1 : 0);
                         cm.ExecuteNonQuery();
-                        
+
                     }
 
                     //先不用，mark起來
@@ -1229,12 +1235,13 @@ values
                     #region 比對詞彙
 
                     var res = arrLu_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "Size" && x.ColName == "Name"
-                    && x.code== codeid
+                    && x.code == codeid
                                   && x.Termname_org == Name.Trim().Replace(" ", "").ToLower());
 
                     if (res != null)
                     {
                         Name = res.Termname;
+                        InsertLuLuNote(cm, "lustid", lustid, "Name", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -1255,6 +1262,7 @@ values
                     if (res != null)
                     {
                         HTMInstruction = res.Termname;
+                        InsertLuLuNote(cm, "lustid", lustid, "HTMInstruction", res.Ctermname);
                         isUpdate = true;
                     }
 
@@ -1263,7 +1271,7 @@ values
                     if (isUpdate)
                     {
                         sSql = "update PDFTAG.dbo.Lu_SizeTable \n";
-                        sSql += "set  Name=@Name,HTMInstruction=@HTMInstruction          \n";
+                        sSql += "set  Name=@Name,HTMInstruction=@HTMInstruction,isEdit=1          \n";
                         sSql += "where lustid=@lustid\n";
                         cm.CommandText = sSql;
                         cm.Parameters.Clear();
@@ -1323,9 +1331,9 @@ values
                 //確認是否已有備註
                 string sqlNote = "";
                 if (_colSoruce == "BOM")
-                    sqlNote = "select * from Lu_Ch_Note a where a.IdName='lubid' and a.ColName = '"+ _colName + "' and a.Id = " + _id;
+                    sqlNote = "select * from Lu_Ch_Note a where a.IdName='lubid' and a.ColName = '" + _colName + "' and a.Id = " + _id;
                 else if (_colSoruce == "Size")
-                    sqlNote = "select * from Lu_Ch_Note a where a.IdName='lustid' and a.ColName = '"+ _colName + "' and a.Id = " + _id;
+                    sqlNote = "select * from Lu_Ch_Note a where a.IdName='lustid' and a.ColName = '" + _colName + "' and a.Id = " + _id;
                 cm.CommandText = sqlNote;
                 cm.Parameters.Clear();
                 DataTable dtNote = new DataTable();
@@ -1341,9 +1349,9 @@ values
                                 (@IdName,@id,@ColName,@note,@creator,@createordate) ";
                     cm.CommandText = newNoteSql;
                     cm.Parameters.Clear();
-                    if(_colSoruce == "BOM")
+                    if (_colSoruce == "BOM")
                         cm.Parameters.AddWithValue("@IdName", "lubid");
-                    else if(_colSoruce == "Size")
+                    else if (_colSoruce == "Size")
                         cm.Parameters.AddWithValue("@IdName", "lustid");
                     cm.Parameters.AddWithValue("@id", _id);
                     cm.Parameters.AddWithValue("@ColName", _colName);
@@ -1357,7 +1365,7 @@ values
     }
 
 
-    public void InsertLuLuNote(System.Data.SqlClient.SqlCommand cm, string lubid, string ColName, string note)
+    public void InsertLuLuNote(System.Data.SqlClient.SqlCommand cm, string IdName, string lubid, string ColName, string note)
     {
         if (string.IsNullOrEmpty(note))
             return;
@@ -1377,7 +1385,7 @@ values
 
         cm.CommandText = sSql;
         cm.Parameters.Clear();
-        cm.Parameters.AddWithValue("@IdName", "lubid");
+        cm.Parameters.AddWithValue("@IdName", IdName);
         cm.Parameters.AddWithValue("@id", lubid);
         cm.Parameters.AddWithValue("@ColName", ColName);
         cm.Parameters.AddWithValue("@note", note);
