@@ -391,7 +391,7 @@ public partial class Passport_Passport_A000 : System.Web.UI.Page
                                 else
                                     org_supplierArticle2 = drOrgBom["W1"].ToString();
 
-                                if (string.IsNullOrEmpty(drBom["EW4"].ToString()))
+                                if (false && string.IsNullOrEmpty(drBom["EW4"].ToString()))
                                 {
 
                                     //if (drOrgBom["supplierArticle"].ToString() == supplierArticle)
@@ -1002,6 +1002,7 @@ values
 
                 foreach (DataRow drUA_TagData in dtUA_TagData.Rows)
                 {
+                    string lubid = drUA_TagData["lubid"].ToString();
                     string utdid = drUA_TagData["utdid"].ToString();
 
                     string sEW = "";
@@ -1027,11 +1028,20 @@ values
                                 sSql += " ,E" + SubColName + "_note=@note ";
                             sSql += " where utdid=@utdid";
 
+                            Response.Write("<!--20240221 " + sSql.Replace("@utdid", utdid) + "-->");
                             cm.CommandText = sSql;
                             cm.Parameters.Clear();
                             cm.Parameters.AddWithValue("@utdid", utdid);
                             cm.Parameters.AddWithValue("@E" + SubColName, sEW);
                             cm.Parameters.AddWithValue("@note", sEW_note);
+                            cm.ExecuteNonQuery();
+
+                            sSql = "update PDFTAG.dbo.UA_BOM \n";
+                            sSql += "set  isEdit=1           \n";
+                            sSql += "where lubid=@lubid\n";
+                            cm.CommandText = sSql;
+                            cm.Parameters.Clear();
+                            cm.Parameters.AddWithValue("@lubid", lubid);
                             cm.ExecuteNonQuery();
                         }
                     }

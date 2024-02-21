@@ -362,7 +362,7 @@ and ISNULL(Ctermname,'')=@Ctermname
                             if ((EditText == null || EditText == sTermname_org) && string.IsNullOrEmpty(EditNoteText))
                                 continue;
 
-                            sSql = @"IF NOT Exists (select * from PDFTAG.dbo.UA_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and SubColName=@SubColName and termname=@termname and termname_org=@termname_org and Ctermname=@Ctermname )
+                            sSql = @"IF NOT Exists (select * from PDFTAG.dbo.UA_LearnmgrItem where ColSource=@ColSource and ColName=@ColName and SubColName=@SubColName and termname=@termname and termname_org=@termname_org and Ctermname=@Ctermname and style=@style )
                              begin
                                   insert into PDFTAG.dbo.UA_LearnmgrItem
                                    (ColSource,ColName,FirstCharTermname_org,termname_org,termname,utdid,SubColName,Ctermname,style,creator,creatordate)

@@ -686,19 +686,28 @@
                             }
 
                             html += "<tr " + (isHideRow ? "style='display:none'" : "") + ">";
-                            html += "<td>" + arrName[i - 1] + "</td>";
-                            html += "<td style='width:20%'><div><span id='span_W" + i + "' class='span_w'>" + res["W" + i] + "</span></div></td>";
+                            html += "<td style='width:10%'>" + arrName[i - 1] + "</td>";
+                            //html += "<td style='width:60px'><div style='width:100%'><span id='span_W" + i + "' class='span_w'>" + res["W" + i] + "</span></div></td>";
                             html += "<td style='width:30%'>";
+                            html += "  <textarea style='width:100%;height:200px' disabled>" + res["W" + i] +"</textarea>";
+                            html += "<span id='span_W" + i + "' class='span_w' style='display:none'>" + res["W" + i] + "</span>";
+                            html += "</td>";
+                            html += "<td style='width:40%'>";
                             html += "  學習選取:<select class='form-control' id='dlEWLearnmgrItem_"+i+"' onchange='dlEWLearnmgrItem_change(" + i +")'></select><br>";
-                            html += "  <textarea  id='EW" + i + "' value='' style='width:100%'></textarea>";
+                            html += "  <textarea  id='EW" + i + "' value='' style='width:100%;height:100px'></textarea>";
 
                             if ((!isFabric && i == 1) || (isFabric && i == 4)) {
                                 html += "<input type='button' value='挑選' onclick='showSelectMatNo(" + i + "); return false;' />";
                             }
                             html += "</td>";
-                            html += "<td style='width:30%'>";
+                            html += "<td style='width:40%'>";
                             html += "  學習選取:<select class='form-control' id='dlEWLearnmgrNote_" + i +"' onchange='dlEWLearnmgrNote_change(" + i + ")'></select><br>";
-                            html += "  <textarea id='EW" + i + "_noteText' class='form-control'>" + (res["EW" + i + "_note"]=='null'?"": res["EW" + i + "_note"]) +"</textarea>";
+
+                            let noteText = res["EW" + i + "_note"];
+                            if (!noteText)
+                                noteText = "";
+
+                            html += "  <textarea id='EW" + i + "_noteText' class='form-control'>" + noteText + "</textarea>";
 
                             html += "</td>";
                             html += "</tr>";

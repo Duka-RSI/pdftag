@@ -5668,6 +5668,7 @@ where b.pipid=@pipid;
 
             foreach (DataRow drUA_TagData in dtUA_TagData.Rows)
             {
+                string lubid = drUA_TagData["lubid"].ToString();
                 string utdid = drUA_TagData["utdid"].ToString();
 
                 string sEW = "";
@@ -5681,7 +5682,7 @@ where b.pipid=@pipid;
                     #region 比對詞彙
 
                     var res = arrUA_LearnmgrItemDto.FirstOrDefault(x => x.ColSource == "BOM" && x.ColName == "SupplierArticle" && x.SubColName == SubColName
-                 && x.Termname_org.Trim() == sW.Trim());
+                 && x.Termname_org.Trim() == sW.Trim().Replace(" ", "").ToLower());
 
                     if (res != null)
                     {
@@ -5698,6 +5699,14 @@ where b.pipid=@pipid;
                         cm.Parameters.AddWithValue("@utdid", utdid);
                         cm.Parameters.AddWithValue("@E" + SubColName, sEW);
                         cm.Parameters.AddWithValue("@note", sEW_note);
+                        cm.ExecuteNonQuery();
+
+                        sSql = "update PDFTAG.dbo.UA_BOM \n";
+                        sSql += "set  isEdit=1           \n";
+                        sSql += "where lubid=@lubid\n";
+                        cm.CommandText = sSql;
+                        cm.Parameters.Clear();
+                        cm.Parameters.AddWithValue("@lubid", lubid);
                         cm.ExecuteNonQuery();
                     }
                 }
